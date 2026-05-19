@@ -37,7 +37,6 @@ public class GameManager : MonoBehaviour
     {
         EnemiesAlive = Mathf.Max(0, EnemiesAlive - 1);
         Score += 10 + CurrentWave * 5;
-        SlotMachine.Instance?.OnEnemyKilled();
         UpdateUI();
     }
 

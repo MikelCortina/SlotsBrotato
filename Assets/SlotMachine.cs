@@ -5,22 +5,21 @@ using TMPro;
 
 public class SlotMachine : MonoBehaviour
 {
-    [Header("Timer")]
-    public float spinInterval = 10f;  // segundos entre spin
-    public float timerReduceAmount = 1f;  // segundos que quita cada kill
+    [Header("Combo Charge")]
+    public float maxCharge = 10f;
+    public float chargePerDamage = 1f;
 
     [Header("Referencias UI")]
-    public SlotReel[] reels;              // array de 3 SlotReel
+    public SlotReel[] reels;
     public TextMeshProUGUI timerText;
     public Image timerBarFill;
-    public GameObject flashOverlay;       // panel semitransparente que flashea al ganar
+    public GameObject flashOverlay;
 
     [Header("Spin Config")]
     public float reelSpinDuration = 1.2f;
-    public float reelStaggerDelay = 0.18f; // cada rueda para un poco después
+    public float reelStaggerDelay = 0.18f;
 
-    // ?? Privado ??????????????????????????????????????????????????????
-    private float _timer;
+    private float _charge;
     private bool _spinning;
 
     public static SlotMachine Instance { get; private set; }
@@ -33,67 +32,64 @@ public class SlotMachine : MonoBehaviour
 
     void Start()
     {
-        _timer = spinInterval;
+        _charge = 0f;
         if (flashOverlay) flashOverlay.SetActive(false);
+        UpdateTimerUI();
     }
 
     void Update()
     {
         if (_spinning) return;
 
-        _timer -= Time.deltaTime;
-        UpdateTimerUI();
-
-        if (_timer <= 0f)
+        if (_charge >= maxCharge)
         {
-            _timer = 0f;
+            _charge = maxCharge;
             StartCoroutine(DoSpin());
         }
     }
 
-    // Llamado por GameManager cuando muere un enemigo
-    public void OnEnemyKilled()
+    public void OnEnemyDamaged(float amount)
     {
         if (_spinning) return;
-        _timer = Mathf.Max(0f, _timer - timerReduceAmount);
+
+        _charge = Mathf.Min(maxCharge, _charge + chargePerDamage);
         UpdateTimerUI();
     }
 
-    // ?? UI Timer ?????????????????????????????????????????????????????
+    public void OnPlayerHit()
+    {
+        _charge = 0f;
+        UpdateTimerUI();
+    }
 
     void UpdateTimerUI()
     {
         if (timerText)
-            timerText.text = Mathf.Ceil(_timer).ToString("0") + "s";
+            timerText.text = $"{Mathf.Ceil(_charge)}/{maxCharge}";
 
         if (timerBarFill)
-            timerBarFill.fillAmount = _timer / spinInterval;
+            timerBarFill.fillAmount = maxCharge > 0f ? _charge / maxCharge : 0f;
     }
-
-    // ?? Spin ?????????????????????????????????????????????????????????
 
     IEnumerator DoSpin()
     {
         _spinning = true;
 
-        // Lanzar las 3 ruedas con stagger
         for (int i = 0; i < reels.Length; i++)
         {
             float stopDelay = reelSpinDuration + i * reelStaggerDelay;
             reels[i].StartSpin(stopDelay);
         }
 
-        // Esperar a que paren todas
         float totalDuration = reelSpinDuration + (reels.Length - 1) * reelStaggerDelay + 0.1f;
         yield return new WaitForSeconds(totalDuration);
 
-        // Comprobar resultado
         CheckResult();
 
-        // Pausa breve antes del siguiente ciclo
         yield return new WaitForSeconds(0.6f);
 
-        _timer = spinInterval;
+        _charge = 0f;
+        UpdateTimerUI();
         _spinning = false;
     }
 

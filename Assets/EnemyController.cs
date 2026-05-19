@@ -5,6 +5,7 @@ public class EnemyController : MonoBehaviour
 {
     [Header("Stats")]
     public float speed = 2.5f;
+    public float acceleration = 8f;
     public float separationRadius = 1.2f;
     public float separationForce = 6f;
     public float arrivalRadius = 0.7f;
@@ -15,6 +16,8 @@ public class EnemyController : MonoBehaviour
     private Transform _player;
     private PlayerHealth _playerHealth;
     private float _nextDamageTime;
+    private bool _isKnockedBack;
+    private Vector2 _currentVelocity;
 
     void Awake()
     {
@@ -33,15 +36,24 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    public void SetKnockback(bool value)
+    {
+        _isKnockedBack = value;
+        if (value)
+            _currentVelocity = Vector2.zero;
+    }
+
     void FixedUpdate()
     {
+        if (_isKnockedBack) return;
         if (_player == null) return;
 
         Vector2 pos = _rb.position;
         Vector2 toPlayer = (Vector2)_player.position - pos;
         float dist = toPlayer.magnitude;
         float speedMult = dist < arrivalRadius ? dist / arrivalRadius : 1f;
-        Vector2 seekForce = toPlayer.normalized * speed * speedMult;
+
+        Vector2 desiredVelocity = toPlayer.normalized * speed * speedMult;
 
         Vector2 sepForce = Vector2.zero;
         Collider2D[] neighbors = Physics2D.OverlapCircleAll(pos, separationRadius);
@@ -56,12 +68,19 @@ public class EnemyController : MonoBehaviour
             sepForce += away.normalized * separationForce * (1f - d / separationRadius);
         }
 
-        Vector2 finalVel = seekForce + sepForce;
-        _rb.MovePosition(pos + finalVel * Time.fixedDeltaTime);
+        desiredVelocity += sepForce;
 
-        if (finalVel.sqrMagnitude > 0.01f)
+        _currentVelocity = Vector2.MoveTowards(
+            _currentVelocity,
+            desiredVelocity,
+            acceleration * Time.fixedDeltaTime
+        );
+
+        _rb.MovePosition(pos + _currentVelocity * Time.fixedDeltaTime);
+
+        if (_currentVelocity.sqrMagnitude > 0.01f)
         {
-            float angle = Mathf.Atan2(finalVel.y, finalVel.x) * Mathf.Rad2Deg;
+            float angle = Mathf.Atan2(_currentVelocity.y, _currentVelocity.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0, 0, angle);
         }
     }

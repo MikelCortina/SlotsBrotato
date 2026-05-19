@@ -37,6 +37,8 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - damage);
         UpdateUI();
 
+        SlotMachine.Instance?.OnPlayerHit();
+
         if (currentHealth <= 0)
             Die();
     }

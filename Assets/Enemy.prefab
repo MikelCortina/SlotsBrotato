@@ -9,10 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7967900922330101624}
+  - component: {fileID: 8140386557186043596}
+  - component: {fileID: 1675383525046909161}
+  - component: {fileID: 2376289031831199660}
+  - component: {fileID: 601241133694424984}
+  - component: {fileID: 5704340328708446050}
+  - component: {fileID: 6058993248186953044}
   - component: {fileID: 1132406168940409485}
   - component: {fileID: 4763244687152569090}
-  - component: {fileID: 6058993248186953044}
-  - component: {fileID: 5704340328708446050}
   - component: {fileID: 6354277436017179375}
   m_Layer: 0
   m_Name: Enemy
@@ -36,6 +40,93 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8140386557186043596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ba0cf810c3b614b9dd348d0fa8c6de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1675383525046909161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aa28f6c87e93cc438a63424ea0a3776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  popupPrefab: {fileID: 3129514728396672326, guid: d95a9a58c54a2c34bb82fa8856c9d76c, type: 3}
+  popupOffset: {x: 0, y: 0.4, z: 0}
+  randomHorizontalOffset: 0.2
+--- !u!114 &2376289031831199660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7376d54bfe6acc844b51ebd15b05bc2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  knockbackForce: 0.5
+  knockbackDuration: 0.04
+--- !u!114 &601241133694424984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdb3ec6afcc766946ad37806b7bbd718, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 1, b: 1, a: 0.6039216}
+  flashDuration: 0.05
+--- !u!114 &5704340328708446050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dd3ed94cc53221488757b23fdbaf684, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHp: 50
+--- !u!114 &6058993248186953044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d695157a6f5e34459eef8381a7fa2b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 2.5
+  acceleration: 8
+  separationRadius: 1.2
+  separationForce: 6
+  arrivalRadius: 0.7
+  contactDamage: 1
+  damageInterval: 0.5
 --- !u!212 &1132406168940409485
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -118,37 +209,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &6058993248186953044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6964806071213379794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d695157a6f5e34459eef8381a7fa2b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 2.5
-  separationRadius: 1.2
-  separationForce: 6
-  arrivalRadius: 0.7
-  contactDamage: 1
-  damageInterval: 0.5
---- !u!114 &5704340328708446050
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6964806071213379794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8dd3ed94cc53221488757b23fdbaf684, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHp: 50
 --- !u!58 &6354277436017179375
 CircleCollider2D:
   m_ObjectHideFlags: 0
