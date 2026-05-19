@@ -8,7 +8,9 @@ public class EnemySpawner : MonoBehaviour
     public GameObject enemyPrefab;
     public int baseEnemies = 5;
     public int enemiesIncreasePerWave = 3;
-    public float spawnInterval = 0.5f;
+    [Header("Spawn Intervalo Aleatorio")]
+    public float minSpawnInterval = 0.2f;
+    public float maxSpawnInterval = 0.8f;
     public float pauseBetweenWaves = 2f;
 
     // ?? Escalado de dificultad ???????????????????????????????????????
@@ -17,6 +19,11 @@ public class EnemySpawner : MonoBehaviour
     public float hpIncreasePerWave = 15f;
     public float baseEnemySpeed = 2f;
     public float speedIncreasePerWave = 0.3f;
+
+    [Header("Warning Spawn")]
+    public GameObject spawnWarningPrefab;
+    public float spawnWarningTime = 0.8f;
+    public float blinkInterval = 0.1f;
 
     // ?? Zona de Spawn ????????????????????????????????????????????????
     [Header("Zona de Spawn")]
@@ -82,42 +89,67 @@ public class EnemySpawner : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            SpawnEnemy(wave);
-            GameManager.Instance?.ReportEnemySpawned();
-            yield return new WaitForSeconds(spawnInterval);
+            StartCoroutine(SpawnEnemyWithWarning(wave));
+            yield return new WaitForSeconds(Random.Range(minSpawnInterval, maxSpawnInterval));
         }
 
-        // Esperar hasta que mueran todos
         yield return new WaitUntil(() => _enemiesAlive <= 0);
     }
 
     // ?? Spawn ????????????????????????????????????????????????????????
 
-    void SpawnEnemy(int wave)
+    IEnumerator SpawnEnemyWithWarning(int wave)
     {
-        if (enemyPrefab == null) return;
+        if (enemyPrefab == null) yield break;
 
         Vector2 center = GetCenter();
         Vector2 pos = areaMode == SpawnAreaMode.Donut
             ? GetDonutPosition(center)
             : GetRectPosition(center);
 
+        GameObject warning = null;
+
+        if (spawnWarningPrefab != null)
+        {
+            warning = Instantiate(spawnWarningPrefab, pos, Quaternion.identity);
+            yield return StartCoroutine(BlinkWarning(warning, spawnWarningTime, blinkInterval));
+            Destroy(warning);
+        }
+        else
+        {
+            yield return new WaitForSeconds(spawnWarningTime);
+        }
+
         var go = Instantiate(enemyPrefab, pos, Quaternion.identity);
 
         var health = go.GetComponent<EnemyHealth>();
         if (health != null)
-        {
             health.maxHp = baseEnemyHp + (wave - 1) * hpIncreasePerWave;
-        }
 
         var ctrl = go.GetComponent<EnemyController>();
         if (ctrl != null)
-        {
             ctrl.speed = baseEnemySpeed + (wave - 1) * speedIncreasePerWave;
+
+        go.GetComponent<EnemyHealth>()?.SubscribeOnDeath(OnEnemyDied);
+    }
+
+    IEnumerator BlinkWarning(GameObject warning, float duration, float interval)
+    {
+        SpriteRenderer sr = warning.GetComponent<SpriteRenderer>();
+        if (sr == null) yield break;
+
+        float elapsed = 0f;
+        bool visible = true;
+
+        while (elapsed < duration)
+        {
+            sr.enabled = visible;
+            visible = !visible;
+            yield return new WaitForSeconds(interval);
+            elapsed += interval;
         }
 
-        // Suscribir muerte para el contador
-        go.GetComponent<EnemyHealth>()?.SubscribeOnDeath(OnEnemyDied);
+        sr.enabled = true;
     }
 
     void OnEnemyDied()

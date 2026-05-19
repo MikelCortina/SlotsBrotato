@@ -1031,7 +1031,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1b698c5dff08e44385de801efb9abb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 3
 --- !u!114 &809848639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1114,8 +1114,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.1227822, y: -1.2865479, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.66, y: 0.66, z: 0.66}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1708,12 +1708,16 @@ MonoBehaviour:
   enemyPrefab: {fileID: 6964806071213379794, guid: db01582ad918cc04d98806971fc1f7f1, type: 3}
   baseEnemies: 5
   enemiesIncreasePerWave: 3
-  spawnInterval: 0.5
+  minSpawnInterval: 0.3
+  maxSpawnInterval: 0.8
   pauseBetweenWaves: 2
   baseEnemyHp: 30
   hpIncreasePerWave: 15
   baseEnemySpeed: 2
   speedIncreasePerWave: 0.3
+  spawnWarningPrefab: {fileID: 2738494950079665022, guid: d5aab33a3610ed241b22af8a21859d2b, type: 3}
+  spawnWarningTime: 1.2
+  blinkInterval: 0.1
   areaMode: 1
   innerRadius: 7
   outerRadius: 12
@@ -2861,7 +2865,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waveText: {fileID: 1612347666}
   scoreText: {fileID: 809126476}
-  gameOverMenu: {fileID: 0}
+  gameOverMenu: {fileID: 1242824830}
 --- !u!4 &1781656793
 Transform:
   m_ObjectHideFlags: 0

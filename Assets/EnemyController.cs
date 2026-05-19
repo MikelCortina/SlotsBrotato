@@ -66,12 +66,12 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        if (!collision.collider.CompareTag("Player")) return;
+        if (!collision.CompareTag("Player")) return;
 
         if (_playerHealth == null)
-            _playerHealth = collision.collider.GetComponent<PlayerHealth>();
+            _playerHealth = collision.GetComponent<PlayerHealth>();
 
         if (_playerHealth == null) return;
         if (Time.time < _nextDamageTime) return;
