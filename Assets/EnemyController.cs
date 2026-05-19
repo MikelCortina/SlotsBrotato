@@ -8,9 +8,13 @@ public class EnemyController : MonoBehaviour
     public float separationRadius = 1.2f;
     public float separationForce = 6f;
     public float arrivalRadius = 0.7f;
+    public int contactDamage = 1;
+    public float damageInterval = 0.5f;
 
     private Rigidbody2D _rb;
     private Transform _player;
+    private PlayerHealth _playerHealth;
+    private float _nextDamageTime;
 
     void Awake()
     {
@@ -21,9 +25,12 @@ public class EnemyController : MonoBehaviour
 
     void Start()
     {
-        // Cache player
         var p = GameObject.FindGameObjectWithTag("Player");
-        if (p != null) _player = p.transform;
+        if (p != null)
+        {
+            _player = p.transform;
+            _playerHealth = p.GetComponent<PlayerHealth>();
+        }
     }
 
     void FixedUpdate()
@@ -31,14 +38,11 @@ public class EnemyController : MonoBehaviour
         if (_player == null) return;
 
         Vector2 pos = _rb.position;
-
-        // 1. Seek hacia el jugador
         Vector2 toPlayer = (Vector2)_player.position - pos;
         float dist = toPlayer.magnitude;
         float speedMult = dist < arrivalRadius ? dist / arrivalRadius : 1f;
         Vector2 seekForce = toPlayer.normalized * speed * speedMult;
 
-        // 2. Separación con otros enemigos
         Vector2 sepForce = Vector2.zero;
         Collider2D[] neighbors = Physics2D.OverlapCircleAll(pos, separationRadius);
         foreach (var col in neighbors)
@@ -49,19 +53,30 @@ public class EnemyController : MonoBehaviour
             Vector2 away = pos - (Vector2)col.transform.position;
             float d = away.magnitude;
             if (d < 0.001f) d = 0.001f;
-            // Fuerza inversamente proporcional a la distancia
             sepForce += away.normalized * separationForce * (1f - d / separationRadius);
         }
 
-        // 3. Combinar fuerzas y mover
         Vector2 finalVel = seekForce + sepForce;
         _rb.MovePosition(pos + finalVel * Time.fixedDeltaTime);
 
-        // 4. Rotar hacia dirección de movimiento
         if (finalVel.sqrMagnitude > 0.01f)
         {
             float angle = Mathf.Atan2(finalVel.y, finalVel.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0, 0, angle);
         }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (!collision.collider.CompareTag("Player")) return;
+
+        if (_playerHealth == null)
+            _playerHealth = collision.collider.GetComponent<PlayerHealth>();
+
+        if (_playerHealth == null) return;
+        if (Time.time < _nextDamageTime) return;
+
+        _nextDamageTime = Time.time + damageInterval;
+        _playerHealth.TakeDamage(contactDamage);
     }
 }

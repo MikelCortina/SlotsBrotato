@@ -22,12 +22,14 @@ public class SlotReel : MonoBehaviour
 
     void Awake()
     {
-        if (symbols.Length > 0)
+        if (symbols == null || symbols.Length == 0)
         {
-            _displayIndex = Random.Range(0, symbols.Length);
-            CurrentSymbolId = _displayIndex;
-            displayImage.sprite = symbols[_displayIndex];
+            Debug.LogWarning($"[SlotReel] {gameObject.name} no tiene símbolos asignados.");
+            return;
         }
+        _displayIndex = Random.Range(0, symbols.Length);
+        CurrentSymbolId = _displayIndex;
+        displayImage.sprite = symbols[_displayIndex];
     }
 
     // Llamado por SlotMachine
@@ -39,6 +41,7 @@ public class SlotReel : MonoBehaviour
 
     IEnumerator SpinRoutine(float stopAfter)
     {
+        if (symbols == null || symbols.Length == 0) yield break; // guard
         _spinning = true;
         SetBlurVisible(true);
 
