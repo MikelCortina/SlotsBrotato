@@ -5,11 +5,15 @@ using TMPro;
 
 public class SlotReel : MonoBehaviour
 {
+
+
     [Header("Símbolos")]
+    public SlotSymbolType[] symbolTypes;
     public Sprite[] symbols;          // asigna tus sprites en orden en el Inspector
     public Image displayImage;     // la Image central que muestra el símbolo actual
     public Image topBlur;          // Image semitransparente arriba (efecto de blur/fade)
     public Image botBlur;          // Image semitransparente abajo
+    public SlotSymbolType CurrentSymbolType { get; private set; }
 
     [Header("Animación")]
     public float fastScrollInterval = 0.055f;  // segundos entre cada tick mientras gira
@@ -29,6 +33,7 @@ public class SlotReel : MonoBehaviour
         }
         _displayIndex = Random.Range(0, symbols.Length);
         CurrentSymbolId = _displayIndex;
+        CurrentSymbolType = symbolTypes[_displayIndex];
         displayImage.sprite = symbols[_displayIndex];
     }
 
@@ -74,6 +79,7 @@ public class SlotReel : MonoBehaviour
         // Forzar símbolo final
         _displayIndex = result;
         CurrentSymbolId = result;
+        CurrentSymbolType = symbolTypes[result];
         displayImage.sprite = symbols[result];
 
         SetBlurVisible(false);

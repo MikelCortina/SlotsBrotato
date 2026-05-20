@@ -5,10 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
+
     [Header("Health")]
     [SerializeField] private int maxHealth = 5;
     [SerializeField] private int currentHealth;
     [SerializeField] private float damageCooldown = 0.5f;
+    private PlayerShield _shield;
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI healthText;
@@ -25,12 +27,17 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
         if (gameOverMenu) gameOverMenu.SetActive(false);
+        _shield = GetComponent<PlayerShield>();
         UpdateUI();
     }
 
     public void TakeDamage(int damage)
     {
         if (_isDead) return;
+        if (_shield != null && _shield.TryBlockDamage())
+        {
+            return;
+        }
         if (Time.time < _lastDamageTime + damageCooldown) return;
 
         _lastDamageTime = Time.time;
