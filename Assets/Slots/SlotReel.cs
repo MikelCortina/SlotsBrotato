@@ -1,95 +1,110 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class SlotReel : MonoBehaviour
 {
-
-
     [Header("Símbolos")]
-    public SlotSymbolType[] symbolTypes;
-    public Sprite[] symbols;          // asigna tus sprites en orden en el Inspector
-    public Image displayImage;     // la Image central que muestra el símbolo actual
-    public Image topBlur;          // Image semitransparente arriba (efecto de blur/fade)
-    public Image botBlur;          // Image semitransparente abajo
-    public SlotSymbolType CurrentSymbolType { get; private set; }
+    public SlotSymbolData[] currentSymbols;
+    public Image displayImage;
+    public Image topBlur;
+    public Image botBlur;
+
+    public SlotSymbolData CurrentSymbol { get; private set; }
 
     [Header("Animación")]
-    public float fastScrollInterval = 0.055f;  // segundos entre cada tick mientras gira
-    public float slowScrollInterval = 0.12f;   // se ralentiza al frenar
-
-    public int CurrentSymbolId { get; private set; }
+    public float fastScrollInterval = 0.055f;
+    public float slowScrollInterval = 0.12f;
 
     private bool _spinning;
     private int _displayIndex;
 
     void Awake()
     {
-        if (symbols == null || symbols.Length == 0)
-        {
-            Debug.LogWarning($"[SlotReel] {gameObject.name} no tiene símbolos asignados.");
-            return;
-        }
-        _displayIndex = Random.Range(0, symbols.Length);
-        CurrentSymbolId = _displayIndex;
-        CurrentSymbolType = symbolTypes[_displayIndex];
-        displayImage.sprite = symbols[_displayIndex];
+        BuildSymbolPool();
+        SetInitialSymbol();
     }
 
-    // Llamado por SlotMachine
+    void BuildSymbolPool()
+    {
+        if (RunConfig.Instance == null) return;
+
+        currentSymbols = RunConfig.Instance.selectedSymbols.ToArray();
+    }
+
+    void SetInitialSymbol()
+    {
+        if (currentSymbols == null || currentSymbols.Length == 0)
+        {
+            Debug.LogWarning($"[SlotReel] {gameObject.name} no tiene símbolos seleccionados.");
+            return;
+        }
+
+        _displayIndex = Random.Range(0, currentSymbols.Length);
+        CurrentSymbol = currentSymbols[_displayIndex];
+
+        if (displayImage)
+            displayImage.sprite = CurrentSymbol.icon;
+    }
+
     public void StartSpin(float stopAfter)
     {
         if (_spinning) return;
+
+        BuildSymbolPool();
+
+        if (currentSymbols == null || currentSymbols.Length == 0)
+        {
+            Debug.LogWarning($"[SlotReel] {gameObject.name} no puede girar porque no hay símbolos.");
+            return;
+        }
+
         StartCoroutine(SpinRoutine(stopAfter));
     }
 
     IEnumerator SpinRoutine(float stopAfter)
     {
-        if (symbols == null || symbols.Length == 0) yield break; // guard
         _spinning = true;
         SetBlurVisible(true);
 
         float elapsed = 0f;
         float interval = fastScrollInterval;
 
-        // Decidir resultado ANTES de animar (así siempre es consistente)
-        int result = Random.Range(0, symbols.Length);
+        int result = Random.Range(0, currentSymbols.Length);
 
         while (elapsed < stopAfter)
         {
-            // Ralentizar en el tramo final
             float remaining = stopAfter - elapsed;
+
             if (remaining < 0.35f)
                 interval = Mathf.Lerp(fastScrollInterval, slowScrollInterval, 1f - remaining / 0.35f);
             else
                 interval = fastScrollInterval;
 
-            // Avanzar un símbolo
-            _displayIndex = (_displayIndex + 1) % symbols.Length;
-            displayImage.sprite = symbols[_displayIndex];
+            _displayIndex = (_displayIndex + 1) % currentSymbols.Length;
 
-            // Pequeño punch de escala
-            StartCoroutine(PunchScale(displayImage.transform));
+            if (displayImage)
+                displayImage.sprite = currentSymbols[_displayIndex].icon;
+
+            if (displayImage)
+                StartCoroutine(PunchScale(displayImage.transform));
 
             elapsed += interval;
             yield return new WaitForSeconds(interval);
         }
 
-        // Forzar símbolo final
         _displayIndex = result;
-        CurrentSymbolId = result;
-        CurrentSymbolType = symbolTypes[result];
-        displayImage.sprite = symbols[result];
+        CurrentSymbol = currentSymbols[result];
+
+        if (displayImage)
+            displayImage.sprite = CurrentSymbol.icon;
 
         SetBlurVisible(false);
         _spinning = false;
 
-        // Punch final más grande
-        StartCoroutine(PunchScale(displayImage.transform, 1.22f));
+        if (displayImage)
+            StartCoroutine(PunchScale(displayImage.transform, 1.22f));
     }
-
-    // ?? Helpers visuales ?????????????????????????????????????????????
 
     void SetBlurVisible(bool visible)
     {
@@ -110,7 +125,9 @@ public class SlotReel : MonoBehaviour
             t.localScale = Vector3.one * s;
             yield return null;
         }
+
         elapsed = 0f;
+
         while (elapsed < half)
         {
             elapsed += Time.deltaTime;
@@ -118,6 +135,7 @@ public class SlotReel : MonoBehaviour
             t.localScale = Vector3.one * s;
             yield return null;
         }
+
         t.localScale = Vector3.one;
     }
 }

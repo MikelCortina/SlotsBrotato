@@ -95,7 +95,7 @@ public class SlotMachine : MonoBehaviour
 
     void CheckResult()
     {
-        if (reels.Length == 0) return;
+        if (reels == null || reels.Length == 0) return;
 
         int shieldCount = 0;
         int staticCount = 0;
@@ -103,7 +103,10 @@ public class SlotMachine : MonoBehaviour
 
         for (int i = 0; i < reels.Length; i++)
         {
-            switch (reels[i].CurrentSymbolType)
+            if (reels[i] == null) continue;
+            if (reels[i].CurrentSymbol == null) continue;
+
+            switch (reels[i].CurrentSymbol.symbolType)
             {
                 case SlotSymbolType.Shield:
                     shieldCount++;
