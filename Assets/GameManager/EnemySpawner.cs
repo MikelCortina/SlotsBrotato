@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+
+    [Header("Tienda")]
+    public GameObject shopPanel;
+
     // ?? Oleadas ??????????????????????????????????????????????????????
     [Header("Configuración de Oleadas")]
     public GameObject enemyPrefab;
@@ -72,12 +76,37 @@ public class EnemySpawner : MonoBehaviour
 
     IEnumerator WaveLoop()
     {
+        if (shopPanel)
+            shopPanel.SetActive(false);
+
         while (true)
         {
             yield return StartCoroutine(RunWave(_currentWave));
-            yield return new WaitForSeconds(pauseBetweenWaves);
+
+            OpenShop();
+
+            yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+
+            CloseShop();
+
             _currentWave++;
         }
+    }
+
+    void OpenShop()
+    {
+        if (shopPanel)
+            shopPanel.SetActive(true);
+
+        Time.timeScale = 0f;
+    }
+
+    void CloseShop()
+    {
+        if (shopPanel)
+            shopPanel.SetActive(false);
+
+        Time.timeScale = 1f;
     }
 
     IEnumerator RunWave(int wave)

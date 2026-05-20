@@ -2039,6 +2039,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84df676f38b2ffc419c6eed6c66fbd35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shopPanel: {fileID: 1285479937}
   enemyPrefab: {fileID: 6964806071213379794, guid: db01582ad918cc04d98806971fc1f7f1, type: 3}
   baseEnemies: 5
   enemiesIncreasePerWave: 3
@@ -2230,7 +2231,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1285479938
 RectTransform:
   m_ObjectHideFlags: 0
