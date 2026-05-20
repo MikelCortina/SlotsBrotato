@@ -24,10 +24,25 @@ public class SlotMachine : MonoBehaviour
 
     public static SlotMachine Instance { get; private set; }
 
+    private Transform playerTransform;
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
+
+        if (playerTransform == null)
+        {
+            GameObject playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null)
+            {
+                playerTransform = playerObj.transform;
+            }
+            else
+            {
+                Debug.LogError("No se encontr? ning?n GameObject con tag 'Player'");
+            }
+        }
     }
 
     void Start()
@@ -152,20 +167,22 @@ public class SlotMachine : MonoBehaviour
             PlayerWallet.Instance.AddCoins(coinAmount);
     }
 
+
     void ApplyStatik(int amount)
     {
         int chains = amount == 3 ? 10 : amount * 3;
 
-        if (ChainLightning.Instance != null)
+        if (ChainLightning.Instance != null && playerTransform != null)
         {
             ChainLightning.Instance.Trigger(
-                transform.position,
+                playerTransform,    // ? Ahora siempre sale desde el jugador
                 chains,
-                5f,
+                1000f,
                 20f
             );
         }
     }
+
 
 
 
