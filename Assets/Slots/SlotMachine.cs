@@ -95,16 +95,58 @@ public class SlotMachine : MonoBehaviour
 
     void CheckResult()
     {
-        if (reels.Length < 2) return;
+        if (reels.Length == 0) return;
 
-        bool allMatch = true;
-        int firstId = reels[0].CurrentSymbolId;
-        for (int i = 1; i < reels.Length; i++)
+        int shieldCount = 0;
+        int staticCount = 0;
+        int coinCount = 0;
+
+        for (int i = 0; i < reels.Length; i++)
         {
-            if (reels[i].CurrentSymbolId != firstId) { allMatch = false; break; }
+            switch (reels[i].CurrentSymbolType)
+            {
+                case SlotSymbolType.Shield:
+                    shieldCount++;
+                    break;
+
+                case SlotSymbolType.Static:
+                    staticCount++;
+                    break;
+
+                case SlotSymbolType.Coin:
+                    coinCount++;
+                    break;
+            }
         }
 
-        if (allMatch) StartCoroutine(WinFlash());
+        if (shieldCount > 0)
+            ApplyShield(shieldCount);
+
+        if (coinCount > 0)
+            ApplyCoins(coinCount);
+
+        if (staticCount > 0)
+            Debug.Log("Statik todavía no implementado");
+
+        if (shieldCount == 3 || coinCount == 3 || staticCount == 3)
+            StartCoroutine(WinFlash());
+    }
+
+    void ApplyShield(int amount)
+    {
+        int shieldAmount = amount == 3 ? 10 : amount;
+
+        PlayerShield playerShield = FindObjectOfType<PlayerShield>();
+        if (playerShield != null)
+            playerShield.AddShield(shieldAmount);
+    }
+
+    void ApplyCoins(int amount)
+    {
+        int coinAmount = amount == 3 ? 10 : amount;
+
+        if (PlayerWallet.Instance != null)
+            PlayerWallet.Instance.AddCoins(coinAmount);
     }
 
     IEnumerator WinFlash()
