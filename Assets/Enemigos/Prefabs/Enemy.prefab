@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7967900922330101624}
+  - component: {fileID: 309524094935071854}
   - component: {fileID: 8140386557186043596}
   - component: {fileID: 1675383525046909161}
   - component: {fileID: 2376289031831199660}
@@ -40,6 +41,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &309524094935071854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d783c5a8ad16e4146a83e06ffdf3eefe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coinPrefab: {fileID: 3576412726108514001, guid: 2b78c77736421ac408539b3eacbba79c, type: 3}
+  minCoins: 1
+  maxCoins: 1
+  dropRadius: 0.35
 --- !u!114 &8140386557186043596
 MonoBehaviour:
   m_ObjectHideFlags: 0
