@@ -2086,10 +2086,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 897558871f66115449cff1247f076d54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  symbolTypes: 000000000100000002000000
+  symbolTypes: 01000000
   symbols:
-  - {fileID: -3239681624356725467, guid: d0275f8a1c63447419a036056e17145b, type: 3}
-  - {fileID: 5149459247027304299, guid: 3c795a45565e82546a71d9943ad45e66, type: 3}
   - {fileID: -3435608628000792942, guid: d776d5080a2adf044b7f3d885900fbd5, type: 3}
   displayImage: {fileID: 373162773}
   topBlur: {fileID: 2135411707}
@@ -2151,7 +2149,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1008328077
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2740,7 +2738,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shopPanel: {fileID: 1285479937}
   enemyPrefab: {fileID: 6964806071213379794, guid: db01582ad918cc04d98806971fc1f7f1, type: 3}
-  baseEnemies: 5
+  baseEnemies: 20
   enemiesIncreasePerWave: 3
   minSpawnInterval: 0.3
   maxSpawnInterval: 0.8
@@ -2943,6 +2941,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lightningPrefab: {fileID: 7877978178304766050, guid: b02801a91f47b5347ac6f7cf20e4b56f, type: 3}
+  jumpDelay: 0.05
 --- !u!4 &1252829477
 Transform:
   m_ObjectHideFlags: 0
@@ -2951,8 +2950,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1252829475}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1139.8948, y: 488.34076, z: 4.4439874}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3777,10 +3776,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 897558871f66115449cff1247f076d54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  symbolTypes: 000000000100000002000000
+  symbolTypes: 01000000
   symbols:
-  - {fileID: -3239681624356725467, guid: d0275f8a1c63447419a036056e17145b, type: 3}
-  - {fileID: 5149459247027304299, guid: 3c795a45565e82546a71d9943ad45e66, type: 3}
   - {fileID: -3435608628000792942, guid: d776d5080a2adf044b7f3d885900fbd5, type: 3}
   displayImage: {fileID: 451837911}
   topBlur: {fileID: 2095956002}
@@ -3878,10 +3875,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 897558871f66115449cff1247f076d54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  symbolTypes: 000000000100000002000000
+  symbolTypes: 01000000
   symbols:
-  - {fileID: -3239681624356725467, guid: d0275f8a1c63447419a036056e17145b, type: 3}
-  - {fileID: 5149459247027304299, guid: 3c795a45565e82546a71d9943ad45e66, type: 3}
   - {fileID: -3435608628000792942, guid: d776d5080a2adf044b7f3d885900fbd5, type: 3}
   displayImage: {fileID: 1109251892}
   topBlur: {fileID: 1032405936}
@@ -5933,5 +5928,5 @@ SceneRoots:
   - {fileID: 1573430228}
   - {fileID: 1456000080}
   - {fileID: 1205018490}
-  - {fileID: 1252829477}
   - {fileID: 209767691}
+  - {fileID: 1252829477}
