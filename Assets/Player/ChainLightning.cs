@@ -4,6 +4,8 @@ using UnityEngine;
 public class ChainLightning : MonoBehaviour
 {
     public static ChainLightning Instance;
+    [Header("Visual")]
+    public LightningEffect lightningPrefab;
 
     void Awake()
     {
@@ -26,16 +28,22 @@ public class ChainLightning : MonoBehaviour
             if (current == null)
                 break;
 
-            current.TakeDamage(damage, origin, DamageSource.Trap);
+            Vector2 startPos = origin;
+            Vector2 endPos = current.transform.position;
+
+            if (lightningPrefab != null)
+            {
+                LightningEffect fx = Instantiate(lightningPrefab, Vector3.zero, Quaternion.identity);
+                fx.Setup(startPos, endPos);
+            }
 
             hitEnemies.Add(current);
 
-            current = FindClosestEnemy(
-                current.transform.position,
-                enemies,
-                hitEnemies,
-                radius
-            );
+            current.TakeDamage(damage, startPos, DamageSource.Trap);
+
+            origin = endPos;
+
+            current = FindClosestEnemy(origin, enemies, hitEnemies, radius);
         }
     }
 
