@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class RunConfig : MonoBehaviour
 {
+    public WeaponData selectedWeapon;
     public static RunConfig Instance { get; private set; }
 
     public List<SlotSymbolData> selectedSymbols = new List<SlotSymbolData>();
@@ -35,5 +36,15 @@ public class RunConfig : MonoBehaviour
     public bool HasAtLeastOneSymbol()
     {
         return selectedSymbols.Count > 0;
+    }
+
+    public void SelectWeapon(WeaponData weapon)
+    {
+        selectedWeapon = weapon;
+    }
+
+    public bool HasWeapon()
+    {
+        return selectedWeapon != null;
     }
 }
