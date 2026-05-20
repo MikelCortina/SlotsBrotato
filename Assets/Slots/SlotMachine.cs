@@ -126,7 +126,7 @@ public class SlotMachine : MonoBehaviour
             ApplyCoins(coinCount);
 
         if (staticCount > 0)
-            Debug.Log("Statik todavía no implementado");
+            ApplyStatik(staticCount);
 
         if (shieldCount == 3 || coinCount == 3 || staticCount == 3)
             StartCoroutine(WinFlash());
@@ -148,6 +148,23 @@ public class SlotMachine : MonoBehaviour
         if (PlayerWallet.Instance != null)
             PlayerWallet.Instance.AddCoins(coinAmount);
     }
+
+    void ApplyStatik(int amount)
+    {
+        int chains = amount == 3 ? 10 : amount * 3;
+
+        if (ChainLightning.Instance != null)
+        {
+            ChainLightning.Instance.Trigger(
+                transform.position,
+                chains,
+                5f,
+                20f
+            );
+        }
+    }
+
+
 
     IEnumerator WinFlash()
     {
