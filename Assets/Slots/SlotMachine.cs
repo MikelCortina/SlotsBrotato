@@ -21,13 +21,26 @@ public class SlotMachine : MonoBehaviour
 
     private float _charge;
     private bool _spinning;
-
+    private Transform playerTransform;
     public static SlotMachine Instance { get; private set; }
 
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
+
+        if (playerTransform == null)
+        {
+            GameObject playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null)
+            {
+                playerTransform = playerObj.transform;
+            }
+            else
+            {
+                Debug.LogError("No se encontró ningún GameObject con tag 'Player'");
+            }
+        }
     }
 
     void Start()
@@ -95,7 +108,7 @@ public class SlotMachine : MonoBehaviour
 
     void CheckResult()
     {
-        if (reels == null || reels.Length == 0) return;
+        if (reels.Length == 0) return;
 
         int shieldCount = 0;
         int staticCount = 0;
@@ -103,10 +116,7 @@ public class SlotMachine : MonoBehaviour
 
         for (int i = 0; i < reels.Length; i++)
         {
-            if (reels[i] == null) continue;
-            if (reels[i].CurrentSymbol == null) continue;
-
-            switch (reels[i].CurrentSymbol.symbolType)
+            switch (reels[i].CurrentSymbolType)
             {
                 case SlotSymbolType.Shield:
                     shieldCount++;
@@ -152,16 +162,17 @@ public class SlotMachine : MonoBehaviour
             PlayerWallet.Instance.AddCoins(coinAmount);
     }
 
+
     void ApplyStatik(int amount)
     {
         int chains = amount == 3 ? 10 : amount * 3;
 
-        if (ChainLightning.Instance != null)
+        if (ChainLightning.Instance != null && playerTransform != null)
         {
             ChainLightning.Instance.Trigger(
-                transform.position,
+                playerTransform,    // ? Ahora siempre sale desde el jugador
                 chains,
-                5f,
+                1000f,
                 20f
             );
         }
