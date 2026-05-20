@@ -2911,7 +2911,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shopPanel: {fileID: 1285479937}
   enemyPrefab: {fileID: 6964806071213379794, guid: db01582ad918cc04d98806971fc1f7f1, type: 3}
-  baseEnemies: 5
+  baseEnemies: 15
   enemiesIncreasePerWave: 3
   minSpawnInterval: 0.3
   maxSpawnInterval: 0.8
@@ -3114,6 +3114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lightningPrefab: {fileID: 7877978178304766050, guid: b02801a91f47b5347ac6f7cf20e4b56f, type: 3}
+  jumpDelay: 0.08
 --- !u!4 &1252829477
 Transform:
   m_ObjectHideFlags: 0
