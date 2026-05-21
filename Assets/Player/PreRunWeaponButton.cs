@@ -12,34 +12,44 @@ public class PreRunWeaponButton : MonoBehaviour
 
     private bool _selected;
 
+    void OnEnable()
+    {
+        RefreshVisual();
+    }
+
     void Start()
     {
-        if (weaponData && iconImage)
-            iconImage.sprite = weaponData.icon;
-
-        UpdateVisual();
+        RefreshVisual();
     }
 
     public void SelectWeapon()
     {
         if (weaponData == null) return;
+        if (RunConfig.Instance == null) return;
 
         RunConfig.Instance.SelectWeapon(weaponData);
 
-        PreRunWeaponButton[] all =
-            FindObjectsOfType<PreRunWeaponButton>();
+        PreRunWeaponButton[] allButtons = FindObjectsOfType<PreRunWeaponButton>();
 
-        foreach (var b in all)
+        foreach (var button in allButtons)
         {
-            b._selected = false;
-            b.UpdateVisual();
+            button._selected = false;
+            button.UpdateVisual();
         }
 
         _selected = true;
         UpdateVisual();
     }
 
-    void UpdateVisual()
+    private void RefreshVisual()
+    {
+        if (iconImage != null && weaponData != null)
+            iconImage.sprite = weaponData.icon;
+
+        UpdateVisual();
+    }
+
+    private void UpdateVisual()
     {
         if (selectedFrame)
             selectedFrame.SetActive(_selected);

@@ -30,6 +30,9 @@ public class PreRunStartButton : MonoBehaviour
             enemySpawner.enabled = true;
 
         if (playerShooter)
+        {
+            playerShooter.ApplyWeaponData(RunConfig.Instance.selectedWeapon);
             playerShooter.enabled = true;
+        }
     }
 }
