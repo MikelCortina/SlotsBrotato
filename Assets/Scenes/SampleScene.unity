@@ -1940,7 +1940,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -2318,6 +2318,8 @@ MonoBehaviour:
   timerText: {fileID: 1196354523}
   timerBarFill: {fileID: 523173959}
   flashOverlay: {fileID: 1508926457}
+  activateKey: 32
+  pendingIndicator: {fileID: 0}
   reelSpinDuration: 1.2
   reelStaggerDelay: 0.18
 --- !u!114 &955838247
@@ -5040,7 +5042,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1781656792
 MonoBehaviour:
   m_ObjectHideFlags: 0
