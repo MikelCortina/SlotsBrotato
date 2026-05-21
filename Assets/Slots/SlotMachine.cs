@@ -226,9 +226,21 @@ public class SlotMachine : MonoBehaviour
 
     void ApplyStatik(int amount)
     {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        int aliveEnemies = 0;
+        foreach (var e in enemies)
+        {
+            var eh = e.GetComponent<EnemyHealth>();
+            if (eh != null && eh.currentHealth > 0)
+                aliveEnemies++;
+        }
+
         int chains = amount >= 3 ? 10 : amount * 3;
+        chains = Mathf.Max(chains, aliveEnemies); // asegurar suficientes saltos para todos los enemigos vivos
+
         if (ChainLightning.Instance != null && _playerTransform != null)
-            ChainLightning.Instance.Trigger(_playerTransform, chains, 1000f, 20f);
+            ChainLightning.Instance.Trigger(_playerTransform, chains, float.MaxValue, 20f);
     }
 
     IEnumerator WinFlash()
