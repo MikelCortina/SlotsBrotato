@@ -1,10 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SlotReel : MonoBehaviour
 {
-    [Header("S�mbolos")]
+    [Header("Símbolos")]
     public SlotSymbolData[] currentSymbols;
     public Image displayImage;
     public Image topBlur;
@@ -12,17 +12,29 @@ public class SlotReel : MonoBehaviour
 
     public SlotSymbolData CurrentSymbol { get; private set; }
 
-    [Header("Animaci�n")]
+    [Header("Animación")]
     public float fastScrollInterval = 0.055f;
     public float slowScrollInterval = 0.12f;
 
+    [Header("Lock Visual")]
+    [Tooltip("Imagen que se muestra cuando el símbolo se activa (cubre el slot)")]
+    public Image lockImage;
+
     private bool _spinning;
     private int _displayIndex;
+    private Sprite _originalSprite;
 
     void Awake()
     {
         BuildSymbolPool();
         SetInitialSymbol();
+
+        if (displayImage != null)
+            _originalSprite = displayImage.sprite;
+
+        // Inicializar lockImage INACTIVO (se activará en Start de SlotMachine)
+        if (lockImage != null)
+            lockImage.gameObject.SetActive(false);
     }
 
     void BuildSymbolPool()
@@ -36,7 +48,7 @@ public class SlotReel : MonoBehaviour
     {
         if (currentSymbols == null || currentSymbols.Length == 0)
         {
-            Debug.LogWarning($"[SlotReel] {gameObject.name} no tiene s�mbolos seleccionados.");
+            Debug.LogWarning($"[SlotReel] {gameObject.name} no tiene símbolos seleccionados.");
             return;
         }
 
@@ -51,11 +63,14 @@ public class SlotReel : MonoBehaviour
     {
         if (_spinning) return;
 
+        // Ocultar lockImage cuando el reel empieza a girar
+        HideLock();
+
         BuildSymbolPool();
 
         if (currentSymbols == null || currentSymbols.Length == 0)
         {
-            Debug.LogWarning($"[SlotReel] {gameObject.name} no puede girar porque no hay s�mbolos.");
+            Debug.LogWarning($"[SlotReel] {gameObject.name} no puede girar porque no hay símbolos.");
             return;
         }
 
@@ -137,5 +152,34 @@ public class SlotReel : MonoBehaviour
         }
 
         t.localScale = Vector3.one;
+    }
+
+    // ── Métodos de bloqueo ────────────────────────────────────────────
+
+    /// <summary>
+    /// Muestra lockImage (forzado, sin importar estado anterior)
+    /// </summary>
+    public void ForceShowLock()
+    {
+        if (lockImage != null)
+            lockImage.gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// Muestra lockImage cubriendo el slot (cuando el símbolo se activa)
+    /// </summary>
+    public void ShowLock()
+    {
+        if (lockImage != null)
+            lockImage.gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// Oculta lockImage y vuelve a mostrar el símbolo (cuando el reel empieza a girar)
+    /// </summary>
+    public void HideLock()
+    {
+        if (lockImage != null)
+            lockImage.gameObject.SetActive(false);
     }
 }

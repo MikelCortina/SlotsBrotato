@@ -19,11 +19,15 @@ public class SlotMachine : MonoBehaviour
     [Header("Activación manual UI")]
     [Tooltip("Botón o tecla que activa los símbolos pendientes")]
     public KeyCode activateKey = KeyCode.Space;
-    public GameObject pendingIndicator; // icono/panel que avisa de que hay símbolos por activar
+    public GameObject pendingIndicator;
 
     [Header("Spin Config")]
     public float reelSpinDuration = 1.2f;
     public float reelStaggerDelay = 0.18f;
+
+    [Header("Wave Visuals")]
+    [Tooltip("Overlay que tapa los reels durante la oleada hasta que empieza a girar")]
+    public Image waveCover;
 
     // ?? Estado interno ????????????????????????????????????????????????
     float _charge;
@@ -31,13 +35,10 @@ public class SlotMachine : MonoBehaviour
     bool _hasPendingSymbols;
     bool _pendingIsJackpot;
 
-    // Guarda el resultado de la última tirada sin aplicar aún
-    readonly List<SlotSymbolData> _pendingSymbols = new();
+    readonly List<(int reelIndex, SlotSymbolData data)> _pendingSymbols = new();
 
     public static SlotMachine Instance { get; private set; }
     Transform _playerTransform;
-
-    // ?????????????????????????????????????????????????????????????????
 
     void Awake()
     {
@@ -55,21 +56,32 @@ public class SlotMachine : MonoBehaviour
     {
         _charge = 0f;
         _hasPendingSymbols = false;
+
         if (flashOverlay) flashOverlay.SetActive(false);
         if (pendingIndicator) pendingIndicator.SetActive(false);
+        if (waveCover) waveCover.gameObject.SetActive(false);
+
+        // Asegurar que todos los reels empiecen con lockImage activo (cubiertos)
+        if (reels != null)
+        {
+            foreach (var reel in reels)
+            {
+                if (reel != null)
+                    reel.ForceShowLock();
+            }
+        }
+
         UpdateChargeUI();
     }
 
     void Update()
     {
-        // Activación manual: el jugador pulsa la tecla cuando quiere usar los símbolos
         if (_hasPendingSymbols && Input.GetKeyDown(activateKey))
         {
             ActivatePendingSymbols();
             return;
         }
 
-        // La siguiente carga NO empieza mientras haya símbolos pendientes
         if (_hasPendingSymbols || _spinning) return;
 
         if (_charge >= maxCharge)
@@ -78,8 +90,6 @@ public class SlotMachine : MonoBehaviour
             StartCoroutine(DoSpin());
         }
     }
-
-    // ?? Carga ?????????????????????????????????????????????????????????
 
     public void OnEnemyDamaged(float amount)
     {
@@ -102,11 +112,11 @@ public class SlotMachine : MonoBehaviour
             timerBarFill.fillAmount = maxCharge > 0f ? _charge / maxCharge : 0f;
     }
 
-    // ?? Spin ??????????????????????????????????????????????????????????
-
     IEnumerator DoSpin()
     {
         _spinning = true;
+
+        if (waveCover) waveCover.gameObject.SetActive(true);
 
         for (int i = 0; i < reels.Length; i++)
         {
@@ -124,21 +134,20 @@ public class SlotMachine : MonoBehaviour
         _spinning = false;
     }
 
-    // ?? Recolectar resultado (sin aplicar todavía) ????????????????????
-
     void CollectResults()
     {
         _pendingSymbols.Clear();
 
-        foreach (var reel in reels)
+        for (int i = 0; i < reels.Length; i++)
         {
+            var reel = reels[i];
             if (reel == null || reel.CurrentSymbol == null) continue;
-            _pendingSymbols.Add(reel.CurrentSymbol);
+
+            _pendingSymbols.Add((i, reel.CurrentSymbol));
         }
 
         if (_pendingSymbols.Count == 0) return;
 
-        // Detectar jackpot: los 3 símbolos son del mismo tipo
         _pendingIsJackpot = IsJackpot(_pendingSymbols);
 
         _hasPendingSymbols = true;
@@ -148,42 +157,41 @@ public class SlotMachine : MonoBehaviour
             StartCoroutine(WinFlash());
     }
 
-    bool IsJackpot(List<SlotSymbolData> symbols)
+    bool IsJackpot(List<(int reelIndex, SlotSymbolData data)> symbols)
     {
         if (symbols.Count < 2) return false;
-        var first = symbols[0].symbolType;
+        var first = symbols[0].data.symbolType;
         for (int i = 1; i < symbols.Count; i++)
-            if (symbols[i].symbolType != first) return false;
+            if (symbols[i].data.symbolType != first) return false;
         return true;
     }
-
-    // ?? Activación manual ?????????????????????????????????????????????
 
     void ActivatePendingSymbols()
     {
         if (!_hasPendingSymbols || _pendingSymbols.Count == 0) return;
 
-        // Jackpot: activa los 3 de golpe en una sola pulsación
         if (_pendingIsJackpot)
         {
-            ApplyJackpot(_pendingSymbols[0].symbolType);
+            foreach (var p in _pendingSymbols)
+            {
+                ApplyByType(p.data.symbolType, 1);
+
+                if (reels != null && p.reelIndex >= 0 && p.reelIndex < reels.Length)
+                    reels[p.reelIndex].ShowLock();
+            }
             _pendingSymbols.Clear();
         }
         else
         {
-            // Normal: consume solo el primer símbolo de la lista
-            var symbol = _pendingSymbols[0];
+            var p = _pendingSymbols[0];
             _pendingSymbols.RemoveAt(0);
 
-            switch (symbol.symbolType)
-            {
-                case SlotSymbolType.Shield: ApplyShield(1); break;
-                case SlotSymbolType.Coin: ApplyCoins(1); break;
-                case SlotSymbolType.Static: ApplyStatik(1); break;
-            }
+            ApplyByType(p.data.symbolType, 1);
+
+            if (reels != null && p.reelIndex >= 0 && p.reelIndex < reels.Length)
+                reels[p.reelIndex].ShowLock();
         }
 
-        // Si ya no quedan símbolos pendientes, limpiar estado
         if (_pendingSymbols.Count == 0)
         {
             _hasPendingSymbols = false;
@@ -192,7 +200,15 @@ public class SlotMachine : MonoBehaviour
         }
     }
 
-    // ?? Aplicar efectos ???????????????????????????????????????????????
+    void ApplyByType(SlotSymbolType type, int amount)
+    {
+        switch (type)
+        {
+            case SlotSymbolType.Shield: ApplyShield(amount); break;
+            case SlotSymbolType.Coin: ApplyCoins(amount); break;
+            case SlotSymbolType.Static: ApplyStatik(amount); break;
+        }
+    }
 
     void ApplyShield(int amount)
     {
@@ -214,19 +230,6 @@ public class SlotMachine : MonoBehaviour
         if (ChainLightning.Instance != null && _playerTransform != null)
             ChainLightning.Instance.Trigger(_playerTransform, chains, 1000f, 20f);
     }
-
-    void ApplyJackpot(SlotSymbolType type)
-    {
-        // Jackpot siempre usa multiplicador máximo (como si hubieran salido 3)
-        switch (type)
-        {
-            case SlotSymbolType.Shield: ApplyShield(3); break;
-            case SlotSymbolType.Coin: ApplyCoins(3); break;
-            case SlotSymbolType.Static: ApplyStatik(3); break;
-        }
-    }
-
-    // ?? Flash ?????????????????????????????????????????????????????????
 
     IEnumerator WinFlash()
     {
