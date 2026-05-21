@@ -16,6 +16,8 @@ public class EnemySpawner : MonoBehaviour
     public float hpIncreasePerWave = 15f;
     public float baseEnemySpeed = 2f;
     public float speedIncreasePerWave = 0.3f;
+    public float baseEnemyDamage = 4f;
+    public float damageIncreasePerWave = 1f;
 
     [Header("Warning Spawn")]
     public GameObject spawnWarningPrefab;
@@ -33,6 +35,10 @@ public class EnemySpawner : MonoBehaviour
     Transform _playerTransform;
     Coroutine _spawnRoutine;
     bool _running;
+
+    public float spawnBudgetPerSecond = 1.5f;
+    public float spawnBudgetIncreasePerWave = 0.25f;
+    float _spawnBudget;
 
     public enum SpawnAreaMode { Donut, Rectangle }
 
@@ -69,12 +75,20 @@ public class EnemySpawner : MonoBehaviour
                 continue;
             }
 
-            yield return new WaitForSeconds(spawnGraceTime);
+            int wave = GameManager.Instance.CurrentWave;
+            _spawnBudget = spawnBudgetPerSecond + (wave - 1) * spawnBudgetIncreasePerWave;
 
             while (_running && GameManager.Instance != null && GameManager.Instance.IsWaveRunning)
             {
-                StartCoroutine(SpawnEnemyWithWarning(GameManager.Instance.CurrentWave));
-                yield return new WaitForSeconds(Random.Range(minSpawnInterval, maxSpawnInterval));
+                _spawnBudget += Time.deltaTime;
+
+                while (_spawnBudget >= 1f)
+                {
+                    _spawnBudget -= 1f;
+                    StartCoroutine(SpawnEnemyWithWarning(wave));
+                }
+
+                yield return null;
             }
         }
     }
@@ -102,11 +116,12 @@ public class EnemySpawner : MonoBehaviour
 
         GameObject go = Instantiate(enemyPrefab, pos, Quaternion.identity);
         GameManager.Instance.RegisterEnemy(go);
-
+     
         var health = go.GetComponent<EnemyHealth>();
         if (health != null)
         {
             health.maxHp = baseEnemyHp + (wave - 1) * hpIncreasePerWave;
+            health.ResetHealth();
             health.SubscribeOnDeath(() =>
             {
                 GameManager.Instance?.OnEnemyKilled();
@@ -117,6 +132,10 @@ public class EnemySpawner : MonoBehaviour
         var ctrl = go.GetComponent<EnemyController>();
         if (ctrl != null)
             ctrl.speed = baseEnemySpeed + (wave - 1) * speedIncreasePerWave;
+
+        var dmg = go.GetComponent<EnemyDamage>();
+        if (dmg != null)
+            dmg.damage = baseEnemyDamage + (wave - 1) * damageIncreasePerWave;
     }
 
     IEnumerator BlinkWarning(GameObject warning, float duration, float interval)

@@ -25,6 +25,10 @@ public class GameManager : MonoBehaviour
     public float finalWaveDuration = 90f;
     public int finalWave = 20;
 
+    [Header("Escalado enemigos")]
+    public int baseEnemyCount = 4;
+    public int enemyCountIncreasePerWave = 2;
+
     [Header("Tienda")]
     public float shopDuration = 15f;
 
@@ -74,6 +78,7 @@ public class GameManager : MonoBehaviour
 
         UpdateUI();
     }
+
     IEnumerator GameLoop()
     {
         while (true)
@@ -166,6 +171,11 @@ public class GameManager : MonoBehaviour
         LiveEnemies.Remove(enemy);
         EnemiesAlive = Mathf.Max(0, EnemiesAlive - 1);
         UpdateUI();
+    }
+
+    public int GetEnemyCountForWave(int wave)
+    {
+        return baseEnemyCount + (wave - 1) * enemyCountIncreasePerWave;
     }
 
     public float GetWaveDuration(int wave)

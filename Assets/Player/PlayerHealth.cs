@@ -8,7 +8,7 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Health")]
     [SerializeField] private int maxHealth = 5;
-    [SerializeField] private int currentHealth;
+    [SerializeField] private float currentHealth;
     [SerializeField] private float damageCooldown = 0.5f;
     private PlayerShield _shield;
 
@@ -19,7 +19,7 @@ public class PlayerHealth : MonoBehaviour
     private float _lastDamageTime;
     private bool _isDead;
 
-    public int CurrentHealth => currentHealth;
+    public float CurrentHealth => currentHealth;
     public int MaxHealth => maxHealth;
     public bool IsDead => _isDead;
 
@@ -31,7 +31,7 @@ public class PlayerHealth : MonoBehaviour
         UpdateUI();
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         if (_isDead) return;
         if (_shield != null && _shield.TryBlockDamage())

@@ -36,9 +36,6 @@ public class PreRunStartButton : MonoBehaviour
         }
 
         if (playerShooter)
-        {
-            playerShooter.ApplyWeaponData(RunConfig.Instance.selectedWeapon);
             playerShooter.enabled = true;
-        }
     }
 }

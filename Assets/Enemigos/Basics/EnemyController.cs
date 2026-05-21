@@ -9,21 +9,22 @@ public class EnemyController : MonoBehaviour
     public float separationRadius = 1.2f;
     public float separationForce = 6f;
     public float arrivalRadius = 0.7f;
-    public int contactDamage = 1;
     public float damageInterval = 0.5f;
 
-    private Rigidbody2D _rb;
-    private Transform _player;
-    private PlayerHealth _playerHealth;
-    private float _nextDamageTime;
-    private bool _isKnockedBack;
-    private Vector2 _currentVelocity;
+    Rigidbody2D _rb;
+    Transform _player;
+    PlayerHealth _playerHealth;
+    EnemyDamage _enemyDamage;
+    float _nextDamageTime;
+    bool _isKnockedBack;
+    Vector2 _currentVelocity;
 
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _rb.gravityScale = 0f;
         _rb.freezeRotation = true;
+        _enemyDamage = GetComponent<EnemyDamage>();
     }
 
     void Start()
@@ -85,7 +86,7 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    void OnTriggerStay2D(Collider2D collision)
     {
         if (!collision.CompareTag("Player")) return;
 
@@ -95,7 +96,10 @@ public class EnemyController : MonoBehaviour
         if (_playerHealth == null) return;
         if (Time.time < _nextDamageTime) return;
 
+        float dmg = _enemyDamage != null ? _enemyDamage.damage : 1f;
+
         _nextDamageTime = Time.time + damageInterval;
-        _playerHealth.TakeDamage(contactDamage);
+        _playerHealth.TakeDamage(dmg);
+        Debug.Log($"Damage: {dmg} by {gameObject.name}");
     }
 }

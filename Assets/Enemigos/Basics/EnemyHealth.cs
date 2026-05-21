@@ -20,9 +20,14 @@ public class EnemyHealth : MonoBehaviour
 
     private float _hp;
 
-    public float currentHealth => _hp; // Propiedad pública de solo lectura
+    public float currentHealth => _hp;
 
     void Awake()
+    {
+        _hp = maxHp;
+    }
+
+    public void ResetHealth()
     {
         _hp = maxHp;
     }
