@@ -26,8 +26,14 @@ public class PreRunStartButton : MonoBehaviour
         if (gameplayUI)
             gameplayUI.SetActive(true);
 
+        if (GameManager.Instance != null)
+            GameManager.Instance.BeginRun();
+
         if (enemySpawner)
+        {
             enemySpawner.enabled = true;
+            enemySpawner.BeginSpawning();
+        }
 
         if (playerShooter)
             playerShooter.enabled = true;
