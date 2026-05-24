@@ -20,19 +20,19 @@ public class SlotReel : MonoBehaviour
     [Tooltip("Imagen que se muestra cuando el símbolo se activa (cubre el slot)")]
     public Image lockImage;
 
+    [Header("Activation Visual")]
+    public float activationPunchScale = 1.28f;
+    public float activationPunchDuration = 0.16f;
+
     private bool _spinning;
     private int _displayIndex;
-    private Sprite _originalSprite;
+    private Coroutine _scaleRoutine;
 
     void Awake()
     {
         BuildSymbolPool();
         SetInitialSymbol();
 
-        if (displayImage != null)
-            _originalSprite = displayImage.sprite;
-
-        // Inicializar lockImage INACTIVO (se activará en Start de SlotMachine)
         if (lockImage != null)
             lockImage.gameObject.SetActive(false);
     }
@@ -40,7 +40,6 @@ public class SlotReel : MonoBehaviour
     void BuildSymbolPool()
     {
         if (RunConfig.Instance == null) return;
-
         currentSymbols = RunConfig.Instance.selectedSymbols.ToArray();
     }
 
@@ -63,8 +62,8 @@ public class SlotReel : MonoBehaviour
     {
         if (_spinning) return;
 
-        // Ocultar lockImage cuando el reel empieza a girar
         HideLock();
+        ResetVisualState();
 
         BuildSymbolPool();
 
@@ -84,7 +83,6 @@ public class SlotReel : MonoBehaviour
 
         float elapsed = 0f;
         float interval = fastScrollInterval;
-
         int result = Random.Range(0, currentSymbols.Length);
 
         while (elapsed < stopAfter)
@@ -102,7 +100,7 @@ public class SlotReel : MonoBehaviour
                 displayImage.sprite = currentSymbols[_displayIndex].icon;
 
             if (displayImage)
-                StartCoroutine(PunchScale(displayImage.transform));
+                PlayScalePunch(1.08f, 0.07f);
 
             elapsed += interval;
             yield return new WaitForSeconds(interval);
@@ -118,7 +116,7 @@ public class SlotReel : MonoBehaviour
         _spinning = false;
 
         if (displayImage)
-            StartCoroutine(PunchScale(displayImage.transform, 1.22f));
+            PlayScalePunch(1.18f, 0.12f);
     }
 
     void SetBlurVisible(bool visible)
@@ -127,11 +125,28 @@ public class SlotReel : MonoBehaviour
         if (botBlur) botBlur.gameObject.SetActive(visible);
     }
 
-    IEnumerator PunchScale(Transform t, float peakScale = 1.1f)
+    public void PlayActivationPunch()
     {
-        float duration = 0.07f;
-        float half = duration / 2f;
+        if (displayImage == null) return;
+        PlayScalePunch(activationPunchScale, activationPunchDuration);
+    }
+
+    void PlayScalePunch(float peakScale, float duration)
+    {
+        if (displayImage == null) return;
+
+        if (_scaleRoutine != null)
+            StopCoroutine(_scaleRoutine);
+
+        _scaleRoutine = StartCoroutine(PunchScaleRoutine(displayImage.transform, peakScale, duration));
+    }
+
+    IEnumerator PunchScaleRoutine(Transform t, float peakScale, float duration)
+    {
+        float half = duration * 0.5f;
         float elapsed = 0f;
+
+        t.localScale = Vector3.one;
 
         while (elapsed < half)
         {
@@ -152,31 +167,33 @@ public class SlotReel : MonoBehaviour
         }
 
         t.localScale = Vector3.one;
+        _scaleRoutine = null;
     }
 
-    // ── Métodos de bloqueo ────────────────────────────────────────────
+    public void ResetVisualState()
+    {
+        if (displayImage != null)
+            displayImage.transform.localScale = Vector3.one;
 
-    /// <summary>
-    /// Muestra lockImage (forzado, sin importar estado anterior)
-    /// </summary>
+        if (_scaleRoutine != null)
+        {
+            StopCoroutine(_scaleRoutine);
+            _scaleRoutine = null;
+        }
+    }
+
     public void ForceShowLock()
     {
         if (lockImage != null)
             lockImage.gameObject.SetActive(true);
     }
 
-    /// <summary>
-    /// Muestra lockImage cubriendo el slot (cuando el símbolo se activa)
-    /// </summary>
     public void ShowLock()
     {
         if (lockImage != null)
             lockImage.gameObject.SetActive(true);
     }
 
-    /// <summary>
-    /// Oculta lockImage y vuelve a mostrar el símbolo (cuando el reel empieza a girar)
-    /// </summary>
     public void HideLock()
     {
         if (lockImage != null)
