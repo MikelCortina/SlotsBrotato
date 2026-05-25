@@ -2991,7 +2991,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fireRate: 2
   damage: 25
-  bulletSpeed: 12
+  bulletSpeed: 24
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
   bulletsPerShot: 1
 --- !u!212 &809848640
