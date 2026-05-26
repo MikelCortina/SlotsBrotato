@@ -3489,7 +3489,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxCharge: 10
   maxOverloadReserve: 5
-  chargePerDamage: 1
+  chargePerCoin: 1
   reels:
   - {fileID: 1539462052}
   - {fileID: 958888469}
@@ -3498,7 +3498,7 @@ MonoBehaviour:
   timerBarFill: {fileID: 523173959}
   overloadBarFill: {fileID: 95607369}
   flashOverlay: {fileID: 1508926457}
-  pendingIndicator: {fileID: 2738494950079665022, guid: d5aab33a3610ed241b22af8a21859d2b, type: 3}
+  pendingIndicator: {fileID: 0}
   activateKey: 32
   activationStepDelay: 0.25
   activationResolveDelay: 0.1
