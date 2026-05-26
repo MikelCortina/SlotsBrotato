@@ -9,7 +9,7 @@ public class SlotMachine : MonoBehaviour
     [Header("Charge")]
     public float maxCharge = 10f;
     public float maxOverloadReserve = 5f;
-    public float chargePerDamage = 1f;
+    public float chargePerCoin = 1f;
 
     [Header("UI")]
     public SlotReel[] reels;
@@ -110,9 +110,9 @@ public class SlotMachine : MonoBehaviour
         }
     }
 
-    public void OnEnemyDamaged(float amount)
+    public void OnCoinCollected(int amount)
     {
-        float gain = chargePerDamage;
+        float gain = amount * chargePerCoin;
         bool currentSpinAlreadyCommitted = _spinQueued || _spinning || _chargeLockedFull;
 
         if (currentSpinAlreadyCommitted)
@@ -145,7 +145,7 @@ public class SlotMachine : MonoBehaviour
         if (timerText)
         {
             if (_chargeLockedFull || _spinning || _spinQueued || _overloadReserve > 0f)
-                timerText.text = $"Main: {Mathf.Ceil(displayedMainCharge)}/{maxCharge} | Next: {Mathf.Ceil(_overloadReserve)}/{maxOverloadReserve}";
+                timerText.text = $"{Mathf.Ceil(_overloadReserve)}/{maxCharge}";
             else
                 timerText.text = $"{Mathf.Ceil(displayedMainCharge)}/{maxCharge}";
         }

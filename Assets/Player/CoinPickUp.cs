@@ -8,6 +8,9 @@ public class CoinPickup : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
+        if (SlotMachine.Instance != null)
+            SlotMachine.Instance.OnCoinCollected(value);
+
         Destroy(gameObject);
     }
 }

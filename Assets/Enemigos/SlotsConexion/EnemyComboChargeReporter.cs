@@ -24,6 +24,6 @@ public class EnemyComboChargeReporter : MonoBehaviour
 
     private void HandleDamaged(float amount, float currentHp)
     {
-        SlotMachine.Instance?.OnEnemyDamaged(amount);
+       // SlotMachine.Instance?.OnEnemyDamaged(amount);
     }
 }
