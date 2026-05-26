@@ -18,5 +18,6 @@ MonoBehaviour:
   fireRate: 0.8
   damage: 15
   bulletSpeed: 10
-  bulletsPerShot: 3
+  bulletsPerShot: 5
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
+  spreadAngle: 25

@@ -3082,6 +3082,7 @@ GameObject:
   - component: {fileID: 809848643}
   - component: {fileID: 809848644}
   - component: {fileID: 809848645}
+  - component: {fileID: 809848646}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -3128,7 +3129,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1b698c5dff08e44385de801efb9abb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
   acceleration: 18
   deceleration: 22
 --- !u!114 &809848639
@@ -3138,7 +3138,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 809848636}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e6bfa9ca309dc1a4397ed5a4903afda8, type: 3}
   m_Name: 
@@ -3147,7 +3147,8 @@ MonoBehaviour:
   damage: 25
   bulletSpeed: 18
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
-  bulletsPerShot: 1
+  bulletsPerShot: 5
+  spreadAngle: 25
 --- !u!212 &809848640
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3297,6 +3298,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68e948036bf30be48a213fd763bd7b10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &809848646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 809848636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5333a4c47bd49544a9bdcc285bbc174, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 0
+  fireRate: 0
+  critChance: 0
+  critMultiplier: 2
+  maxHealth: 5
+  damageReduction: 0
+  regeneration: 0
+  moveSpeed: 5
 --- !u!1 &848715207
 GameObject:
   m_ObjectHideFlags: 0

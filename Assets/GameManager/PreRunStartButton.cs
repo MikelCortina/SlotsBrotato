@@ -35,7 +35,15 @@ public class PreRunStartButton : MonoBehaviour
             enemySpawner.BeginSpawning();
         }
 
+        if (!RunConfig.Instance.HasWeapon())
+        {
+            Debug.Log("Debes seleccionar un arma.");
+            return;
+        }
         if (playerShooter)
+        {
+            playerShooter.ApplyWeaponData(RunConfig.Instance.selectedWeapon);
             playerShooter.enabled = true;
+        }
     }
 }

@@ -11,7 +11,16 @@ public class PlayerShooter : MonoBehaviour
     [Header("Multi-disparo")]
     public int bulletsPerShot = 1;
 
+    [Header("Shotgun")]
+    public float spreadAngle = 15f;
+
     private float _fireTimer;
+    private PlayerStats _stats;
+
+    void Awake()
+    {
+        _stats = GetComponent<PlayerStats>();
+    }
 
     public void ApplyWeaponData(WeaponData weapon)
     {
@@ -22,6 +31,7 @@ public class PlayerShooter : MonoBehaviour
         bulletSpeed = weapon.bulletSpeed;
         bulletsPerShot = weapon.bulletsPerShot;
         bulletPrefab = weapon.bulletPrefab;
+        spreadAngle = weapon.spreadAngle;
 
         Debug.Log($"Arma equipada: {weapon.weaponName}");
     }
@@ -33,7 +43,12 @@ public class PlayerShooter : MonoBehaviour
         if (_fireTimer <= 0f)
         {
             Shoot();
-            _fireTimer = 1f / fireRate;
+            float finalFireRate = fireRate;
+
+            if (_stats != null)
+                finalFireRate = _stats.GetFireRate(fireRate);
+
+            _fireTimer = 1f / finalFireRate;
         }
     }
 
@@ -46,21 +61,50 @@ public class PlayerShooter : MonoBehaviour
 
         System.Array.Sort(enemies, (a, b) =>
             Vector2.Distance(transform.position, a.transform.position)
-            .CompareTo(Vector2.Distance(transform.position, b.transform.position))
+                .CompareTo(Vector2.Distance(transform.position, b.transform.position))
         );
 
-        int shots = Mathf.Min(bulletsPerShot, enemies.Length);
+        int shots = bulletsPerShot;
+
+        Transform target = enemies[0].transform;
+
+        Vector2 baseDir =
+            (target.position - transform.position).normalized;
 
         for (int i = 0; i < shots; i++)
         {
-            Vector2 dir = (enemies[i].transform.position - transform.position).normalized;
-            Vector3 spawnPos = transform.position + (Vector3)(dir * 0.5f);
+            float angleOffset = 0f;
 
-            GameObject go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
+            if (shots > 1)
+            {
+                angleOffset = Mathf.Lerp(
+                    -spreadAngle,
+                    spreadAngle,
+                    (float)i / (shots - 1)
+                );
+            }
+
+            Vector2 dir = Quaternion.Euler(0, 0, angleOffset) * baseDir;
+
+            Vector3 spawnPos =
+                transform.position + (Vector3)(dir * 0.5f);
+
+            GameObject go = Instantiate(
+                bulletPrefab,
+                spawnPos,
+                Quaternion.identity
+            );
+
             HomingBullet bullet = go.GetComponent<HomingBullet>();
 
-            if (bullet != null)
-                bullet.Init(enemies[i].transform, bulletSpeed, damage);
+            if (bullet == null) continue;
+
+            float finalDamage = damage;
+
+            if (_stats != null)
+                finalDamage = _stats.GetFinalDamage(damage);
+
+            bullet.Init(target, bulletSpeed, finalDamage);
         }
     }
 }
