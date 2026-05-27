@@ -18,6 +18,9 @@ public class PlayerStats : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 5f;
 
+    [Header("Coin Collection")]
+    public float coinPickupRadius = 3f;
+
     public float GetFinalDamage(float baseDamage)
     {
         float finalDamage = baseDamage + damage;
@@ -42,6 +45,11 @@ public class PlayerStats : MonoBehaviour
     public float GetFireRate(float weaponFireRate)
     {
         return weaponFireRate + fireRate;
+    }
+
+    public float GetCoinPickupRadius()
+    {
+        return coinPickupRadius;
     }
 
     public void ApplyPassive(PassiveData passive)
