@@ -16,6 +16,7 @@ public class PlayerShooter : MonoBehaviour
 
     private float _fireTimer;
     private PlayerStats _stats;
+    private WeaponData _currentWeapon;
 
     void Awake()
     {
@@ -25,7 +26,7 @@ public class PlayerShooter : MonoBehaviour
     public void ApplyWeaponData(WeaponData weapon)
     {
         if (weapon == null) return;
-
+        _currentWeapon = weapon;
         fireRate = weapon.fireRate;
         damage = weapon.damage;
         bulletSpeed = weapon.bulletSpeed;
@@ -66,14 +67,18 @@ public class PlayerShooter : MonoBehaviour
 
         Transform target = enemies[0].transform;
 
-        if (RunConfig.Instance != null &&
-            RunConfig.Instance.selectedWeapon != null &&
-            RunConfig.Instance.selectedWeapon.weaponType == WeaponType.Boomerang)
+        if (_currentWeapon != null &&
+            _currentWeapon.weaponType == WeaponType.Boomerang)
         {
             ShootBoomerang(target);
             return;
         }
 
+        ShootProjectileWeapon(target);
+    }
+
+    void ShootProjectileWeapon(Transform target)
+    {
         int shots = bulletsPerShot;
 
         Vector2 baseDir =
@@ -136,8 +141,8 @@ public class PlayerShooter : MonoBehaviour
 
         float distance = 5f;
 
-        if (RunConfig.Instance != null && RunConfig.Instance.selectedWeapon != null)
-            distance = RunConfig.Instance.selectedWeapon.boomerangDistance;
+        if (_currentWeapon != null)
+            distance = _currentWeapon.boomerangDistance;
 
         boomerang.Init(transform, dir, bulletSpeed, finalDamage, distance);
     }
