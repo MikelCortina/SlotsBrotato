@@ -13,4 +13,5 @@ public class WeaponData : ScriptableObject
     public int bulletsPerShot = 1;
     public GameObject bulletPrefab;
     public float spreadAngle = 0f;
+    public float boomerangDistance = 5f;
 }

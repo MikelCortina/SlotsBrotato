@@ -64,9 +64,17 @@ public class PlayerShooter : MonoBehaviour
                 .CompareTo(Vector2.Distance(transform.position, b.transform.position))
         );
 
-        int shots = bulletsPerShot;
-
         Transform target = enemies[0].transform;
+
+        if (RunConfig.Instance != null &&
+            RunConfig.Instance.selectedWeapon != null &&
+            RunConfig.Instance.selectedWeapon.weaponType == WeaponType.Boomerang)
+        {
+            ShootBoomerang(target);
+            return;
+        }
+
+        int shots = bulletsPerShot;
 
         Vector2 baseDir =
             (target.position - transform.position).normalized;
@@ -106,5 +114,31 @@ public class PlayerShooter : MonoBehaviour
 
             bullet.Init(target, bulletSpeed, finalDamage);
         }
+    }
+
+
+    void ShootBoomerang(Transform target)
+    {
+        if (target == null || bulletPrefab == null) return;
+
+        Vector2 dir = (target.position - transform.position).normalized;
+        Vector3 spawnPos = transform.position + (Vector3)(dir * 0.5f);
+
+        GameObject go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
+        BoomerangProjectile boomerang = go.GetComponent<BoomerangProjectile>();
+
+        if (boomerang == null) return;
+
+        float finalDamage = damage;
+
+        if (_stats != null)
+            finalDamage = _stats.GetFinalDamage(damage);
+
+        float distance = 5f;
+
+        if (RunConfig.Instance != null && RunConfig.Instance.selectedWeapon != null)
+            distance = RunConfig.Instance.selectedWeapon.boomerangDistance;
+
+        boomerang.Init(transform, dir, bulletSpeed, finalDamage, distance);
     }
 }
