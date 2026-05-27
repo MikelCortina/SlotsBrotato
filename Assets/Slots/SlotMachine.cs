@@ -52,6 +52,8 @@ public class SlotMachine : MonoBehaviour
     public static SlotMachine Instance { get; private set; }
     Transform _playerTransform;
 
+    private TemporaryBuffSystem _buffSystem;
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
@@ -62,6 +64,8 @@ public class SlotMachine : MonoBehaviour
             _playerTransform = playerObj.transform;
         else
             Debug.LogError("[SlotMachine] No se encontró ningún GameObject con tag 'Player'");
+
+        _buffSystem = FindFirstObjectByType<TemporaryBuffSystem>();
     }
 
     void Start()
@@ -369,6 +373,10 @@ public class SlotMachine : MonoBehaviour
             case SlotSymbolType.Static:
                 ApplyStatik(amount);
                 break;
+
+            case SlotSymbolType.Berserk:
+                ApplyBerserk(amount);
+                break;
         }
     }
 
@@ -427,5 +435,15 @@ public class SlotMachine : MonoBehaviour
     public void SetActivationResolveDelay(float newDelay)
     {
         activationResolveDelay = Mathf.Max(0f, newDelay);
+    }
+
+    void ApplyBerserk(int amount)
+    {
+        if (_buffSystem == null) return;
+
+        float damageBuff = 10f * amount;
+        float duration = 5f;
+
+        _buffSystem.ApplyDamageBuff(damageBuff, duration);
     }
 }
