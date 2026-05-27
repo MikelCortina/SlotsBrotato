@@ -42,7 +42,11 @@ public class PreRunStartButton : MonoBehaviour
         }
         if (playerShooter)
         {
-            playerShooter.ApplyWeaponData(RunConfig.Instance.selectedWeapon);
+            WeaponSystem weaponSystem =
+    playerShooter.GetComponent<WeaponSystem>();
+
+            if (weaponSystem != null)
+                weaponSystem.EquipWeapon(RunConfig.Instance.selectedWeapon);
             playerShooter.enabled = true;
         }
     }
