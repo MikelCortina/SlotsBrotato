@@ -47,6 +47,10 @@ public class PreRunStartButton : MonoBehaviour
 
             if (weaponSystem != null)
                 weaponSystem.EquipWeapon(RunConfig.Instance.selectedWeapon);
+            PlayerStats stats = playerShooter.GetComponent<PlayerStats>();
+
+            if (stats != null)
+                stats.ApplyPassives(RunConfig.Instance.selectedPassives);
             playerShooter.enabled = true;
         }
     }

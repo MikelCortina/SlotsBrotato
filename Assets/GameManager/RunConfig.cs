@@ -3,10 +3,16 @@ using UnityEngine;
 
 public class RunConfig : MonoBehaviour
 {
-    public WeaponData selectedWeapon;
     public static RunConfig Instance { get; private set; }
 
+    [Header("Symbols")]
     public List<SlotSymbolData> selectedSymbols = new List<SlotSymbolData>();
+
+    [Header("Weapon")]
+    public WeaponData selectedWeapon;
+
+    [Header("Passives")]
+    public List<PassiveData> selectedPassives = new List<PassiveData>();
 
     void Awake()
     {
@@ -46,5 +52,20 @@ public class RunConfig : MonoBehaviour
     public bool HasWeapon()
     {
         return selectedWeapon != null;
+    }
+
+    public void AddPassive(PassiveData passive)
+    {
+        if (passive == null) return;
+
+        if (!selectedPassives.Contains(passive))
+            selectedPassives.Add(passive);
+    }
+
+    public void RemovePassive(PassiveData passive)
+    {
+        if (passive == null) return;
+
+        selectedPassives.Remove(passive);
     }
 }

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+
 
 public class PlayerStats : MonoBehaviour
 {
@@ -41,4 +43,25 @@ public class PlayerStats : MonoBehaviour
     {
         return weaponFireRate + fireRate;
     }
+
+    public void ApplyPassive(PassiveData passive)
+    {
+        if (passive == null) return;
+
+        damage += passive.bonusDamage;
+        fireRate += passive.bonusFireRate;
+        moveSpeed += passive.bonusMoveSpeed;
+        maxHealth += passive.bonusMaxHealth;
+    }
+
+    public void ApplyPassives(List<PassiveData> passives)
+    {
+        if (passives == null) return;
+
+        foreach (var passive in passives)
+        {
+            ApplyPassive(passive);
+        }
+    }
+
 }
