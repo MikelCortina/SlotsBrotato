@@ -227,6 +227,7 @@ public class SlotMachine : MonoBehaviour
         if (results.Count == 0) return;
 
         bool jackpot = IsJackpot(results);
+        Debug.Log("JACKPOT = " + jackpot);
 
         foreach (var result in results)
         {
@@ -290,6 +291,7 @@ public class SlotMachine : MonoBehaviour
 
         if (_pendingIsJackpot)
         {
+            Debug.Log("Activando jackpot. Pendientes: " + _pendingSymbols.Count);
             for (int i = 0; i < _pendingSymbols.Count; i++)
             {
                 var p = _pendingSymbols[i];
@@ -310,6 +312,11 @@ public class SlotMachine : MonoBehaviour
 
         if (_pendingSymbols.Count == 0)
         {
+            foreach (var reel in reels)
+            {
+                if (reel != null)
+                    reel.ForceShowLock();
+            }
             _hasPendingSymbols = false;
             _pendingIsJackpot = false;
             _chargeLockedFull = false;
@@ -335,11 +342,16 @@ public class SlotMachine : MonoBehaviour
             if (activationResolveDelay > 0f)
                 yield return new WaitForSeconds(activationResolveDelay);
 
+            RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
+
             ApplyByType(symbol.data.symbolType, amount);
+
             reel.ShowLock();
         }
         else
         {
+            RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
+
             ApplyByType(symbol.data.symbolType, amount);
         }
     }
@@ -376,6 +388,9 @@ public class SlotMachine : MonoBehaviour
 
             case SlotSymbolType.Berserk:
                 ApplyBerserk(amount);
+                break;
+            case SlotSymbolType.Power:
+                ApplyPower(amount);
                 break;
         }
     }
@@ -445,5 +460,19 @@ public class SlotMachine : MonoBehaviour
         float duration = 5f;
 
         _buffSystem.ApplyDamageBuff(damageBuff, duration);
+    }
+    void ApplyPower(int amount)
+    {
+        if (_playerTransform == null) return;
+
+        PlayerStats stats = _playerTransform.GetComponent<PlayerStats>();
+
+        if (stats == null) return;
+
+        float damageGain = amount >= 3 ? 10f : 2f * amount;
+
+        stats.damage += damageGain;
+
+        Debug.Log($"+{damageGain} daño permanente");
     }
 }
