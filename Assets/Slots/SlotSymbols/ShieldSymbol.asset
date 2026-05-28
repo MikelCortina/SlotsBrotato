@@ -15,4 +15,4 @@ MonoBehaviour:
   symbolName: ShieldSymbol
   symbolType: 0
   icon: {fileID: -3239681624356725467, guid: d0275f8a1c63447419a036056e17145b, type: 3}
-  activateInstantly: 1
+  activateInstantly: 0

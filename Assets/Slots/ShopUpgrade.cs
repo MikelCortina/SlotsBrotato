@@ -12,11 +12,19 @@ public class ShopUpgrade : MonoBehaviour
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI costText;
 
+    [Header("Rarity")]
+    public UpgradeRarity rarity;
+
+    public UnityEngine.UI.Image backgroundImage;
+
+
     private bool _bought;
 
     void Start()
     {
+        ApplyRarity();
         UpdateUI();
+       
     }
 
     void UpdateUI()
@@ -26,6 +34,39 @@ public class ShopUpgrade : MonoBehaviour
 
         if (costText)
             costText.text = $"{cost}G";
+        if (titleText)
+            titleText.text = $"{upgradeType} [{rarity}] +{value}";
+    }
+
+    void ApplyRarity()
+    {
+        float multiplier = 1f;
+
+        switch (rarity)
+        {
+            case UpgradeRarity.Common:
+                multiplier = 1f;
+                if (backgroundImage) backgroundImage.color = Color.white;
+                break;
+
+            case UpgradeRarity.Rare:
+                multiplier = 1.5f;
+                if (backgroundImage) backgroundImage.color = Color.cyan;
+                break;
+
+            case UpgradeRarity.Epic:
+                multiplier = 2.5f;
+                if (backgroundImage) backgroundImage.color = new Color(0.7f, 0.3f, 1f);
+                break;
+
+            case UpgradeRarity.Legendary:
+                multiplier = 5f;
+                if (backgroundImage) backgroundImage.color = Color.yellow;
+                break;
+        }
+
+        value *= multiplier;
+        cost = Mathf.RoundToInt(cost * multiplier);
     }
 
     public void Buy()
@@ -77,5 +118,11 @@ public class ShopUpgrade : MonoBehaviour
 
         _bought = true;
         gameObject.SetActive(false);
+    }
+
+    public void ResetUpgrade()
+    {
+        _bought = false;
+        gameObject.SetActive(true);
     }
 }
