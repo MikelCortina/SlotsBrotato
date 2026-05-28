@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerShooter : MonoBehaviour
 {
@@ -14,6 +15,14 @@ public class PlayerShooter : MonoBehaviour
     [Header("Shotgun")]
     public float spreadAngle = 15f;
 
+    [Header("RenderTexture Aim")]
+    public RectTransform renderTextureRect;
+    public Camera gameCamera;
+    public Canvas uiCanvas;
+
+    [Header("Control")]
+    public bool autoFire = true;
+
     private float _fireTimer;
     private PlayerStats _stats;
     private WeaponData _currentWeapon;
@@ -26,6 +35,7 @@ public class PlayerShooter : MonoBehaviour
     public void ApplyWeaponData(WeaponData weapon)
     {
         if (weapon == null) return;
+
         _currentWeapon = weapon;
         fireRate = weapon.fireRate;
         damage = weapon.damage;
@@ -41,11 +51,15 @@ public class PlayerShooter : MonoBehaviour
     {
         _fireTimer -= Time.deltaTime;
 
-        if (_fireTimer <= 0f)
+        bool shootPressed = autoFire
+            ? Input.GetMouseButton(0)
+            : Input.GetMouseButtonDown(0);
+
+        if (shootPressed && _fireTimer <= 0f)
         {
             Shoot();
-            float finalFireRate = fireRate;
 
+            float finalFireRate = fireRate;
             if (_stats != null)
                 finalFireRate = _stats.GetFireRate(fireRate);
 
@@ -55,34 +69,59 @@ public class PlayerShooter : MonoBehaviour
 
     void Shoot()
     {
-        if (bulletPrefab == null) return;
+        if (bulletPrefab == null || renderTextureRect == null || gameCamera == null) return;
 
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        if (enemies.Length == 0) return;
+        if (!TryGetMouseWorldPosition(out Vector3 mouseWorld))
+            return;
 
-        System.Array.Sort(enemies, (a, b) =>
-            Vector2.Distance(transform.position, a.transform.position)
-                .CompareTo(Vector2.Distance(transform.position, b.transform.position))
-        );
-
-        Transform target = enemies[0].transform;
+        Vector2 baseDir = ((Vector2)mouseWorld - (Vector2)transform.position).normalized;
+        if (baseDir.sqrMagnitude < 0.0001f)
+            baseDir = Vector2.right;
 
         if (_currentWeapon != null &&
             _currentWeapon.weaponType == WeaponType.Boomerang)
         {
-            ShootBoomerang(target);
+            ShootBoomerang(baseDir);
             return;
         }
 
-        ShootProjectileWeapon(target);
+        ShootProjectileWeapon(baseDir);
     }
 
-    void ShootProjectileWeapon(Transform target)
+    bool TryGetMouseWorldPosition(out Vector3 worldPos)
     {
-        int shots = bulletsPerShot;
+        worldPos = Vector3.zero;
 
-        Vector2 baseDir =
-            (target.position - transform.position).normalized;
+        Vector2 screenMouse = Input.mousePosition;
+
+        Camera uiCam = null;
+        if (uiCanvas != null && uiCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            uiCam = uiCanvas.worldCamera;
+
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                renderTextureRect,
+                screenMouse,
+                uiCam,
+                out Vector2 localPoint))
+        {
+            return false;
+        }
+
+        Rect rect = renderTextureRect.rect;
+
+        float u = Mathf.InverseLerp(rect.xMin, rect.xMax, localPoint.x);
+        float v = Mathf.InverseLerp(rect.yMin, rect.yMax, localPoint.y);
+
+        Vector3 viewportPoint = new Vector3(u, v, gameCamera.nearClipPlane);
+        worldPos = gameCamera.ViewportToWorldPoint(viewportPoint);
+        worldPos.z = 0f;
+
+        return true;
+    }
+
+    void ShootProjectileWeapon(Vector2 baseDir)
+    {
+        int shots = Mathf.Max(1, bulletsPerShot);
 
         for (int i = 0; i < shots; i++)
         {
@@ -90,43 +129,30 @@ public class PlayerShooter : MonoBehaviour
 
             if (shots > 1)
             {
-                angleOffset = Mathf.Lerp(
-                    -spreadAngle,
-                    spreadAngle,
-                    (float)i / (shots - 1)
-                );
+                angleOffset = Mathf.Lerp(-spreadAngle, spreadAngle, (float)i / (shots - 1));
             }
 
             Vector2 dir = Quaternion.Euler(0, 0, angleOffset) * baseDir;
 
-            Vector3 spawnPos =
-                transform.position + (Vector3)(dir * 0.5f);
+            Vector3 spawnPos = transform.position + (Vector3)(dir * 0.5f);
 
-            GameObject go = Instantiate(
-                bulletPrefab,
-                spawnPos,
-                Quaternion.identity
-            );
+            GameObject go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
 
-            HomingBullet bullet = go.GetComponent<HomingBullet>();
-
+            Bullet bullet = go.GetComponent<Bullet>();
             if (bullet == null) continue;
 
             float finalDamage = damage;
-
             if (_stats != null)
                 finalDamage = _stats.GetFinalDamage(damage);
 
-            bullet.Init(target, bulletSpeed, finalDamage);
+            bullet.Init(dir, bulletSpeed, finalDamage);
         }
     }
 
-
-    void ShootBoomerang(Transform target)
+    void ShootBoomerang(Vector2 dir)
     {
-        if (target == null || bulletPrefab == null) return;
+        if (bulletPrefab == null) return;
 
-        Vector2 dir = (target.position - transform.position).normalized;
         Vector3 spawnPos = transform.position + (Vector3)(dir * 0.5f);
 
         GameObject go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
@@ -135,12 +161,10 @@ public class PlayerShooter : MonoBehaviour
         if (boomerang == null) return;
 
         float finalDamage = damage;
-
         if (_stats != null)
             finalDamage = _stats.GetFinalDamage(damage);
 
         float distance = 5f;
-
         if (_currentWeapon != null)
             distance = _currentWeapon.boomerangDistance;
 

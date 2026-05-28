@@ -1,21 +1,22 @@
 using UnityEngine;
 
-public class HomingBullet : MonoBehaviour
+public class Bullet : MonoBehaviour
 {
     [Header("Stats")]
     public float speed = 12f;
     public float damage = 25f;
     public float maxLifetime = 4f;
 
-    private Transform _target;
-    private Vector2 _lastKnownPos;
+    [Header("Visual")]
+    public float rotationOffset = -90f;
+
+    private Vector2 _direction;
     private float _lifetime;
     private bool _fired;
 
-    public void Init(Transform target, float spd, float dmg)
+    public void Init(Vector2 dir, float spd, float dmg)
     {
-        _target = target;
-        _lastKnownPos = target.position;
+        _direction = dir.normalized;
         speed = spd;
         damage = dmg;
         _fired = true;
@@ -25,23 +26,14 @@ public class HomingBullet : MonoBehaviour
     {
         if (!_fired) return;
 
-        if (_target != null)
-            _lastKnownPos = _target.position;
+        transform.position += (Vector3)(_direction * speed * Time.deltaTime);
 
-        Vector2 dir = (_lastKnownPos - (Vector2)transform.position).normalized;
-        transform.position += (Vector3)(dir * speed * Time.deltaTime);
-
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(_direction.y, _direction.x) * Mathf.Rad2Deg + rotationOffset;
         transform.rotation = Quaternion.Euler(0, 0, angle);
 
-        if (_target == null)
-        {
-            float dist = Vector2.Distance(transform.position, _lastKnownPos);
-            if (dist < 0.15f) Destroy(gameObject);
-        }
-
         _lifetime += Time.deltaTime;
-        if (_lifetime >= maxLifetime) Destroy(gameObject);
+        if (_lifetime >= maxLifetime)
+            Destroy(gameObject);
     }
 
     void OnTriggerEnter2D(Collider2D other)

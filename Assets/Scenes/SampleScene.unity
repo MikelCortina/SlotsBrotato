@@ -2031,7 +2031,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -807, y: 502}
+  m_AnchoredPosition: {x: 831, y: -370}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &462446324
@@ -4164,6 +4164,10 @@ MonoBehaviour:
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
   bulletsPerShot: 2
   spreadAngle: 25
+  renderTextureRect: {fileID: 734169031}
+  gameCamera: {fileID: 1695375334}
+  uiCanvas: {fileID: 733434914}
+  autoFire: 1
 --- !u!212 &809848640
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -9580,7 +9584,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -807, y: 390}
+  m_AnchoredPosition: {x: 831, y: -482}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1947461220
@@ -9903,7 +9907,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -807, y: 449}
+  m_AnchoredPosition: {x: 831, y: -423}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2093354424
