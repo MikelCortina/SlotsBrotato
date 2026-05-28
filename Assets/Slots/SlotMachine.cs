@@ -127,21 +127,7 @@ public class SlotMachine : MonoBehaviour
         UpdateChargeUI();
     }
 
-    public void OnPlayerHit()
-    {
-        if (_chargeLockedFull || _spinning || _spinQueued)
-        {
-            _overloadReserve = 0f;
-        }
-        else
-        {
-            _charge = 0f;
-            _overloadReserve = 0f;
-        }
-
-        UpdateChargeUI();
-    }
-
+  
     void UpdateChargeUI()
     {
         float displayedMainCharge = _chargeLockedFull ? maxCharge : _charge;
