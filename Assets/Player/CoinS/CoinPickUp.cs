@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class CoinPickup : MonoBehaviour
@@ -9,11 +10,16 @@ public class CoinPickup : MonoBehaviour
     [SerializeField] private float minCollectionDistance = 0.2f;
 
     [Header("Oscillation")]
-    [SerializeField] private float oscillationDistance = 0.2f; // Distancia de la oscilación inicial
-    [SerializeField] private float oscillationDuration = 0.2f; // Duración de la oscilación
-    [SerializeField] private float oscillationSpeed = 8f;      // Velocidad de la oscilación
+    [SerializeField] private float oscillationDistance = 0.2f;
+    [SerializeField] private float oscillationDuration = 0.2f;
+    [SerializeField] private float oscillationSpeed = 8f;
+
+    [Header("SFX")]
+    [SerializeField] private AudioClip collectSound;
+    [SerializeField] private float collectVolume = 1f;
 
     private Transform playerTransform;
+    private AudioSource playerAudioSource;
     private bool isCollected = false;
     private bool isPulled = false;
     private bool isOscillating = false;
@@ -31,6 +37,7 @@ public class CoinPickup : MonoBehaviour
         oscillationTimer = 0f;
         startPosition = transform.position;
         playerTransform = null;
+        playerAudioSource = null;
     }
 
     private void Update()
@@ -41,7 +48,13 @@ public class CoinPickup : MonoBehaviour
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player == null) return;
+
             playerTransform = player.transform;
+
+            if (!player.TryGetComponent<AudioSource>(out playerAudioSource))
+                playerAudioSource = player.GetComponentInChildren<AudioSource>();
+
+            Debug.Log("PlayerAudioSource found: " + (playerAudioSource != null));
         }
 
         PlayerStats playerStats = playerTransform.GetComponent<PlayerStats>();
@@ -50,7 +63,6 @@ public class CoinPickup : MonoBehaviour
         float radius = playerStats.GetCoinPickupRadius();
         float distance = Vector2.Distance(transform.position, playerTransform.position);
 
-        // Activar oscilación cuando entra en rango
         if (!isPulled && !isOscillating && distance <= radius)
         {
             isPulled = true;
@@ -58,7 +70,6 @@ public class CoinPickup : MonoBehaviour
             oscillationTimer = 0f;
             startPosition = transform.position;
 
-            // Calcular dirección OPUESTA al jugador para la oscilación inicial
             Vector2 directionToPlayer = (playerTransform.position - transform.position).normalized;
             oscillationTarget = transform.position - (Vector3)directionToPlayer * oscillationDistance;
 
@@ -67,40 +78,29 @@ public class CoinPickup : MonoBehaviour
                 dropController.StartBeingPulled();
         }
 
-        // Fase 1: Oscilación inicial (en dirección opuesta al jugador)
         if (isOscillating)
         {
             oscillationTimer += Time.deltaTime;
 
-            // Mover hacia el punto opuesto al jugador
             float progress = Mathf.Clamp01(oscillationTimer / oscillationDuration);
-
-            // Easing suave (ease-out)
             float easedProgress = 1f - Mathf.Pow(1f - progress, 3f);
 
             transform.position = Vector3.Lerp(startPosition, oscillationTarget, easedProgress);
 
             if (oscillationTimer >= oscillationDuration)
             {
-                // Terminar oscilación, empezar atracción fuerte
                 isOscillating = false;
                 currentSpeed = pullSpeed;
             }
-            return; // No atraer todavía
+            return;
         }
 
-        // Fase 2: Atracción fuerte hacia el jugador
         if (isPulled)
         {
             Vector2 direction = (playerTransform.position - transform.position).normalized;
-
-            // Acelerar constantemente
             currentSpeed = Mathf.Min(currentSpeed + acceleration * Time.deltaTime, maxSpeed);
-
-            // Mover hacia el jugador
             transform.position += (Vector3)direction * currentSpeed * Time.deltaTime;
 
-            // Recoger cuando está cerca
             float newDistance = Vector2.Distance(transform.position, playerTransform.position);
             if (newDistance <= minCollectionDistance)
             {
@@ -114,14 +114,25 @@ public class CoinPickup : MonoBehaviour
         if (isCollected) return;
         isCollected = true;
 
+        if (playerAudioSource != null && collectSound != null)
+        {
+            playerAudioSource.volume = 1f;
+            playerAudioSource.mute = false;
+            playerAudioSource.spatialBlend = 0f;
+            playerAudioSource.PlayOneShot(collectSound, collectVolume);
+
+            Debug.Log("Playing collect sound");
+        }
+        else
+        {
+            Debug.LogWarning("No audio source or collect sound assigned");
+        }
+
         if (SlotMachine.Instance != null)
             SlotMachine.Instance.OnCoinCollected(value);
 
-        // Pedir al CoinDropManager que instancie el objeto de salida
         if (CoinDropManager.Instance != null)
-        {
             CoinDropManager.Instance.SpawnDropFromCoin(transform.position);
-        }
 
         Destroy(gameObject);
     }

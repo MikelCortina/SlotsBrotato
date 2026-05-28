@@ -73,6 +73,8 @@ MonoBehaviour:
   oscillationDistance: 0.5
   oscillationDuration: 0.1
   oscillationSpeed: 8
+  collectSound: {fileID: 8300000, guid: 81fede700cd3f014f8feb4be9af94764, type: 3}
+  collectSoundVolume: 1
 --- !u!212 &5601814686720296783
 SpriteRenderer:
   m_ObjectHideFlags: 0
