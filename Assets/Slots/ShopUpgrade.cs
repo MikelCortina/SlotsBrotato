@@ -41,18 +41,37 @@ public class ShopUpgrade : MonoBehaviour
         PlayerShooter shooter = FindObjectOfType<PlayerShooter>();
         if (shooter == null) return;
 
+        PlayerStats stats = FindObjectOfType<PlayerStats>();
+
+
         switch (upgradeType)
         {
-            case UpgradeType.FireRate:
-                shooter.fireRate += value;
+            case UpgradeType.Damage:
+                if (stats != null) stats.damage += value;
                 break;
 
-            case UpgradeType.Damage:
-                shooter.damage += value;
+            case UpgradeType.FireRate:
+                if (stats != null) stats.fireRate += value;
+                break;
+
+            case UpgradeType.MoveSpeed:
+                if (stats != null) stats.moveSpeed += value;
+                break;
+
+            case UpgradeType.CritChance:
+                if (stats != null) stats.critChance += value;
+                break;
+
+            case UpgradeType.MaxHealth:
+                if (stats != null) stats.maxHealth += Mathf.RoundToInt(value);
+                break;
+
+            case UpgradeType.Regen:
+                if (stats != null) stats.regeneration += value;
                 break;
 
             case UpgradeType.MultiShot:
-                shooter.bulletsPerShot += Mathf.RoundToInt(value);
+                if (shooter != null) shooter.bulletsPerShot += Mathf.RoundToInt(value);
                 break;
         }
 

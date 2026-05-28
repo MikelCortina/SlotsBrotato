@@ -1,6 +1,10 @@
 public enum UpgradeType
 {
-    FireRate,
     Damage,
-    MultiShot
+    FireRate,
+    MultiShot,
+    MoveSpeed,
+    CritChance,
+    MaxHealth,
+    Regen
 }
