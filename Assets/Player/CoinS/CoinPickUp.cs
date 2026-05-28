@@ -117,12 +117,12 @@ public class CoinPickup : MonoBehaviour
         if (SlotMachine.Instance != null)
             SlotMachine.Instance.OnCoinCollected(value);
 
-        Destroy(gameObject);
-    }
+        // Pedir al CoinDropManager que instancie el objeto de salida
+        if (CoinDropManager.Instance != null)
+        {
+            CoinDropManager.Instance.SpawnDropFromCoin(transform.position);
+        }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!other.CompareTag("Player")) return;
-        CollectCoin();
+        Destroy(gameObject);
     }
 }
