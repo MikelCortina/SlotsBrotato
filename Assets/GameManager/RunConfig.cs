@@ -11,6 +11,10 @@ public class RunConfig : MonoBehaviour
     [Header("Weapon")]
     public WeaponData selectedWeapon;
 
+    [Header("Symbol Levels")]
+    public Dictionary<SlotSymbolType, int> symbolLevels =
+    new Dictionary<SlotSymbolType, int>();
+
     [Header("Passives")]
     public List<PassiveData> selectedPassives = new List<PassiveData>();
     [Header("Activated Symbols")]
@@ -82,5 +86,20 @@ public class RunConfig : MonoBehaviour
             activatedSymbols[symbolName] = 0;
 
         activatedSymbols[symbolName]++;
+    }
+    public int GetSymbolLevel(SlotSymbolType type)
+    {
+        if (!symbolLevels.ContainsKey(type))
+            symbolLevels[type] = 1;
+
+        return symbolLevels[type];
+    }
+
+    public void UpgradeSymbol(SlotSymbolType type)
+    {
+        if (!symbolLevels.ContainsKey(type))
+            symbolLevels[type] = 1;
+
+        symbolLevels[type]++;
     }
 }
