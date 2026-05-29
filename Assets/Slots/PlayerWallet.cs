@@ -10,6 +10,7 @@ public class PlayerWallet : MonoBehaviour
     public int Coins => coins;
     [Header("UI")]
     public TextMeshProUGUI coinsText;
+    public TextMeshProUGUI shopCoinsText;
 
     void Awake()
     {
@@ -27,6 +28,9 @@ public class PlayerWallet : MonoBehaviour
     {
         if (coinsText)
             coinsText.text = $"Monedas: {coins}";
+
+        if (shopCoinsText)
+            shopCoinsText.text = $"Monedas: {coins}";
     }
 
     public bool SpendCoins(int amount)

@@ -102,4 +102,14 @@ public class RunConfig : MonoBehaviour
 
         symbolLevels[type]++;
     }
+
+    public void RemoveSymbol(SlotSymbolData symbol, bool removeLevel = true)
+    {
+        if (symbol == null) return;
+
+        selectedSymbols.Remove(symbol);
+
+        if (removeLevel)
+            symbolLevels.Remove(symbol.symbolType);
+    }
 }
