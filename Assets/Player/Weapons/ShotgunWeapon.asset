@@ -15,9 +15,12 @@ MonoBehaviour:
   weaponName: ShotgunWeapon
   weaponType: 0
   icon: {fileID: -2457411745532661688, guid: 09816d4c90e1b8e4ba76188a47b962cd, type: 3}
+  weaponPrefab: {fileID: 1855688961912401076, guid: 2f31bd0c0cedc1e419f0f35a10a4cd86, type: 3}
   fireRate: 0.8
   damage: 15
   bulletSpeed: 10
   bulletsPerShot: 5
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
   spreadAngle: 25
+  boomerangDistance: 5
+  holdRadius: 2

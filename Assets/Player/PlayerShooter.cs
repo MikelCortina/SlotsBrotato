@@ -1,54 +1,47 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerShooter : MonoBehaviour
 {
-    [Header("Disparo")]
-    public float fireRate = 2f;
-    public float damage = 25f;
-    public float bulletSpeed = 12f;
+    [Header("Referencias")]
+    [SerializeField] public Transform weaponPivot;
+    [SerializeField] public WeaponPivotAim weaponAim;
+    [SerializeField] public bool autoFire = true;
+
+    [Header("Debug / arma inicial")]
+    [SerializeField] public WeaponData startWeapon;
+
+    public float _fireTimer;
+    public PlayerStats _stats;
+    public WeaponData _currentWeapon;
+
+    public WeaponInstance _currentWeaponInstance;
+    public Transform _firePoint;
+    public Vector3 _weaponBaseScale = Vector3.one;
+
+    public float fireRate;
+    public float damage;
+    public float bulletSpeed;
+    public int bulletsPerShot;
     public GameObject bulletPrefab;
+    public float spreadAngle;
 
-    [Header("Multi-disparo")]
-    public int bulletsPerShot = 1;
-
-    [Header("Shotgun")]
-    public float spreadAngle = 15f;
-
-    [Header("RenderTexture Aim")]
-    public RectTransform renderTextureRect;
-    public Camera gameCamera;
-    public Canvas uiCanvas;
-
-    [Header("Control")]
-    public bool autoFire = true;
-
-    private float _fireTimer;
-    private PlayerStats _stats;
-    private WeaponData _currentWeapon;
+    private SpriteRenderer _weaponSpriteRenderer;
 
     void Awake()
     {
         _stats = GetComponent<PlayerStats>();
     }
 
-    public void ApplyWeaponData(WeaponData weapon)
+    void Start()
     {
-        if (weapon == null) return;
-
-        _currentWeapon = weapon;
-        fireRate = weapon.fireRate;
-        damage = weapon.damage;
-        bulletSpeed = weapon.bulletSpeed;
-        bulletsPerShot = weapon.bulletsPerShot;
-        bulletPrefab = weapon.bulletPrefab;
-        spreadAngle = weapon.spreadAngle;
-
-        Debug.Log($"Arma equipada: {weapon.weaponName}");
+        if (startWeapon != null)
+            ApplyWeaponData(startWeapon);
     }
 
     void Update()
     {
+        UpdateWeaponFlip();
+
         _fireTimer -= Time.deltaTime;
 
         bool shootPressed = autoFire
@@ -63,60 +56,79 @@ public class PlayerShooter : MonoBehaviour
             if (_stats != null)
                 finalFireRate = _stats.GetFireRate(fireRate);
 
-            _fireTimer = 1f / finalFireRate;
+            _fireTimer = 1f / Mathf.Max(0.01f, finalFireRate);
+        }
+    }
+
+    public void ApplyWeaponData(WeaponData weapon)
+    {
+        if (weapon == null) return;
+
+        _currentWeapon = weapon;
+        fireRate = weapon.fireRate;
+        damage = weapon.damage;
+        bulletSpeed = weapon.bulletSpeed;
+        bulletsPerShot = weapon.bulletsPerShot;
+        bulletPrefab = weapon.bulletPrefab;
+        spreadAngle = weapon.spreadAngle;
+
+        EquipWeaponPrefab();
+    }
+
+    void EquipWeaponPrefab()
+    {
+        if (_currentWeaponInstance != null)
+            Destroy(_currentWeaponInstance.gameObject);
+
+        _firePoint = null;
+        _weaponSpriteRenderer = null;
+
+        if (_currentWeapon == null || _currentWeapon.weaponPrefab == null || weaponPivot == null)
+            return;
+
+        GameObject weaponGO = Instantiate(_currentWeapon.weaponPrefab, weaponPivot);
+        weaponGO.transform.localPosition = new Vector3(_currentWeapon.holdRadius, 0f, 0f);
+        weaponGO.transform.localRotation = Quaternion.identity;
+        weaponGO.transform.localScale = Vector3.one;
+
+        _currentWeaponInstance = weaponGO.GetComponent<WeaponInstance>();
+
+        if (_currentWeaponInstance != null)
+            _firePoint = _currentWeaponInstance.firePoint;
+
+        _weaponSpriteRenderer = weaponGO.GetComponentInChildren<SpriteRenderer>();
+        _weaponBaseScale = weaponGO.transform.localScale;
+    }
+
+    void UpdateWeaponFlip()
+    {
+        if (_currentWeaponInstance == null || weaponAim == null)
+            return;
+
+        if (!weaponAim.TryGetMouseWorldPosition(out Vector3 mouseWorld))
+            return;
+
+        bool mouseOnLeft = mouseWorld.x < weaponPivot.position.x;
+
+        if (_weaponSpriteRenderer != null)
+        {
+            _weaponSpriteRenderer.flipY = mouseOnLeft;
         }
     }
 
     void Shoot()
     {
-        if (bulletPrefab == null || renderTextureRect == null || gameCamera == null) return;
+        if (bulletPrefab == null || _firePoint == null) return;
 
-        if (!TryGetMouseWorldPosition(out Vector3 mouseWorld))
-            return;
+        Vector2 baseDir = _firePoint.right.normalized;
 
-        Vector2 baseDir = ((Vector2)mouseWorld - (Vector2)transform.position).normalized;
-        if (baseDir.sqrMagnitude < 0.0001f)
-            baseDir = Vector2.right;
-
-        if (_currentWeapon != null &&
-            _currentWeapon.weaponType == WeaponType.Boomerang)
+        if (_currentWeapon != null && _currentWeapon.weaponType == WeaponType.Boomerang)
         {
             ShootBoomerang(baseDir);
             return;
         }
 
         ShootProjectileWeapon(baseDir);
-    }
-
-    bool TryGetMouseWorldPosition(out Vector3 worldPos)
-    {
-        worldPos = Vector3.zero;
-
-        Vector2 screenMouse = Input.mousePosition;
-
-        Camera uiCam = null;
-        if (uiCanvas != null && uiCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-            uiCam = uiCanvas.worldCamera;
-
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                renderTextureRect,
-                screenMouse,
-                uiCam,
-                out Vector2 localPoint))
-        {
-            return false;
-        }
-
-        Rect rect = renderTextureRect.rect;
-
-        float u = Mathf.InverseLerp(rect.xMin, rect.xMax, localPoint.x);
-        float v = Mathf.InverseLerp(rect.yMin, rect.yMax, localPoint.y);
-
-        Vector3 viewportPoint = new Vector3(u, v, gameCamera.nearClipPlane);
-        worldPos = gameCamera.ViewportToWorldPoint(viewportPoint);
-        worldPos.z = 0f;
-
-        return true;
     }
 
     void ShootProjectileWeapon(Vector2 baseDir)
@@ -128,15 +140,11 @@ public class PlayerShooter : MonoBehaviour
             float angleOffset = 0f;
 
             if (shots > 1)
-            {
                 angleOffset = Mathf.Lerp(-spreadAngle, spreadAngle, (float)i / (shots - 1));
-            }
 
-            Vector2 dir = Quaternion.Euler(0, 0, angleOffset) * baseDir;
+            Vector2 dir = Quaternion.Euler(0f, 0f, angleOffset) * baseDir;
 
-            Vector3 spawnPos = transform.position + (Vector3)(dir * 0.5f);
-
-            GameObject go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
+            GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
 
             Bullet bullet = go.GetComponent<Bullet>();
             if (bullet == null) continue;
@@ -151,11 +159,9 @@ public class PlayerShooter : MonoBehaviour
 
     void ShootBoomerang(Vector2 dir)
     {
-        if (bulletPrefab == null) return;
+        if (bulletPrefab == null || _firePoint == null) return;
 
-        Vector3 spawnPos = transform.position + (Vector3)(dir * 0.5f);
-
-        GameObject go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
+        GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
         BoomerangProjectile boomerang = go.GetComponent<BoomerangProjectile>();
 
         if (boomerang == null) return;
@@ -164,10 +170,7 @@ public class PlayerShooter : MonoBehaviour
         if (_stats != null)
             finalDamage = _stats.GetFinalDamage(damage);
 
-        float distance = 5f;
-        if (_currentWeapon != null)
-            distance = _currentWeapon.boomerangDistance;
-
+        float distance = _currentWeapon != null ? _currentWeapon.boomerangDistance : 5f;
         boomerang.Init(transform, dir, bulletSpeed, finalDamage, distance);
     }
 }

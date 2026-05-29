@@ -1549,6 +1549,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 308125491}
   m_CullTransparentMesh: 1
+--- !u!1 &308567654
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 308567655}
+  - component: {fileID: 308567656}
+  m_Layer: 6
+  m_Name: WeaponPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &308567655
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308567654}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 809848641}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &308567656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308567654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88754c91f3d60a64e98fe79b4e88b384, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponPivot: {fileID: 308567655}
+  renderTextureRect: {fileID: 734169031}
+  gameCamera: {fileID: 1695375334}
+  uiCanvas: {fileID: 733434914}
 --- !u!1 &351811000
 GameObject:
   m_ObjectHideFlags: 0
@@ -4615,16 +4663,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6bfa9ca309dc1a4397ed5a4903afda8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponPivot: {fileID: 308567655}
+  weaponAim: {fileID: 0}
+  autoFire: 1
+  startWeapon: {fileID: 0}
+  _fireTimer: 0
+  _stats: {fileID: 0}
+  _currentWeapon: {fileID: 0}
+  _currentWeaponInstance: {fileID: 0}
+  _firePoint: {fileID: 0}
+  _weaponBaseScale: {x: 1, y: 1, z: 1}
   fireRate: 2
   damage: 25
   bulletSpeed: 18
-  bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
   bulletsPerShot: 2
+  bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
   spreadAngle: 25
-  renderTextureRect: {fileID: 734169031}
-  gameCamera: {fileID: 1695375334}
-  uiCanvas: {fileID: 733434914}
-  autoFire: 1
 --- !u!212 &809848640
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4692,7 +4746,8 @@ Transform:
   m_LocalPosition: {x: 0, y: -100, z: 0}
   m_LocalScale: {x: 0.39999998, y: 0.39999998, z: 0.39999998}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 308567655}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!58 &809848642
