@@ -14,12 +14,12 @@ public class PlayerStatsUI : MonoBehaviour
         if (playerStats == null || statsText == null) return;
 
         statsText.text =
-            $"DMG: {playerStats.damage}\n" +
-            $"FIRE RATE: {playerStats.fireRate}\n" +
-            $"CRIT: {playerStats.critChance * 100f}%\n" +
-            $"MOVE: {playerStats.moveSpeed}\n" +
-            $"MAX HP: {playerStats.maxHealth}\n" +
-            $"REDUCTION: {playerStats.damageReduction * 100f}%\n" +
-            $"REGEN: {playerStats.regeneration}";
+            $"Daño actual: {playerStats.damage}\n" +
+            $"Cadencia extra: {playerStats.fireRate}\n" +
+            $"Crítico: {playerStats.critChance * 100f:0}%\n" +
+            $"Velocidad: {playerStats.moveSpeed}\n" +
+            $"Vida máxima: {playerStats.maxHealth}\n" +
+            $"Reducción daño: {playerStats.damageReduction * 100f:0}%\n" +
+            $"Regeneración: {playerStats.regeneration}";
     }
 }

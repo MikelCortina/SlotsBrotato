@@ -13,6 +13,9 @@ public class RunConfig : MonoBehaviour
 
     [Header("Passives")]
     public List<PassiveData> selectedPassives = new List<PassiveData>();
+    [Header("Activated Symbols")]
+    public Dictionary<string, int> activatedSymbols =
+    new Dictionary<string, int>();
 
     void Awake()
     {
@@ -67,5 +70,17 @@ public class RunConfig : MonoBehaviour
         if (passive == null) return;
 
         selectedPassives.Remove(passive);
+    }
+
+    public void RegisterActivatedSymbol(SlotSymbolData symbol)
+    {
+        if (symbol == null) return;
+
+        string symbolName = symbol.symbolName;
+
+        if (!activatedSymbols.ContainsKey(symbolName))
+            activatedSymbols[symbolName] = 0;
+
+        activatedSymbols[symbolName]++;
     }
 }

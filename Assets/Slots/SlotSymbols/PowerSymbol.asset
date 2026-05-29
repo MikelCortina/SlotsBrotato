@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dca06fd1a03d7546ae102841a284ba9, type: 3}
-  m_Name: ShieldSymbol
+  m_Name: PowerSymbol
   m_EditorClassIdentifier: 
-  symbolName: ShieldSymbol
-  symbolType: 0
-  icon: {fileID: -3239681624356725467, guid: d0275f8a1c63447419a036056e17145b, type: 3}
+  symbolName: PowerSymbol
+  symbolType: 4
+  icon: {fileID: 0}
   activateInstantly: 0

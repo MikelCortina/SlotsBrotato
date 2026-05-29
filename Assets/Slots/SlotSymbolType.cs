@@ -3,5 +3,6 @@ public enum SlotSymbolType
     Shield,
     Static,
     Coin,
-    Berserk
+    Berserk,
+    Power
 }
