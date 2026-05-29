@@ -15,4 +15,4 @@ MonoBehaviour:
   symbolName: PowerSymbol
   symbolType: 4
   icon: {fileID: 0}
-  activateInstantly: 0
+  activateInstantly: 1

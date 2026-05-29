@@ -15,4 +15,4 @@ MonoBehaviour:
   symbolName: StaticSymbol
   symbolType: 1
   icon: {fileID: 5149459247027304299, guid: 3c795a45565e82546a71d9943ad45e66, type: 3}
-  activateInstantly: 0
+  activateInstantly: 1

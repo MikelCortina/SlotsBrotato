@@ -15,4 +15,4 @@ MonoBehaviour:
   symbolName: BerserkSymbol
   symbolType: 3
   icon: {fileID: -6406569410316271377, guid: f8314741febfa0847bd2879cca86827b, type: 3}
-  activateInstantly: 0
+  activateInstantly: 1

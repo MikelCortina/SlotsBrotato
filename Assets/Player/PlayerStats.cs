@@ -21,6 +21,9 @@ public class PlayerStats : MonoBehaviour
     [Header("Coin Collection")]
     public float coinPickupRadius = 3f;
 
+    [Header("Slot Machine")]
+    public float slotChargeTime = 10f; 
+
     public float GetFinalDamage(float baseDamage)
     {
         float finalDamage = baseDamage + damage;

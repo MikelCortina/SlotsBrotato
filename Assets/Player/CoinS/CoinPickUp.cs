@@ -128,8 +128,7 @@ public class CoinPickup : MonoBehaviour
             Debug.LogWarning("No audio source or collect sound assigned");
         }
 
-        if (SlotMachine.Instance != null)
-            SlotMachine.Instance.OnCoinCollected(value);
+    
 
         if (CoinDropManager.Instance != null)
             CoinDropManager.Instance.SpawnDropFromCoin(transform.position);
