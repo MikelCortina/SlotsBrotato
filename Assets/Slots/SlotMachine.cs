@@ -408,7 +408,12 @@ public class SlotMachine : MonoBehaviour
 
     void ApplyShield(int amount)
     {
-        int shieldAmount = amount >= 3 ? 10 : amount;
+        int level = RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Shield);
+
+        int shieldAmount =
+            amount >= 3
+            ? level * 5
+            : amount * level;
         var playerShield = FindFirstObjectByType<PlayerShield>();
         if (playerShield != null)
             playerShield.AddShield(shieldAmount);
@@ -467,7 +472,11 @@ public class SlotMachine : MonoBehaviour
     {
         if (_buffSystem == null) return;
 
-        float damageBuff = 10f * amount;
+        int level = RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Berserk);
+
+        float baseBuff = 10f * level;
+
+        float damageBuff = baseBuff * amount;
         float duration = 5f;
 
         _buffSystem.ApplyDamageBuff(damageBuff, duration);
@@ -481,7 +490,14 @@ public class SlotMachine : MonoBehaviour
 
         if (stats == null) return;
 
-        float damageGain = amount >= 3 ? 10f : 2f * amount;
+        int level = RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Power);
+
+        float baseValue = 2f * level;
+
+        float damageGain =
+            amount >= 3
+            ? baseValue * 5f
+            : baseValue * amount;
 
         stats.damage += damageGain;
 
