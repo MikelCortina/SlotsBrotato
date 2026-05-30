@@ -15,6 +15,7 @@ MonoBehaviour:
   weaponName: Boomerang
   weaponType: 1
   icon: {fileID: 3548383687872758137, guid: 7992d39aeee6dc24497ae33074b8ad11, type: 3}
+  weaponPrefab: {fileID: 1855688961912401076, guid: e45de4123ffba3443a043a70e9e11937, type: 3}
   fireRate: 0.8
   damage: 20
   bulletSpeed: 9
@@ -22,3 +23,4 @@ MonoBehaviour:
   bulletPrefab: {fileID: 2148095309717484689, guid: a9284964cf47e574cb37b6d3fb9babb4, type: 3}
   spreadAngle: 0
   boomerangDistance: 6
+  holdRadius: 0.35

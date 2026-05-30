@@ -9,6 +9,17 @@ public class WeaponPivotAim : MonoBehaviour
     [SerializeField] private Camera gameCamera;
     [SerializeField] private Canvas uiCanvas;
 
+    [Header("Offset estilo 20 Minutes Till Dawn")]
+    [SerializeField] private float sideOffset = 0.3f;
+
+    private Vector3 _basePivotLocalPos;
+
+    void Awake()
+    {
+        if (weaponPivot != null)
+            _basePivotLocalPos = weaponPivot.localPosition;
+    }
+
     void LateUpdate()
     {
         if (weaponPivot == null || gameCamera == null || renderTextureRect == null)
@@ -17,12 +28,25 @@ public class WeaponPivotAim : MonoBehaviour
         if (!TryGetMouseWorldPosition(out Vector3 mouseWorld))
             return;
 
-        Vector2 dir = ((Vector2)mouseWorld - (Vector2)weaponPivot.position);
+        Vector2 dir = (Vector2)mouseWorld - (Vector2)weaponPivot.position;
         if (dir.sqrMagnitude < 0.0001f)
             return;
 
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        weaponPivot.rotation = Quaternion.Euler(0f, 0f, angle);
+        bool mouseIsRight = dir.x >= 0f;
+
+        Vector3 scale = weaponPivot.localScale;
+        scale.x = mouseIsRight ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+        weaponPivot.localScale = scale;
+
+        Vector3 newLocalPos = _basePivotLocalPos;
+        newLocalPos.x = _basePivotLocalPos.x + (mouseIsRight ? sideOffset : -sideOffset);
+        weaponPivot.localPosition = newLocalPos;
+
+        if (mouseIsRight)
+            weaponPivot.rotation = Quaternion.Euler(0f, 0f, angle);
+        else
+            weaponPivot.rotation = Quaternion.Euler(0f, 0f, 180f + angle);
     }
 
     public bool TryGetMouseWorldPosition(out Vector3 worldPos)

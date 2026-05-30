@@ -87,9 +87,9 @@ public class PlayerShooter : MonoBehaviour
             return;
 
         GameObject weaponGO = Instantiate(_currentWeapon.weaponPrefab, weaponPivot);
-        weaponGO.transform.localPosition = new Vector3(_currentWeapon.holdRadius, 0f, 0f);
+        weaponGO.transform.localPosition = Vector3.zero;
         weaponGO.transform.localRotation = Quaternion.identity;
-        weaponGO.transform.localScale = Vector3.one;
+        weaponGO.transform.localScale = Vector3.one*0.5f;
 
         _currentWeaponInstance = weaponGO.GetComponent<WeaponInstance>();
 
@@ -102,7 +102,7 @@ public class PlayerShooter : MonoBehaviour
 
     void UpdateWeaponFlip()
     {
-        if (_currentWeaponInstance == null || weaponAim == null)
+        if (_currentWeaponInstance == null || weaponAim == null || weaponPivot == null)
             return;
 
         if (!weaponAim.TryGetMouseWorldPosition(out Vector3 mouseWorld))
@@ -111,16 +111,19 @@ public class PlayerShooter : MonoBehaviour
         bool mouseOnLeft = mouseWorld.x < weaponPivot.position.x;
 
         if (_weaponSpriteRenderer != null)
-        {
             _weaponSpriteRenderer.flipY = mouseOnLeft;
-        }
     }
 
     void Shoot()
     {
-        if (bulletPrefab == null || _firePoint == null) return;
+        if (bulletPrefab == null || _firePoint == null || weaponPivot == null)
+            return;
 
-        Vector2 baseDir = _firePoint.right.normalized;
+        Vector2 baseDir = weaponPivot.right.normalized;
+
+        // Si el arma está espejada hacia la izquierda, invertimos la dirección real del disparo
+        if (weaponPivot.localScale.x < 0f)
+            baseDir = -baseDir;
 
         if (_currentWeapon != null && _currentWeapon.weaponType == WeaponType.Boomerang)
         {

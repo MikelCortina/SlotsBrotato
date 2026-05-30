@@ -15,8 +15,12 @@ MonoBehaviour:
   weaponName: RifleWeapon
   weaponType: 0
   icon: {fileID: -9057444008558310320, guid: 0515d3661934ef643bec5230a0702c73, type: 3}
+  weaponPrefab: {fileID: 1855688961912401076, guid: 116c7012ed8314f43b085b2c963b98a9, type: 3}
   fireRate: 2
   damage: 25
   bulletSpeed: 12
   bulletsPerShot: 1
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
+  spreadAngle: 0
+  boomerangDistance: 5
+  holdRadius: 0.35
