@@ -5548,8 +5548,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6bfa9ca309dc1a4397ed5a4903afda8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponPivot: {fileID: 308567655}
-  weaponAim: {fileID: 0}
+  weaponPivot: {fileID: 1936309016}
+  weaponAim: {fileID: 1936309017}
   autoFire: 1
   startWeapon: {fileID: 0}
   _fireTimer: 0
@@ -5632,7 +5632,7 @@ Transform:
   m_LocalScale: {x: 0.39999998, y: 0.39999998, z: 0.39999998}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 308567655}
+  - {fileID: 1936309016}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!58 &809848642
@@ -13120,6 +13120,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1933656672}
   m_CullTransparentMesh: 1
+--- !u!1 &1936309015
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1936309016}
+  - component: {fileID: 1936309017}
+  m_Layer: 6
+  m_Name: WeaponPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1936309016
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936309015}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 809848641}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1936309017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936309015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88754c91f3d60a64e98fe79b4e88b384, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponPivot: {fileID: 1936309016}
+  renderTextureRect: {fileID: 734169031}
+  gameCamera: {fileID: 1695375334}
+  uiCanvas: {fileID: 733434914}
+  sideOffset: 0.3
 --- !u!1 &1936484095
 GameObject:
   m_ObjectHideFlags: 0
@@ -14450,7 +14499,5 @@ SceneRoots:
   - {fileID: 2000146891}
   - {fileID: 468307031}
   - {fileID: 733434915}
-  - {fileID: 1304359187}
-  - {fileID: 1653915872}
   - {fileID: 1695375335}
   - {fileID: 2101834686}

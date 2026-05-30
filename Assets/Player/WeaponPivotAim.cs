@@ -37,6 +37,7 @@ public class WeaponPivotAim : MonoBehaviour
 
         Vector3 scale = weaponPivot.localScale;
         scale.x = mouseIsRight ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+        scale.y = mouseIsRight ? Mathf.Abs(scale.y) : -Mathf.Abs(scale.y);
         weaponPivot.localScale = scale;
 
         Vector3 newLocalPos = _basePivotLocalPos;
