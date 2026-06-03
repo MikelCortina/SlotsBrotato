@@ -24,3 +24,4 @@ MonoBehaviour:
   spreadAngle: 0
   boomerangDistance: 5
   holdRadius: 0.35
+  shootSound: {fileID: 8300000, guid: e0ce80b2dae256f4c8cf8b94d9ca4d12, type: 3}

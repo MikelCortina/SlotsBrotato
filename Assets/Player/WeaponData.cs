@@ -21,4 +21,7 @@ public class WeaponData : ScriptableObject
 
     [Header("Posición en mano")]
     public float holdRadius = 0.35f;
+
+    [Header("Audio")]
+    public AudioClip shootSound;
 }

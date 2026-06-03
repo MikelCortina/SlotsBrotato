@@ -27,9 +27,22 @@ public class PlayerShooter : MonoBehaviour
 
     private SpriteRenderer _weaponSpriteRenderer;
 
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _defaultShootSound;
+    [SerializeField][Range(0f, 1f)] private float _shootSoundVolume = 0.5f;
+
     void Awake()
     {
         _stats = GetComponent<PlayerStats>();
+        _audioSource = GetComponent<AudioSource>();
+
+        if (_audioSource == null)
+        {
+            _audioSource = gameObject.AddComponent<AudioSource>();
+            _audioSource.playOnAwake = false;
+        }
     }
 
     void Start()
@@ -51,6 +64,7 @@ public class PlayerShooter : MonoBehaviour
         if (shootPressed && _fireTimer <= 0f)
         {
             Shoot();
+            PlayShootSound();
 
             float finalFireRate = fireRate;
             if (_stats != null)
@@ -133,7 +147,19 @@ public class PlayerShooter : MonoBehaviour
 
         ShootProjectileWeapon(baseDir);
     }
+    void PlayShootSound()
+    {
+        if (_audioSource == null) return;
 
+        AudioClip soundToPlay = _currentWeapon != null && _currentWeapon.shootSound != null
+            ? _currentWeapon.shootSound
+            : _defaultShootSound;
+
+        if (soundToPlay != null)
+        {
+            _audioSource.PlayOneShot(soundToPlay, _shootSoundVolume);
+        }
+    }
     void ShootProjectileWeapon(Vector2 baseDir)
     {
         int shots = Mathf.Max(1, bulletsPerShot);
