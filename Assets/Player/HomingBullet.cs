@@ -10,9 +10,19 @@ public class Bullet : MonoBehaviour
     [Header("Visual")]
     public float rotationOffset = -90f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip hitEnemySfx;
+    [SerializeField, Range(0f, 2f)] private float hitVolume = 1.5f;
+
     private Vector2 _direction;
     private float _lifetime;
     private bool _fired;
+    private AudioManager _audioManager;
+
+    void Awake()
+    {
+        _audioManager = FindFirstObjectByType<AudioManager>();
+    }
 
     public void Init(Vector2 dir, float spd, float dmg)
     {
@@ -43,6 +53,9 @@ public class Bullet : MonoBehaviour
         var health = other.GetComponent<EnemyHealth>();
         if (health != null)
             health.TakeDamage(damage, transform.position, DamageSource.Bullet);
+
+        if (_audioManager != null)
+            _audioManager.PlaySFX(hitEnemySfx, hitVolume);
 
         Destroy(gameObject);
     }
