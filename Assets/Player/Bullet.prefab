@@ -108,7 +108,7 @@ MonoBehaviour:
   maxLifetime: 4
   rotationOffset: -90
   hitEnemySfx: {fileID: 8300000, guid: 10c65f5fd1800054a9dd71fdac451369, type: 3}
-  hitVolume: 2
+  hitVolume: 1.5
 --- !u!50 &6164985924676497854
 Rigidbody2D:
   serializedVersion: 5

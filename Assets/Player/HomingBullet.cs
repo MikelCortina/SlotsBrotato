@@ -12,17 +12,11 @@ public class Bullet : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] private AudioClip hitEnemySfx;
-    [SerializeField, Range(0f, 2f)] private float hitVolume = 1.5f;
+    [SerializeField, Range(0f, 1.5f)] private float hitVolume = 0.9f;
 
     private Vector2 _direction;
     private float _lifetime;
     private bool _fired;
-    private AudioManager _audioManager;
-
-    void Awake()
-    {
-        _audioManager = FindFirstObjectByType<AudioManager>();
-    }
 
     public void Init(Vector2 dir, float spd, float dmg)
     {
@@ -54,8 +48,17 @@ public class Bullet : MonoBehaviour
         if (health != null)
             health.TakeDamage(damage, transform.position, DamageSource.Bullet);
 
-        if (_audioManager != null)
-            _audioManager.PlaySFX(hitEnemySfx, hitVolume);
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX(
+                clip: hitEnemySfx,
+                eventKey: "bullet_hit_enemy",
+                volume: hitVolume,
+                priority: SfxPriority.Low,
+                cooldown: 0.03f,
+                maxVoicesForThisClip: 2
+            );
+        }
 
         Destroy(gameObject);
     }
