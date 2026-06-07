@@ -14,6 +14,7 @@ public class ShopOfferUI : MonoBehaviour
     private WeaponData _weapon;
     private int _cost;
     private bool _bought;
+    private MechanicModifierOfferData _modifierOffer;
 
     public void SetupBuySymbol(SlotSymbolData symbol, int cost)
     {
@@ -94,6 +95,19 @@ public class ShopOfferUI : MonoBehaviour
 
             WeaponLevelSystem.Instance.UpgradeWeapon(_weapon);
         }
+        else if (_offerType == ShopOfferType.BuyModifier)
+        {
+            if (_modifierOffer == null) return;
+            if (MechanicModifierManager.Instance == null) return;
+
+            if (MechanicModifierManager.Instance.HasModifier(_modifierOffer.modifier))
+                return;
+
+            if (!PlayerWallet.Instance.SpendCoins(_cost))
+                return;
+
+            MechanicModifierManager.Instance.AddModifier(_modifierOffer.modifier);
+        }
 
         _bought = true;
         gameObject.SetActive(false);
@@ -121,6 +135,17 @@ public class ShopOfferUI : MonoBehaviour
 
     private void RefreshUI()
     {
+
+        if (_offerType == ShopOfferType.BuyModifier)
+        {
+            if (titleText && _modifierOffer != null)
+                titleText.text = $"Comprar {_modifierOffer.displayName}";
+
+            if (costText)
+                costText.text = $"{_cost}G";
+
+            return;
+        }
         if (_offerType == ShopOfferType.UpgradeWeapon)
         {
             if (iconImage && _weapon != null)
@@ -162,5 +187,18 @@ public class ShopOfferUI : MonoBehaviour
 
         if (costText)
             costText.text = $"{_cost}G";
+    }
+
+    public void SetupBuyModifier(MechanicModifierOfferData modifierOffer)
+    {
+        _offerType = ShopOfferType.BuyModifier;
+        _modifierOffer = modifierOffer;
+        _symbol = null;
+        _weapon = null;
+        _cost = modifierOffer.cost;
+        _bought = false;
+
+        RefreshUI();
+        gameObject.SetActive(true);
     }
 }

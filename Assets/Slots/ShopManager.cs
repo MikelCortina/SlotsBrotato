@@ -85,6 +85,37 @@ public class ShopManager : MonoBehaviour
         {
             if (offerSlots[i] == null) continue;
 
+            bool canOfferModifier =
+                allModifiers != null &&
+                allModifiers.Length > 0 &&
+                Random.value <= 0.20f;
+
+            if (canOfferModifier)
+            {
+                List<MechanicModifierOfferData> validModifiers =
+                    new List<MechanicModifierOfferData>();
+
+                foreach (var modifier in allModifiers)
+                {
+                    if (modifier == null) continue;
+
+                    if (MechanicModifierManager.Instance != null &&
+                        MechanicModifierManager.Instance.HasModifier(modifier.modifier))
+                        continue;
+
+                    validModifiers.Add(modifier);
+                }
+
+                if (validModifiers.Count > 0)
+                {
+                    MechanicModifierOfferData randomModifier =
+                        validModifiers[Random.Range(0, validModifiers.Count)];
+
+                    offerSlots[i].SetupBuyModifier(randomModifier);
+                    continue;
+                }
+            }
+
             bool canOfferWeapon =
                 !weaponOfferAlreadyUsed &&
                 weaponSystem != null &&
