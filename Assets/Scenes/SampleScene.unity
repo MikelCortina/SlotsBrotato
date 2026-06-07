@@ -1626,6 +1626,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207019395}
   m_CullTransparentMesh: 1
+--- !u!1 &208642276
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 208642277}
+  - component: {fileID: 208642279}
+  - component: {fileID: 208642278}
+  m_Layer: 5
+  m_Name: GameOverTransition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &208642277
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208642276}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1456000080}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &208642278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208642276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &208642279
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208642276}
+  m_CullTransparentMesh: 1
 --- !u!1 &209767689
 GameObject:
   m_ObjectHideFlags: 0
@@ -6748,6 +6823,84 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 967919403}
   m_CullTransparentMesh: 1
+--- !u!1 &1007749509
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1007749510}
+  - component: {fileID: 1007749511}
+  m_Layer: 0
+  m_Name: GameUIFlowController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1007749510
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007749509}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1781656793}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1007749511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007749509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f134e36f79df1742b06c794a0a7438d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameplayHUD:
+    id: 1
+    root: {fileID: 570641633}
+    canvasGroup: {fileID: 0}
+    disableWhenHidden: 1
+    interactableWhenVisible: 1
+  shopPanel:
+    id: 2
+    root: {fileID: 1285479937}
+    canvasGroup: {fileID: 0}
+    disableWhenHidden: 1
+    interactableWhenVisible: 1
+  gameOverPanel:
+    id: 3
+    root: {fileID: 1242824830}
+    canvasGroup: {fileID: 0}
+    disableWhenHidden: 1
+    interactableWhenVisible: 1
+  endWaveDelay: 0
+  zoomOutDuration: 2
+  gameOverDelay: 0
+  targetCamera: {fileID: 1695375334}
+  cameraFollow2D: {fileID: 1695375331}
+  perspectiveZoomOutOffset: 4
+  orthographicZoomOutOffset: 0.66
+  onWaveEndTransitionStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onWaveEndTransitionFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  onGameOverTransitionStarted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1008328076
 GameObject:
   m_ObjectHideFlags: 0
@@ -9165,6 +9318,7 @@ RectTransform:
   - {fileID: 1008328077}
   - {fileID: 1242824831}
   - {fileID: 1285479938}
+  - {fileID: 208642277}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -10693,6 +10847,7 @@ MonoBehaviour:
   boundRight: {fileID: 1907152484}
   boundTop: {fileID: 1926646095}
   boundBottom: {fileID: 1883532042}
+  transitionZoomActive: 0
 --- !u!114 &1695375332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11399,8 +11554,8 @@ MonoBehaviour:
   waveText: {fileID: 1612347666}
   scoreText: {fileID: 809126476}
   timerText: {fileID: 372318579}
-  gameOverMenu: {fileID: 1242824830}
-  shopPanel: {fileID: 1285479937}
+  uiFlow: {fileID: 1007749511}
+  directGameOverPanel: {fileID: 1242824830}
   startingWave: 1
   firstWaveDuration: 3
   waveDurationStep: 5
@@ -11425,6 +11580,7 @@ Transform:
   m_Children:
   - {fileID: 1206571888}
   - {fileID: 2059314400}
+  - {fileID: 1007749510}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1787359376
@@ -13761,7 +13917,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b7b4b6c3039c0d48b2841548ff38c33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sfxSource: {fileID: 0}
+  sfxPoolSize: 12
+  musicSourcePrefab: {fileID: 0}
+  sfxSourcePrefab: {fileID: 0}
+  maxSimultaneousSfx: 10
+  defaultSameEventCooldown: 0.04
+  maxSameClipVoices: 2
+  sameClipWindow: 0.12
+  masterSfxVolume: 1
 --- !u!82 &2059314402
 AudioSource:
   m_ObjectHideFlags: 0

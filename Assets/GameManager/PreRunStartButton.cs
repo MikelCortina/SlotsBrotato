@@ -12,11 +12,18 @@ public class PreRunStartButton : MonoBehaviour
 
     public void StartRun()
     {
-        if (RunConfig.Instance == null) return;
+        if (RunConfig.Instance == null)
+            return;
 
         if (!RunConfig.Instance.HasAtLeastOneSymbol())
         {
             Debug.Log("Debes seleccionar al menos un símbolo.");
+            return;
+        }
+
+        if (!RunConfig.Instance.HasWeapon())
+        {
+            Debug.Log("Debes seleccionar un arma.");
             return;
         }
 
@@ -35,22 +42,16 @@ public class PreRunStartButton : MonoBehaviour
             enemySpawner.BeginSpawning();
         }
 
-        if (!RunConfig.Instance.HasWeapon())
-        {
-            Debug.Log("Debes seleccionar un arma.");
-            return;
-        }
         if (playerShooter)
         {
-            WeaponSystem weaponSystem =
-    playerShooter.GetComponent<WeaponSystem>();
-
+            WeaponSystem weaponSystem = playerShooter.GetComponent<WeaponSystem>();
             if (weaponSystem != null)
                 weaponSystem.EquipWeapon(RunConfig.Instance.selectedWeapon);
-            PlayerStats stats = playerShooter.GetComponent<PlayerStats>();
 
+            PlayerStats stats = playerShooter.GetComponent<PlayerStats>();
             if (stats != null)
                 stats.ApplyPassives(RunConfig.Instance.selectedPassives);
+
             playerShooter.enabled = true;
         }
     }
