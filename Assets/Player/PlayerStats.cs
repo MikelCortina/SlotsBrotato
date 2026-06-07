@@ -55,6 +55,10 @@ public class PlayerStats : MonoBehaviour
         return coinPickupRadius;
     }
 
+    public void AddCoinPickupRadius(float amount)
+    {
+        coinPickupRadius += amount;
+    }
     public void ApplyPassive(PassiveData passive)
     {
         if (passive == null) return;
@@ -73,6 +77,10 @@ public class PlayerStats : MonoBehaviour
         {
             ApplyPassive(passive);
         }
+    }
+    public void ReduceSlotChargeTime(float amount)
+    {
+        slotChargeTime = Mathf.Max(1f, slotChargeTime - amount);
     }
 
 }

@@ -27,7 +27,6 @@ public class PlayerShooter : MonoBehaviour
 
     private SpriteRenderer _weaponSpriteRenderer;
 
-
     [Header("Audio")]
     [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip _defaultShootSound;
@@ -67,6 +66,7 @@ public class PlayerShooter : MonoBehaviour
             PlayShootSound();
 
             float finalFireRate = fireRate;
+
             if (_stats != null)
                 finalFireRate = _stats.GetFireRate(fireRate);
 
@@ -79,6 +79,8 @@ public class PlayerShooter : MonoBehaviour
         if (weapon == null) return;
 
         _currentWeapon = weapon;
+
+
         fireRate = weapon.fireRate;
         damage = weapon.damage;
         bulletSpeed = weapon.bulletSpeed;
@@ -103,7 +105,7 @@ public class PlayerShooter : MonoBehaviour
         GameObject weaponGO = Instantiate(_currentWeapon.weaponPrefab, weaponPivot);
         weaponGO.transform.localPosition = Vector3.zero;
         weaponGO.transform.localRotation = Quaternion.identity;
-        weaponGO.transform.localScale = Vector3.one*0.5f;
+        weaponGO.transform.localScale = Vector3.one * 0.5f;
 
         _currentWeaponInstance = weaponGO.GetComponent<WeaponInstance>();
 
@@ -135,7 +137,6 @@ public class PlayerShooter : MonoBehaviour
 
         Vector2 baseDir = weaponPivot.right.normalized;
 
-        // Si el arma está espejada hacia la izquierda, invertimos la dirección real del disparo
         if (weaponPivot.localScale.x < 0f)
             baseDir = -baseDir;
 
@@ -147,6 +148,7 @@ public class PlayerShooter : MonoBehaviour
 
         ShootProjectileWeapon(baseDir);
     }
+
     void PlayShootSound()
     {
         if (_audioSource == null) return;
@@ -156,10 +158,27 @@ public class PlayerShooter : MonoBehaviour
             : _defaultShootSound;
 
         if (soundToPlay != null)
-        {
             _audioSource.PlayOneShot(soundToPlay, _shootSoundVolume);
-        }
     }
+
+    float GetFinalWeaponDamage()
+    {
+        float finalDamage = damage;
+
+        if (WeaponLevelSystem.Instance != null && _currentWeapon != null)
+        {
+            float weaponMultiplier =
+                WeaponLevelSystem.Instance.GetWeaponScalingMultiplier(_currentWeapon);
+
+            finalDamage *= weaponMultiplier;
+        }
+
+        if (_stats != null)
+            finalDamage = _stats.GetFinalDamage(finalDamage);
+
+        return finalDamage;
+    }
+
     void ShootProjectileWeapon(Vector2 baseDir)
     {
         int shots = Mathf.Max(1, bulletsPerShot);
@@ -178,10 +197,7 @@ public class PlayerShooter : MonoBehaviour
             Bullet bullet = go.GetComponent<Bullet>();
             if (bullet == null) continue;
 
-            float finalDamage = damage;
-            if (_stats != null)
-                finalDamage = _stats.GetFinalDamage(damage);
-
+            float finalDamage = GetFinalWeaponDamage();
             bullet.Init(dir, bulletSpeed, finalDamage);
         }
     }
@@ -191,15 +207,16 @@ public class PlayerShooter : MonoBehaviour
         if (bulletPrefab == null || _firePoint == null) return;
 
         GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
-        BoomerangProjectile boomerang = go.GetComponent<BoomerangProjectile>();
 
+        BoomerangProjectile boomerang = go.GetComponent<BoomerangProjectile>();
         if (boomerang == null) return;
 
-        float finalDamage = damage;
-        if (_stats != null)
-            finalDamage = _stats.GetFinalDamage(damage);
+        float finalDamage = GetFinalWeaponDamage();
 
-        float distance = _currentWeapon != null ? _currentWeapon.boomerangDistance : 5f;
+        float distance = _currentWeapon != null
+            ? _currentWeapon.boomerangDistance
+            : 5f;
+
         boomerang.Init(transform, dir, bulletSpeed, finalDamage, distance);
     }
 }

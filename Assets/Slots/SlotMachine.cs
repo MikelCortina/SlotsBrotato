@@ -279,7 +279,16 @@ public class SlotMachine : MonoBehaviour
         for (int i = 0; i < _autoSymbols.Count; i++)
         {
             var symbol = _autoSymbols[i];
-            int amount = jackpotAuto ? 3 : 1;
+            int jackpotValue = 3;
+
+            if (MechanicModifierManager.Instance != null &&
+                MechanicModifierManager.Instance.HasModifier(
+                    MechanicModifierType.ExtendedJackpot))
+            {
+                jackpotValue = 5;
+            }
+
+            int amount = jackpotAuto ? jackpotValue : 1;
 
             yield return StartCoroutine(ResolveSingleSymbolVisual(symbol, amount));
 
@@ -303,7 +312,17 @@ public class SlotMachine : MonoBehaviour
             for (int i = 0; i < _pendingSymbols.Count; i++)
             {
                 var p = _pendingSymbols[i];
-                yield return StartCoroutine(ResolveSingleSymbolVisual(p, 3));
+                int jackpotValue = 3;
+
+                if (MechanicModifierManager.Instance != null &&
+                    MechanicModifierManager.Instance.HasModifier(
+                        MechanicModifierType.ExtendedJackpot))
+                {
+                    jackpotValue = 5;
+                }
+
+                yield return StartCoroutine(
+                    ResolveSingleSymbolVisual(p, jackpotValue));
 
                 if (i < _pendingSymbols.Count - 1 && activationStepDelay > 0f)
                     yield return new WaitForSeconds(activationStepDelay);
