@@ -1,5 +1,6 @@
 public enum ShopOfferType
 {
     BuySymbol,
-    UpgradeSymbol
+    UpgradeSymbol,
+    UpgradeWeapon
 }
