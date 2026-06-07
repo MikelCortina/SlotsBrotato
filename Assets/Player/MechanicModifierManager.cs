@@ -11,7 +11,8 @@ public class MechanicModifierManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        AddModifier(MechanicModifierType.AutoPickupCoins);
+
+
     }
 
     public bool HasModifier(MechanicModifierType modifier)
