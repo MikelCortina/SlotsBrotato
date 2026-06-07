@@ -79,6 +79,11 @@ public class ShopManager : MonoBehaviour
         List<SlotSymbolData> availableSymbols =
             new List<SlotSymbolData>(allSymbols);
 
+        List<MechanicModifierOfferData> availableModifiers =
+            allModifiers != null
+                ? new List<MechanicModifierOfferData>(allModifiers)
+                : new List<MechanicModifierOfferData>();
+
         bool weaponOfferAlreadyUsed = false;
 
         for (int i = 0; i < offerSlots.Length; i++)
@@ -86,8 +91,7 @@ public class ShopManager : MonoBehaviour
             if (offerSlots[i] == null) continue;
 
             bool canOfferModifier =
-                allModifiers != null &&
-                allModifiers.Length > 0 &&
+                availableModifiers.Count > 0 &&
                 Random.value <= 0.20f;
 
             if (canOfferModifier)
@@ -95,7 +99,7 @@ public class ShopManager : MonoBehaviour
                 List<MechanicModifierOfferData> validModifiers =
                     new List<MechanicModifierOfferData>();
 
-                foreach (var modifier in allModifiers)
+                foreach (var modifier in availableModifiers)
                 {
                     if (modifier == null) continue;
 
@@ -110,6 +114,8 @@ public class ShopManager : MonoBehaviour
                 {
                     MechanicModifierOfferData randomModifier =
                         validModifiers[Random.Range(0, validModifiers.Count)];
+
+                    availableModifiers.Remove(randomModifier);
 
                     offerSlots[i].SetupBuyModifier(randomModifier);
                     continue;
