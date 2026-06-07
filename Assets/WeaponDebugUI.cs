@@ -22,11 +22,23 @@ public class WeaponDebugUI : MonoBehaviour
             return;
         }
 
+        int weaponLevel = WeaponLevelSystem.Instance != null
+            ? WeaponLevelSystem.Instance.GetWeaponLevel(weapon)
+            : 1;
+
+        float weaponMultiplier = WeaponLevelSystem.Instance != null
+            ? WeaponLevelSystem.Instance.GetWeaponScalingMultiplier(weapon)
+            : 1f;
+
+        float estimatedDamage = weapon.damage * weaponMultiplier;
+
         weaponText.text =
             $"Arma: {weapon.weaponName}\n" +
             $"Tipo: {weapon.weaponType}\n" +
-            $"Daño arma: {weapon.damage}\n" +
-            $"Daño actual disparo: {playerShooter.damage}\n" +
+            $"Nivel arma: {weaponLevel}\n" +
+            $"Multiplicador nivel: x{weaponMultiplier:0.0}\n" +
+            $"Daño base arma: {weapon.damage}\n" +
+            $"Daño estimado: {estimatedDamage:0.0}\n" +
             $"Cadencia arma: {weapon.fireRate}\n" +
             $"Cadencia actual: {playerShooter.fireRate}\n" +
             $"Velocidad bala: {playerShooter.bulletSpeed}\n" +
