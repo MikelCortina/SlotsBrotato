@@ -78,5 +78,9 @@ public class PlayerStats : MonoBehaviour
             ApplyPassive(passive);
         }
     }
+    public void ReduceSlotChargeTime(float amount)
+    {
+        slotChargeTime = Mathf.Max(1f, slotChargeTime - amount);
+    }
 
 }

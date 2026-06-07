@@ -11,7 +11,7 @@ public class MechanicModifierManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-
+        AddModifier(MechanicModifierType.SlotChargeBoost);
 
     }
 
@@ -44,6 +44,9 @@ public class MechanicModifierManager : MonoBehaviour
         {
             case MechanicModifierType.AutoPickupCoins:
                 stats.AddCoinPickupRadius(4f);
+                break;
+            case MechanicModifierType.SlotChargeBoost:
+                stats.ReduceSlotChargeTime(2f);
                 break;
         }
     }

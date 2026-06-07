@@ -4,5 +4,6 @@ public enum MechanicModifierType
     CompoundInterest,
     AutoPickupCoins,
     FourthReel,
-    ExtendedJackpot
+    ExtendedJackpot,
+    SlotChargeBoost,
 }
