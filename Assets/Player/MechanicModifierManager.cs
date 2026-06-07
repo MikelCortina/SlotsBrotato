@@ -11,7 +11,7 @@ public class MechanicModifierManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        AddModifier(MechanicModifierType.SlotChargeBoost);
+
 
     }
 

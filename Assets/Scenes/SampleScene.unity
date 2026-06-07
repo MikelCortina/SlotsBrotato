@@ -12516,6 +12516,22 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2c89b4e26d1e8df4481324b18be31188, type: 2}
   - {fileID: 11400000, guid: acf6b34bc6924864e9cf32c39bbc090f, type: 2}
   - {fileID: 11400000, guid: 56efffb31063a994986d9b4f7acf5878, type: 2}
+  allModifiers:
+  - modifier: 0
+    displayName: Refresco Gratuito
+    cost: 50
+  - modifier: 1
+    displayName: "Inter\xE9s Compuesto "
+    cost: 60
+  - modifier: 2
+    displayName: "Recogida Autom\xE1tica"
+    cost: 50
+  - modifier: 4
+    displayName: Jackpot Extendido
+    cost: 75
+  - modifier: 5
+    displayName: "Carga R\xE1pida"
+    cost: 60
   weaponSystem: {fileID: 809848647}
   weaponUpgradeBaseCost: 40
   weaponUpgradeChance: 0.35

@@ -9,6 +9,9 @@ public class ShopManager : MonoBehaviour
     [Header("Catalog")]
     public SlotSymbolData[] allSymbols;
 
+    [Header("Modifier Offers")]
+    public MechanicModifierOfferData[] allModifiers;
+
     [Header("Weapon Offers")]
     public WeaponSystem weaponSystem;
     public int weaponUpgradeBaseCost = 40;
