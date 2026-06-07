@@ -22,6 +22,9 @@ public class ShopManager : MonoBehaviour
     void OnEnable()
     {
         _freeRefreshUsed = false;
+
+        ApplyCompoundInterest();
+
         GenerateOffers();
     }
 
@@ -45,6 +48,24 @@ public class ShopManager : MonoBehaviour
             return;
 
         GenerateOffers();
+    }
+
+    void ApplyCompoundInterest()
+    {
+        if (MechanicModifierManager.Instance == null) return;
+
+        if (!MechanicModifierManager.Instance.HasModifier(
+            MechanicModifierType.CompoundInterest))
+            return;
+
+        if (PlayerWallet.Instance == null) return;
+
+        int bonus =
+            Mathf.RoundToInt(PlayerWallet.Instance.Coins * 0.10f);
+
+        PlayerWallet.Instance.AddCoins(bonus);
+
+        Debug.Log($"Interés compuesto: +{bonus} monedas");
     }
 
     public void GenerateOffers()
