@@ -55,6 +55,10 @@ public class PlayerStats : MonoBehaviour
         return coinPickupRadius;
     }
 
+    public void AddCoinPickupRadius(float amount)
+    {
+        coinPickupRadius += amount;
+    }
     public void ApplyPassive(PassiveData passive)
     {
         if (passive == null) return;

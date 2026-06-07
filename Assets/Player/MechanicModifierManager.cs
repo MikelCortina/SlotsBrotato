@@ -11,7 +11,7 @@ public class MechanicModifierManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-
+        AddModifier(MechanicModifierType.AutoPickupCoins);
     }
 
     public bool HasModifier(MechanicModifierType modifier)
@@ -25,7 +25,25 @@ public class MechanicModifierManager : MonoBehaviour
             return false;
 
         activeModifiers.Add(modifier);
+
+        ApplyModifierEffect(modifier);
+
         Debug.Log($"Modificador activado: {modifier}");
         return true;
+    }
+
+    private void ApplyModifierEffect(MechanicModifierType modifier)
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        PlayerStats stats = player != null ? player.GetComponent<PlayerStats>() : null;
+
+        if (stats == null) return;
+
+        switch (modifier)
+        {
+            case MechanicModifierType.AutoPickupCoins:
+                stats.AddCoinPickupRadius(4f);
+                break;
+        }
     }
 }
