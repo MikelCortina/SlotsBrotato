@@ -17,13 +17,28 @@ public class ShopManager : MonoBehaviour
     [Header("Offers")]
     public ShopOfferUI[] offerSlots;
 
+    private bool _freeRefreshUsed;
+
     void OnEnable()
     {
+        _freeRefreshUsed = false;
         GenerateOffers();
     }
 
     public void RefreshShop()
     {
+        bool hasFreeRefresh =
+            MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(MechanicModifierType.FreeRefresh);
+
+        if (hasFreeRefresh && !_freeRefreshUsed)
+        {
+            _freeRefreshUsed = true;
+            GenerateOffers();
+            Debug.Log("Refresco gratuito usado.");
+            return;
+        }
+
         if (PlayerWallet.Instance == null) return;
 
         if (!PlayerWallet.Instance.SpendCoins(refreshCost))
