@@ -50,4 +50,9 @@ public class MechanicModifierManager : MonoBehaviour
                 break;
         }
     }
+
+    public IEnumerable<MechanicModifierType> GetActiveModifiers()
+    {
+        return activeModifiers;
+    }
 }
