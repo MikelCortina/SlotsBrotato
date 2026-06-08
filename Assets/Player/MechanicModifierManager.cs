@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class MechanicModifierManager : MonoBehaviour
 {
+    public int maxModifierSlots = 2;
     public static MechanicModifierManager Instance { get; private set; }
 
     private readonly HashSet<MechanicModifierType> activeModifiers =
@@ -12,7 +13,9 @@ public class MechanicModifierManager : MonoBehaviour
     {
         Instance = this;
 
-
+        AddModifier(MechanicModifierType.FreeRefresh);
+        AddModifier(MechanicModifierType.CompoundInterest);
+        AddModifier(MechanicModifierType.AutoPickupCoins);
     }
 
     public bool HasModifier(MechanicModifierType modifier)
@@ -25,9 +28,13 @@ public class MechanicModifierManager : MonoBehaviour
         if (activeModifiers.Contains(modifier))
             return false;
 
-        activeModifiers.Add(modifier);
+        if (!HasFreeSlot())
+        {
+            Debug.Log("No quedan ranuras de modificador.");
+            return false;
+        }
 
-        ApplyModifierEffect(modifier);
+        activeModifiers.Add(modifier);
 
         Debug.Log($"Modificador activado: {modifier}");
         return true;
@@ -51,6 +58,10 @@ public class MechanicModifierManager : MonoBehaviour
         }
     }
 
+    public bool HasFreeSlot()
+    {
+        return activeModifiers.Count < maxModifierSlots;
+    }
     public IEnumerable<MechanicModifierType> GetActiveModifiers()
     {
         return activeModifiers;
