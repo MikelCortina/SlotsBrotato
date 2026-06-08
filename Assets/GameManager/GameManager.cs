@@ -120,6 +120,8 @@ public class GameManager : MonoBehaviour
         IsInShop = true;
         _shopClosed = false;
 
+        WaveVoucherManager.Instance?.AddVoucher(1);
+
         if (shopPanel) shopPanel.SetActive(true);
 
         while (!_shopClosed)
