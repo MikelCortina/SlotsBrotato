@@ -18,10 +18,6 @@ public class SlotReel : MonoBehaviour
     public float fastScrollInterval = 0.055f;
     public float slowScrollInterval = 0.12f;
 
-    [Header("Lock Visual")]
-    [Tooltip("Imagen que se muestra cuando el símbolo se activa (cubre el slot)")]
-    public Image lockImage;
-
     [Header("Activation Visual")]
     public float activationPunchScale = 1.28f;
     public float activationPunchDuration = 0.16f;
@@ -34,9 +30,6 @@ public class SlotReel : MonoBehaviour
     {
         BuildSymbolPool();
         SetInitialSymbol();
-
-        if (lockImage != null)
-            lockImage.gameObject.SetActive(false);
     }
 
     void BuildSymbolPool()
@@ -64,9 +57,7 @@ public class SlotReel : MonoBehaviour
     {
         if (_spinning) return;
 
-        HideLock();
         ResetVisualState();
-
         BuildSymbolPool();
 
         if (currentSymbols == null || currentSymbols.Length == 0)
@@ -174,33 +165,16 @@ public class SlotReel : MonoBehaviour
 
     public void ResetVisualState()
     {
-        if (displayImage != null)
-            displayImage.transform.localScale = Vector3.one;
-
         if (_scaleRoutine != null)
         {
             StopCoroutine(_scaleRoutine);
             _scaleRoutine = null;
         }
+
+        if (displayImage != null)
+            displayImage.transform.localScale = Vector3.one;
     }
 
-    public void ForceShowLock()
-    {
-        if (lockImage != null)
-            lockImage.gameObject.SetActive(true);
-    }
-
-    public void ShowLock()
-    {
-        if (lockImage != null)
-            lockImage.gameObject.SetActive(true);
-    }
-
-    public void HideLock()
-    {
-        if (lockImage != null)
-            lockImage.gameObject.SetActive(false);
-    }
     void UpdateSymbolVisual()
     {
         if (CurrentSymbol == null) return;

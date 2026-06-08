@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   symbolName: PowerSymbol
   symbolType: 4
-  icon: {fileID: 0}
+  icon: {fileID: 8701140351847246947, guid: 95e82cb4b2a42af4dbcc879343f41969, type: 3}
+  description: 
   activateInstantly: 1

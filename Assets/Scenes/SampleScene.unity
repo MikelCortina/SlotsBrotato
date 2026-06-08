@@ -2627,7 +2627,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -3239681624356725467, guid: d0275f8a1c63447419a036056e17145b, type: 3}
+  m_Sprite: {fileID: -212504349012411075, guid: eb52bec70d05fc04895a39a7c8b3785f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3037,7 +3037,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -3239681624356725467, guid: d0275f8a1c63447419a036056e17145b, type: 3}
+  m_Sprite: {fileID: -212504349012411075, guid: eb52bec70d05fc04895a39a7c8b3785f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7160,7 +7160,6 @@ MonoBehaviour:
   symbolLevelText: {fileID: 587011589}
   fastScrollInterval: 0.055
   slowScrollInterval: 0.12
-  lockImage: {fileID: 1693607246}
   activationPunchScale: 1.28
   activationPunchDuration: 0.16
 --- !u!114 &958888470
@@ -7682,7 +7681,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -3239681624356725467, guid: d0275f8a1c63447419a036056e17145b, type: 3}
+  m_Sprite: {fileID: -212504349012411075, guid: eb52bec70d05fc04895a39a7c8b3785f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8217,7 +8216,6 @@ MonoBehaviour:
   baseEnemyHp: 30
   hpIncreasePerWave: 15
   baseEnemySpeed: 2
-  speedIncreasePerWave: 0.3
   baseEnemyDamage: 1
   damageIncreasePerWave: 1
   spawnWarningPrefab: {fileID: 2738494950079665022, guid: d5aab33a3610ed241b22af8a21859d2b, type: 3}
@@ -10463,7 +10461,6 @@ MonoBehaviour:
   symbolLevelText: {fileID: 1237692868}
   fastScrollInterval: 0.055
   slowScrollInterval: 0.12
-  lockImage: {fileID: 1547773673}
   activationPunchScale: 1.28
   activationPunchDuration: 0.16
 --- !u!114 &1532927245
@@ -10566,7 +10563,6 @@ MonoBehaviour:
   symbolLevelText: {fileID: 1597364537}
   fastScrollInterval: 0.055
   slowScrollInterval: 0.12
-  lockImage: {fileID: 1296357790}
   activationPunchScale: 1.28
   activationPunchDuration: 0.16
 --- !u!114 &1539462053
@@ -12678,8 +12674,11 @@ MonoBehaviour:
   timerText: {fileID: 372318579}
   uiFlow: {fileID: 1007749511}
   directGameOverPanel: {fileID: 1242824830}
+  gameplayCursor: {fileID: 2800000, guid: 49e3e6d2dfa0315478cb0bb080b975c8, type: 3}
+  gameplayCursorHotspot: {x: 0, y: 0}
+  gameplayCursorMode: 0
   startingWave: 1
-  firstWaveDuration: 3
+  firstWaveDuration: 15
   waveDurationStep: 5
   maxNormalWaveDuration: 60
   finalWaveDuration: 90
@@ -14742,10 +14741,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponPivot: {fileID: 1936309016}
+  weaponSprite: {fileID: 0}
   renderTextureRect: {fileID: 734169031}
   gameCamera: {fileID: 1695375334}
   uiCanvas: {fileID: 733434914}
-  sideOffset: 0.3
 --- !u!1 &1936484095
 GameObject:
   m_ObjectHideFlags: 0
