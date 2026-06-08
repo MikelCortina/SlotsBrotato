@@ -8,12 +8,14 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [Header("UI")]
+    [Header("UI Data")]
     public TextMeshProUGUI waveText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI timerText;
-    public GameObject gameOverMenu;
-    public GameObject shopPanel;
+    public GameUIFlowController uiFlow;
+
+    [Header("Fallback panel directo")]
+    [SerializeField] private GameObject directGameOverPanel;
 
     [Header("Oleadas")]
     public int startingWave = 1;
@@ -41,7 +43,8 @@ public class GameManager : MonoBehaviour
 
     public static readonly List<GameObject> LiveEnemies = new List<GameObject>();
 
-    bool _shopClosed;
+    private bool _shopClosed;
+    private bool _isGameOver;
 
     void Awake()
     {
@@ -52,9 +55,25 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
+        Time.timeScale = 1f;
+
         CurrentWave = startingWave;
-        if (gameOverMenu) gameOverMenu.SetActive(false);
-        if (shopPanel) shopPanel.SetActive(false);
+        Score = 0;
+        EnemiesAlive = 0;
+        WaveTimeRemaining = 0f;
+
+        IsWaveRunning = false;
+        IsInShop = false;
+        _isGameOver = false;
+        _shopClosed = false;
+
+        if (uiFlow != null)
+            uiFlow.Initialize(this);
+
+        if (directGameOverPanel != null)
+            directGameOverPanel.SetActive(false);
+
+        ApplyTimeScale();
         UpdateUI();
     }
 
@@ -63,18 +82,43 @@ public class GameManager : MonoBehaviour
         StartCoroutine(GameLoop());
     }
 
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+
+        Time.timeScale = 1f;
+    }
+
+    void ApplyTimeScale()
+    {
+        bool isActuallyPlaying = IsWaveRunning && !IsInShop && !_isGameOver;
+        Time.timeScale = isActuallyPlaying ? 1f : 0f;
+    }
+
     public void BeginRun()
     {
         Time.timeScale = 1f;
+
+        _isGameOver = false;
+        _shopClosed = false;
+
         CurrentWave = startingWave;
         Score = 0;
         EnemiesAlive = 0;
         WaveTimeRemaining = GetWaveDuration(CurrentWave);
+
         IsInShop = false;
         IsWaveRunning = true;
 
-        if (shopPanel) shopPanel.SetActive(false);
-        if (gameOverMenu) gameOverMenu.SetActive(false);
+        if (directGameOverPanel != null)
+            directGameOverPanel.SetActive(false);
+
+        if (uiFlow != null)
+        {
+            uiFlow.Initialize(this);
+            uiFlow.ShowGameplayImmediate();
+        }
 
         UpdateUI();
     }
@@ -83,16 +127,37 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
+            yield return new WaitUntil(() => IsWaveRunning || _isGameOver);
+
+            if (_isGameOver)
+                yield break;
+
             yield return RunWave(CurrentWave);
 
-            IsWaveRunning = false;
+            if (_isGameOver)
+                yield break;
+
             CleanupWaveEnemies();
-            PauseGame();
+
+            if (uiFlow != null)
+                yield return uiFlow.PlayWaveEndTransition(CurrentWave);
+
+            if (_isGameOver)
+                yield break;
 
             yield return RunShop();
 
+            if (_isGameOver)
+                yield break;
+
             CurrentWave++;
-            ResumeGame();
+            IsWaveRunning = true;
+
+            if (uiFlow != null)
+                uiFlow.ShowGameplayImmediate();
+
+            ApplyTimeScale();
+            UpdateUI();
         }
     }
 
@@ -100,14 +165,12 @@ public class GameManager : MonoBehaviour
     {
         IsWaveRunning = true;
         IsInShop = false;
-
-        if (SlotMachine.Instance != null)
-            SlotMachine.Instance.ResetRewind();
-
         WaveTimeRemaining = GetWaveDuration(wave);
+
+        ApplyTimeScale();
         UpdateUI();
 
-        while (WaveTimeRemaining > 0f)
+        while (WaveTimeRemaining > 0f && !_isGameOver)
         {
             WaveTimeRemaining -= Time.deltaTime;
             UpdateUI();
@@ -115,6 +178,9 @@ public class GameManager : MonoBehaviour
         }
 
         WaveTimeRemaining = 0f;
+        IsWaveRunning = false;
+
+        ApplyTimeScale();
         UpdateUI();
     }
 
@@ -123,15 +189,22 @@ public class GameManager : MonoBehaviour
         IsInShop = true;
         _shopClosed = false;
 
-        WaveVoucherManager.Instance?.AddVoucher(1);
+        ApplyTimeScale();
+        UpdateUI();
 
-        if (shopPanel) shopPanel.SetActive(true);
+        if (uiFlow != null)
+            uiFlow.ShowShopImmediate();
 
-        while (!_shopClosed)
+        while (!_shopClosed && !_isGameOver)
             yield return null;
 
         IsInShop = false;
-        if (shopPanel) shopPanel.SetActive(false);
+
+        if (!_isGameOver && uiFlow != null)
+            uiFlow.ShowGameplayImmediate();
+
+        ApplyTimeScale();
+        UpdateUI();
     }
 
     void CleanupWaveEnemies()
@@ -147,16 +220,6 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
-    void PauseGame()
-    {
-        Time.timeScale = 0f;
-    }
-
-    void ResumeGame()
-    {
-        Time.timeScale = 1f;
-    }
-
     public void ContinueFromShop()
     {
         _shopClosed = true;
@@ -165,8 +228,10 @@ public class GameManager : MonoBehaviour
     public void RegisterEnemy(GameObject enemy)
     {
         if (enemy == null) return;
-        LiveEnemies.Add(enemy);
-        EnemiesAlive++;
+        if (!LiveEnemies.Contains(enemy))
+            LiveEnemies.Add(enemy);
+
+        EnemiesAlive = Mathf.Max(0, LiveEnemies.Count);
         UpdateUI();
     }
 
@@ -174,7 +239,7 @@ public class GameManager : MonoBehaviour
     {
         if (enemy == null) return;
         LiveEnemies.Remove(enemy);
-        EnemiesAlive = Mathf.Max(0, EnemiesAlive - 1);
+        EnemiesAlive = Mathf.Max(0, LiveEnemies.Count);
         UpdateUI();
     }
 
@@ -194,15 +259,63 @@ public class GameManager : MonoBehaviour
 
     public void OnEnemyKilled()
     {
-        EnemiesAlive = Mathf.Max(0, EnemiesAlive - 1);
         Score += 10 + CurrentWave * 5;
+        EnemiesAlive = Mathf.Max(0, LiveEnemies.Count);
         UpdateUI();
     }
 
     public void GameOver()
     {
+        if (_isGameOver)
+            return;
+
+        Debug.Log("GameManager -> GameOver()");
+
+        _isGameOver = true;
+        IsWaveRunning = false;
+        IsInShop = false;
+        _shopClosed = true;
+
+        StopAllCoroutines();
+        CleanupWaveEnemies();
+        UpdateUI();
+
+        StartCoroutine(ShowGameOverRoutine());
+    }
+
+    private IEnumerator ShowGameOverRoutine()
+    {
+        Debug.Log("ShowGameOverRoutine iniciado");
+
+        if (uiFlow != null)
+        {
+            uiFlow.ShowGameOverImmediate();
+            Debug.Log("GameOver panel configured: " + uiFlow.IsGameOverPanelConfigured());
+        }
+        else
+        {
+            Debug.LogWarning("GameManager -> uiFlow es null en ShowGameOverRoutine");
+        }
+
+        if (directGameOverPanel != null)
+        {
+            directGameOverPanel.SetActive(true);
+
+            CanvasGroup cg = directGameOverPanel.GetComponent<CanvasGroup>();
+            if (cg == null)
+                cg = directGameOverPanel.AddComponent<CanvasGroup>();
+
+            cg.alpha = 1f;
+            cg.interactable = true;
+            cg.blocksRaycasts = true;
+
+            Debug.Log("directGameOverPanel activado");
+        }
+
+        yield return null; // Deja que Unity pinte un frame antes de pausar
         Time.timeScale = 0f;
-        if (gameOverMenu) gameOverMenu.SetActive(true);
+
+        Debug.Log("Time.timeScale puesto a 0 - juego pausado");
     }
 
     public void RestartGame()
@@ -215,11 +328,17 @@ public class GameManager : MonoBehaviour
     {
         if (waveText) waveText.text = $"Oleada {CurrentWave}";
         if (scoreText) scoreText.text = $"Puntos: {Score}";
+
         if (timerText)
         {
-            if (IsWaveRunning) timerText.text = $"Tiempo: {Mathf.CeilToInt(WaveTimeRemaining)}";
-            else if (IsInShop) timerText.text = "Tienda";
-            else timerText.text = "";
+            if (_isGameOver)
+                timerText.text = "";
+            else if (IsWaveRunning)
+                timerText.text = $"Tiempo: {Mathf.CeilToInt(WaveTimeRemaining)}";
+            else if (IsInShop)
+                timerText.text = "Tienda";
+            else
+                timerText.text = "";
         }
     }
 }

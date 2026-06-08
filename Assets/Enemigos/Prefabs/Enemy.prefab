@@ -152,8 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d695157a6f5e34459eef8381a7fa2b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2.5
-  acceleration: 8
+  speed: 1.25
+  acceleration: 4
   separationRadius: 1.2
   separationForce: 6
   arrivalRadius: 0.7
