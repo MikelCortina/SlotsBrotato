@@ -7,4 +7,5 @@ public enum MechanicModifierType
     ExtendedJackpot,
     SlotChargeBoost,
     DamageCharge,
+    Rewind,
 }

@@ -101,6 +101,9 @@ public class GameManager : MonoBehaviour
         IsWaveRunning = true;
         IsInShop = false;
 
+        if (SlotMachine.Instance != null)
+            SlotMachine.Instance.ResetRewind();
+
         WaveTimeRemaining = GetWaveDuration(wave);
         UpdateUI();
 

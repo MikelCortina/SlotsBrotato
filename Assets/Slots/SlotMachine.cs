@@ -45,6 +45,7 @@ public class SlotMachine : MonoBehaviour
     bool _pendingIsJackpot;
     bool _chargeLockedFull;
     bool _isResolvingActivation;
+    bool _rewindUsedThisWave;
 
     readonly List<(int reelIndex, SlotSymbolData data)> _pendingSymbols = new();
     readonly List<(int reelIndex, SlotSymbolData data)> _autoSymbols = new();
@@ -83,6 +84,7 @@ public class SlotMachine : MonoBehaviour
         _pendingIsJackpot = false;
         _chargeLockedFull = false;
         _isResolvingActivation = false;
+        _rewindUsedThisWave = false;
 
         if (flashOverlay) flashOverlay.SetActive(false);
         if (pendingIndicator) pendingIndicator.SetActive(false);
@@ -535,5 +537,31 @@ public class SlotMachine : MonoBehaviour
         _charge = _chargeTimer;
 
         UpdateChargeUI();
+    }
+
+    public bool CanRewind()
+    {
+        return !_rewindUsedThisWave &&
+               !_spinning &&
+               !_hasPendingSymbols &&
+               !_isResolvingActivation;
+    }
+
+    public void RewindSpin()
+    {
+        if (!CanRewind())
+            return;
+
+        _rewindUsedThisWave = true;
+
+        _chargeTimer = GetSlotChargeTime();
+        _charge = _chargeTimer;
+
+        StartCoroutine(DoSpin());
+    }
+
+    public void ResetRewind()
+    {
+        _rewindUsedThisWave = false;
     }
 }

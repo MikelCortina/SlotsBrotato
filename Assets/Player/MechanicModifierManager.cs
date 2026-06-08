@@ -12,7 +12,7 @@ public class MechanicModifierManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        AddModifier(MechanicModifierType.DamageCharge);
+
     }
 
     public bool HasModifier(MechanicModifierType modifier)
