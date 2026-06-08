@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class SlotReel : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class SlotReel : MonoBehaviour
     public Image displayImage;
     public Image topBlur;
     public Image botBlur;
+    public TextMeshProUGUI symbolLevelText;
 
     public SlotSymbolData CurrentSymbol { get; private set; }
 
@@ -55,7 +57,7 @@ public class SlotReel : MonoBehaviour
         CurrentSymbol = currentSymbols[_displayIndex];
 
         if (displayImage)
-            displayImage.sprite = CurrentSymbol.icon;
+            UpdateSymbolVisual();
     }
 
     public void StartSpin(float stopAfter)
@@ -110,7 +112,7 @@ public class SlotReel : MonoBehaviour
         CurrentSymbol = currentSymbols[result];
 
         if (displayImage)
-            displayImage.sprite = CurrentSymbol.icon;
+            UpdateSymbolVisual();
 
         SetBlurVisible(false);
         _spinning = false;
@@ -198,5 +200,18 @@ public class SlotReel : MonoBehaviour
     {
         if (lockImage != null)
             lockImage.gameObject.SetActive(false);
+    }
+    void UpdateSymbolVisual()
+    {
+        if (CurrentSymbol == null) return;
+
+        if (displayImage)
+            displayImage.sprite = CurrentSymbol.icon;
+
+        if (symbolLevelText != null && RunConfig.Instance != null)
+        {
+            int level = RunConfig.Instance.GetSymbolLevel(CurrentSymbol.symbolType);
+            symbolLevelText.text = $"Lv.{level}";
+        }
     }
 }

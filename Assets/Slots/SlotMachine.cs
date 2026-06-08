@@ -45,6 +45,7 @@ public class SlotMachine : MonoBehaviour
     bool _pendingIsJackpot;
     bool _chargeLockedFull;
     bool _isResolvingActivation;
+    bool _rewindUsedThisWave;
 
     readonly List<(int reelIndex, SlotSymbolData data)> _pendingSymbols = new();
     readonly List<(int reelIndex, SlotSymbolData data)> _autoSymbols = new();
@@ -83,6 +84,7 @@ public class SlotMachine : MonoBehaviour
         _pendingIsJackpot = false;
         _chargeLockedFull = false;
         _isResolvingActivation = false;
+        _rewindUsedThisWave = false;
 
         if (flashOverlay) flashOverlay.SetActive(false);
         if (pendingIndicator) pendingIndicator.SetActive(false);
@@ -260,16 +262,34 @@ public class SlotMachine : MonoBehaviour
 
     bool IsJackpot(List<(int reelIndex, SlotSymbolData data)> symbols)
     {
-        if (symbols.Count < 2) return false;
+        if (symbols.Count < 2)
+            return false;
 
-        var first = symbols[0].data.symbolType;
-        for (int i = 1; i < symbols.Count; i++)
+        bool reducedJackpot =
+            MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(
+                MechanicModifierType.ReducedJackpot);
+
+        Dictionary<SlotSymbolType, int> counts =
+            new Dictionary<SlotSymbolType, int>();
+
+        foreach (var symbol in symbols)
         {
-            if (symbols[i].data.symbolType != first)
-                return false;
+            if (!counts.ContainsKey(symbol.data.symbolType))
+                counts[symbol.data.symbolType] = 0;
+
+            counts[symbol.data.symbolType]++;
         }
 
-        return true;
+        int requiredMatches = reducedJackpot ? 2 : symbols.Count;
+
+        foreach (var pair in counts)
+        {
+            if (pair.Value >= requiredMatches)
+                return true;
+        }
+
+        return false;
     }
 
     IEnumerator ResolveAutoSymbolsRoutine()
@@ -521,5 +541,45 @@ public class SlotMachine : MonoBehaviour
         stats.damage += damageGain;
 
         Debug.Log($"+{damageGain} daño permanente");
+    }
+
+
+    public void AddCharge(float amount)
+    {
+        if (_spinning || _chargeLockedFull || _isResolvingActivation)
+            return;
+
+        float chargeTime = GetSlotChargeTime();
+
+        _chargeTimer = Mathf.Min(chargeTime, _chargeTimer + amount);
+        _charge = _chargeTimer;
+
+        UpdateChargeUI();
+    }
+
+    public bool CanRewind()
+    {
+        return !_rewindUsedThisWave &&
+               !_spinning &&
+               !_hasPendingSymbols &&
+               !_isResolvingActivation;
+    }
+
+    public void RewindSpin()
+    {
+        if (!CanRewind())
+            return;
+
+        _rewindUsedThisWave = true;
+
+        _chargeTimer = GetSlotChargeTime();
+        _charge = _chargeTimer;
+
+        StartCoroutine(DoSpin());
+    }
+
+    public void ResetRewind()
+    {
+        _rewindUsedThisWave = false;
     }
 }

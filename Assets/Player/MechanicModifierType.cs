@@ -6,4 +6,7 @@ public enum MechanicModifierType
     FourthReel,
     ExtendedJackpot,
     SlotChargeBoost,
+    DamageCharge,
+    Rewind,
+    ReducedJackpot,
 }
