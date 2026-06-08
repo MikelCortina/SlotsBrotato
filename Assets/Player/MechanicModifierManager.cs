@@ -13,9 +13,6 @@ public class MechanicModifierManager : MonoBehaviour
     {
         Instance = this;
 
-        AddModifier(MechanicModifierType.FreeRefresh);
-        AddModifier(MechanicModifierType.CompoundInterest);
-        AddModifier(MechanicModifierType.AutoPickupCoins);
     }
 
     public bool HasModifier(MechanicModifierType modifier)
