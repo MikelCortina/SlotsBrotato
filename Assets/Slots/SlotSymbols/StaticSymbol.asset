@@ -15,4 +15,6 @@ MonoBehaviour:
   symbolName: StaticSymbol
   symbolType: 1
   icon: {fileID: 5149459247027304299, guid: 3c795a45565e82546a71d9943ad45e66, type: 3}
+  description: "Lanza un rayo que recorre a todos los enemigos da\xF1ando a cada
+    uno de ellos \n"
   activateInstantly: 1

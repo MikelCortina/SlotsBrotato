@@ -15,7 +15,6 @@ public class EnemySpawner : MonoBehaviour
     public float baseEnemyHp = 30f;
     public float hpIncreasePerWave = 15f;
     public float baseEnemySpeed = 2f;
-    public float speedIncreasePerWave = 0.3f;
     public float baseEnemyDamage = 4f;
     public float damageIncreasePerWave = 1f;
 
@@ -116,7 +115,7 @@ public class EnemySpawner : MonoBehaviour
 
         GameObject go = Instantiate(enemyPrefab, pos, Quaternion.identity);
         GameManager.Instance.RegisterEnemy(go);
-     
+
         var health = go.GetComponent<EnemyHealth>();
         if (health != null)
         {
@@ -131,11 +130,15 @@ public class EnemySpawner : MonoBehaviour
 
         var ctrl = go.GetComponent<EnemyController>();
         if (ctrl != null)
-            ctrl.speed = baseEnemySpeed + (wave - 1) * speedIncreasePerWave;
+        {
+            ctrl.speed = baseEnemySpeed;
+        }
 
         var dmg = go.GetComponent<EnemyDamage>();
         if (dmg != null)
+        {
             dmg.damage = baseEnemyDamage + (wave - 1) * damageIncreasePerWave;
+        }
     }
 
     IEnumerator BlinkWarning(GameObject warning, float duration, float interval)

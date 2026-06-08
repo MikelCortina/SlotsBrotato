@@ -7,6 +7,10 @@ public class SlotSymbolData : ScriptableObject
     public SlotSymbolType symbolType;
     public Sprite icon;
 
+    [Header("Description")]
+    [TextArea(3, 8)]
+    public string description;
+
     [Header("Activation")]
     public bool activateInstantly = false;
 }
