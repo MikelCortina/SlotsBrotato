@@ -606,6 +606,7 @@ public class SlotMachine : MonoBehaviour
         Debug.Log($"-{reduction}s slot charge time");
     }
 
+
     IEnumerator WinFlash()
     {
         if (flashOverlay == null) yield break;
