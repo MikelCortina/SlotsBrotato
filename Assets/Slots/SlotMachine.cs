@@ -262,16 +262,34 @@ public class SlotMachine : MonoBehaviour
 
     bool IsJackpot(List<(int reelIndex, SlotSymbolData data)> symbols)
     {
-        if (symbols.Count < 2) return false;
+        if (symbols.Count < 2)
+            return false;
 
-        var first = symbols[0].data.symbolType;
-        for (int i = 1; i < symbols.Count; i++)
+        bool reducedJackpot =
+            MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(
+                MechanicModifierType.ReducedJackpot);
+
+        Dictionary<SlotSymbolType, int> counts =
+            new Dictionary<SlotSymbolType, int>();
+
+        foreach (var symbol in symbols)
         {
-            if (symbols[i].data.symbolType != first)
-                return false;
+            if (!counts.ContainsKey(symbol.data.symbolType))
+                counts[symbol.data.symbolType] = 0;
+
+            counts[symbol.data.symbolType]++;
         }
 
-        return true;
+        int requiredMatches = reducedJackpot ? 2 : symbols.Count;
+
+        foreach (var pair in counts)
+        {
+            if (pair.Value >= requiredMatches)
+                return true;
+        }
+
+        return false;
     }
 
     IEnumerator ResolveAutoSymbolsRoutine()

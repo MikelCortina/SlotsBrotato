@@ -12,7 +12,6 @@ public class MechanicModifierManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-
     }
 
     public bool HasModifier(MechanicModifierType modifier)
