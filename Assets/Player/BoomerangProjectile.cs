@@ -59,5 +59,11 @@ public class BoomerangProjectile : MonoBehaviour
 
         _hitEnemies.Add(health);
         health.TakeDamage(damage, transform.position, DamageSource.Bullet);
+        if (MechanicModifierManager.Instance != null &&
+    MechanicModifierManager.Instance.HasModifier(
+        MechanicModifierType.DamageCharge))
+        {
+            SlotMachine.Instance?.AddCharge(0.25f);
+        }
     }
 }

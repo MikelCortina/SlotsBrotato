@@ -522,4 +522,18 @@ public class SlotMachine : MonoBehaviour
 
         Debug.Log($"+{damageGain} daño permanente");
     }
+
+
+    public void AddCharge(float amount)
+    {
+        if (_spinning || _chargeLockedFull || _isResolvingActivation)
+            return;
+
+        float chargeTime = GetSlotChargeTime();
+
+        _chargeTimer = Mathf.Min(chargeTime, _chargeTimer + amount);
+        _charge = _chargeTimer;
+
+        UpdateChargeUI();
+    }
 }
