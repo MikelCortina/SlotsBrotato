@@ -193,7 +193,16 @@ public class SlotMachine : MonoBehaviour
             reels[i].StartSpin(stopDelay);
         }
 
-        float totalDuration = reelSpinDuration + (reels.Length - 1) * reelStaggerDelay + 0.1f;
+        int activeReelCount = 0;
+
+        for (int i = 0; i < reels.Length; i++)
+        {
+            if (IsReelEnabledByModifier(i))
+                activeReelCount++;
+        }
+
+        float totalDuration =
+            reelSpinDuration + (activeReelCount - 1) * reelStaggerDelay + 0.1f;
         yield return new WaitForSeconds(totalDuration);
 
         CollectResults();
@@ -239,8 +248,11 @@ public class SlotMachine : MonoBehaviour
 
         for (int i = 0; i < reels.Length; i++)
         {
+            if (!IsReelEnabledByModifier(i)) continue;
+
             var reel = reels[i];
             if (reel == null || reel.CurrentSymbol == null) continue;
+
             results.Add((i, reel.CurrentSymbol));
         }
 
@@ -369,10 +381,13 @@ public class SlotMachine : MonoBehaviour
 
         if (_pendingSymbols.Count == 0)
         {
-            foreach (var reel in reels)
+            for (int i = 0; i < reels.Length; i++)
             {
-                if (reel != null)
-                    reel.ForceShowLock();
+                if (!IsReelEnabledByModifier(i))
+                    continue;
+
+                if (reels[i] != null)
+                    reels[i].ForceShowLock();
             }
 
             _hasPendingSymbols = false;
