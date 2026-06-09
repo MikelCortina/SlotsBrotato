@@ -582,4 +582,18 @@ public class SlotMachine : MonoBehaviour
     {
         _rewindUsedThisWave = false;
     }
+
+    public int GetReelCount()
+    {
+        int count = reels.Length;
+
+        if (MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(
+                MechanicModifierType.FourthReel))
+        {
+            count += 1;
+        }
+
+        return count;
+    }
 }
