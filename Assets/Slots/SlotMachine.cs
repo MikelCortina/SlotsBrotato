@@ -1,22 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class SlotMachine : MonoBehaviour
 {
     [Header("Charge")]
-    public float maxCharge = 10f;
-    public float maxOverloadReserve = 5f;
+    [Min(1f)] public float maxCharge = 10f;
+    [Min(0f)] public float maxOverloadReserve = 10f;
+    [Min(1)] public int totalSegments = 10;
+    [Min(1f)] public float chargePerCoinSegments = 1f;
 
     [Header("UI")]
     public SlotReel[] reels;
     public TextMeshProUGUI timerText;
-    public Image timerBarFill;
-    public Image overloadBarFill;
     public GameObject flashOverlay;
     public GameObject pendingIndicator;
+    public SegmentedChargeBar segmentedChargeBar;
 
     [Header("Manual Activation")]
     public KeyCode activateKey = KeyCode.Space;
@@ -33,7 +33,7 @@ public class SlotMachine : MonoBehaviour
     public float reelStaggerDelay = 0.18f;
 
     [Header("Wave Visuals")]
-    public Image waveCover;
+    public UnityEngine.UI.Image waveCover;
 
     float _charge;
     float _overloadReserve;
@@ -53,8 +53,7 @@ public class SlotMachine : MonoBehaviour
     public static SlotMachine Instance { get; private set; }
     Transform _playerTransform;
     PlayerStats _playerStats;
-
-    private TemporaryBuffSystem _buffSystem;
+    TemporaryBuffSystem _buffSystem;
 
     void Awake()
     {
@@ -68,7 +67,9 @@ public class SlotMachine : MonoBehaviour
             _playerStats = playerObj.GetComponent<PlayerStats>();
         }
         else
+        {
             Debug.LogError("[SlotMachine] No se encontró ningún GameObject con tag 'Player'");
+        }
 
         _buffSystem = FindFirstObjectByType<TemporaryBuffSystem>();
     }
@@ -101,22 +102,28 @@ public class SlotMachine : MonoBehaviour
             return;
         }
 
-        if (_spinning || _chargeLockedFull || _isResolvingActivation)
-            return;
-
         float chargeTime = GetSlotChargeTime();
-        if (chargeTime <= 0f)
-            chargeTime = 1f;
+        if (chargeTime <= 0f) chargeTime = 1f;
 
-        _chargeTimer = Mathf.Min(chargeTime, _chargeTimer + Time.deltaTime);
-        _charge = _chargeTimer;
+        bool currentSpinUnavailable = _spinning || _chargeLockedFull || _isResolvingActivation;
 
-        if (!_spinQueued && _chargeTimer >= chargeTime)
+        if (!currentSpinUnavailable)
         {
-            _chargeTimer = chargeTime;
-            _charge = chargeTime;
-            _spinQueued = true;
-            StartCoroutine(DoSpin());
+            _chargeTimer = Mathf.Min(chargeTime, _chargeTimer + Time.deltaTime);
+            _charge = _chargeTimer;
+
+            if (!_spinQueued && _chargeTimer >= chargeTime)
+            {
+                _chargeTimer = chargeTime;
+                _charge = _chargeTimer;
+                _spinQueued = true;
+                StartCoroutine(DoSpin());
+            }
+        }
+        else
+        {
+            float overloadCap = GetOverloadCap(chargeTime);
+            _overloadReserve = Mathf.Min(overloadCap, _overloadReserve + Time.deltaTime);
         }
 
         UpdateChargeUI();
@@ -124,6 +131,36 @@ public class SlotMachine : MonoBehaviour
 
     public void OnCoinCollected(int amount)
     {
+        if (amount <= 0) return;
+
+        float chargeTime = GetSlotChargeTime();
+        if (chargeTime <= 0f) chargeTime = 1f;
+
+        float chargePerSegment = chargeTime / Mathf.Max(1, totalSegments);
+        float addedCharge = amount * chargePerCoinSegments * chargePerSegment;
+
+        bool currentSpinUnavailable = _spinning || _chargeLockedFull || _isResolvingActivation;
+
+        if (currentSpinUnavailable)
+        {
+            float overloadCap = GetOverloadCap(chargeTime);
+            _overloadReserve = Mathf.Min(overloadCap, _overloadReserve + addedCharge);
+        }
+        else
+        {
+            _chargeTimer = Mathf.Min(chargeTime, _chargeTimer + addedCharge);
+            _charge = _chargeTimer;
+
+            if (!_spinQueued && _chargeTimer >= chargeTime)
+            {
+                _chargeTimer = chargeTime;
+                _charge = _chargeTimer;
+                _spinQueued = true;
+                StartCoroutine(DoSpin());
+            }
+        }
+
+        UpdateChargeUI();
     }
 
     float GetSlotChargeTime()
@@ -131,7 +168,15 @@ public class SlotMachine : MonoBehaviour
         if (_playerStats != null && _playerStats.slotChargeTime > 0f)
             return _playerStats.slotChargeTime;
 
-        return 10f;
+        return maxCharge > 0f ? maxCharge : 10f;
+    }
+
+    float GetOverloadCap(float chargeTime)
+    {
+        if (maxOverloadReserve > 0f)
+            return Mathf.Min(maxOverloadReserve, chargeTime);
+
+        return chargeTime;
     }
 
     void UpdateChargeUI()
@@ -139,25 +184,26 @@ public class SlotMachine : MonoBehaviour
         float chargeTime = GetSlotChargeTime();
         if (chargeTime <= 0f) chargeTime = 1f;
 
-        float displayedMainCharge = _chargeLockedFull ? chargeTime : _chargeTimer;
-
         if (timerText)
         {
-            if (_chargeLockedFull || _spinning || _spinQueued || _overloadReserve > 0f)
-                timerText.text = $"{Mathf.Ceil(_overloadReserve)}/{Mathf.Ceil(chargeTime)}";
+            int mainSegs = Mathf.Clamp(
+                Mathf.RoundToInt((_chargeTimer / chargeTime) * totalSegments),
+                0,
+                totalSegments);
+
+            int overSegs = Mathf.Clamp(
+                Mathf.RoundToInt((_overloadReserve / chargeTime) * totalSegments),
+                0,
+                totalSegments - mainSegs);
+
+            if (_hasPendingSymbols)
+                timerText.text = $"{mainSegs}+{overSegs}/{totalSegments} READY";
             else
-                timerText.text = $"{Mathf.Ceil(displayedMainCharge)}/{Mathf.Ceil(chargeTime)}";
+                timerText.text = $"{mainSegs}+{overSegs}/{totalSegments}";
         }
 
-        if (timerBarFill)
-            timerBarFill.fillAmount = chargeTime > 0f ? displayedMainCharge / chargeTime : 0f;
-
-        if (overloadBarFill)
-        {
-            bool showOverload = _chargeLockedFull || _spinning || _spinQueued || _overloadReserve > 0f;
-            overloadBarFill.gameObject.SetActive(showOverload);
-            overloadBarFill.fillAmount = chargeTime > 0f ? _overloadReserve / chargeTime : 0f;
-        }
+        if (segmentedChargeBar != null)
+            segmentedChargeBar.SetByValues(_chargeTimer, _overloadReserve, chargeTime);
     }
 
     IEnumerator DoSpin()
@@ -189,21 +235,15 @@ public class SlotMachine : MonoBehaviour
 
         if (!_hasPendingSymbols)
         {
-            _chargeTimer = 0f;
-            _charge = 0f;
-
-            if (_overloadReserve > 0f)
-            {
-                _chargeTimer = Mathf.Min(_overloadReserve, chargeTime);
-                _charge = _chargeTimer;
-                _overloadReserve = 0f;
-            }
+            _chargeTimer = Mathf.Min(_overloadReserve, chargeTime);
+            _charge = _chargeTimer;
+            _overloadReserve = 0f;
         }
         else
         {
             _chargeLockedFull = true;
             _chargeTimer = chargeTime;
-            _charge = chargeTime;
+            _charge = _chargeTimer;
         }
 
         UpdateChargeUI();
@@ -357,8 +397,8 @@ public class SlotMachine : MonoBehaviour
                 pendingIndicator.SetActive(false);
 
             float chargeTime = GetSlotChargeTime();
-            _chargeTimer = 0f;
-            _charge = 0f;
+            _chargeTimer = Mathf.Min(_overloadReserve, chargeTime);
+            _charge = _chargeTimer;
             _overloadReserve = 0f;
         }
 
@@ -604,8 +644,8 @@ public class SlotMachine : MonoBehaviour
         _playerStats.ReduceSlotChargeTime(reduction);
 
         Debug.Log($"-{reduction}s slot charge time");
+        ClampChargeAfterChargeTimeChanged();
     }
-
 
     IEnumerator WinFlash()
     {
@@ -664,13 +704,29 @@ public class SlotMachine : MonoBehaviour
 
     public void AddCharge(float amount)
     {
-        if (_spinning || _chargeLockedFull || _isResolvingActivation)
-            return;
+        if (amount <= 0f) return;
 
         float chargeTime = GetSlotChargeTime();
+        bool currentSpinUnavailable = _spinning || _chargeLockedFull || _isResolvingActivation;
 
-        _chargeTimer = Mathf.Min(chargeTime, _chargeTimer + amount);
-        _charge = _chargeTimer;
+        if (currentSpinUnavailable)
+        {
+            float overloadCap = GetOverloadCap(chargeTime);
+            _overloadReserve = Mathf.Min(overloadCap, _overloadReserve + amount);
+        }
+        else
+        {
+            _chargeTimer = Mathf.Min(chargeTime, _chargeTimer + amount);
+            _charge = _chargeTimer;
+
+            if (!_spinQueued && _chargeTimer >= chargeTime)
+            {
+                _chargeTimer = chargeTime;
+                _charge = _chargeTimer;
+                _spinQueued = true;
+                StartCoroutine(DoSpin());
+            }
+        }
 
         UpdateChargeUI();
     }
@@ -699,5 +755,17 @@ public class SlotMachine : MonoBehaviour
     public void ResetRewind()
     {
         _rewindUsedThisWave = false;
+    }
+
+    void ClampChargeAfterChargeTimeChanged()
+    {
+        float chargeTime = GetSlotChargeTime();
+        float overloadCap = GetOverloadCap(chargeTime);
+
+        _chargeTimer = Mathf.Clamp(_chargeTimer, 0f, chargeTime);
+        _charge = _chargeTimer;
+        _overloadReserve = Mathf.Clamp(_overloadReserve, 0f, overloadCap);
+
+        UpdateChargeUI();
     }
 }
