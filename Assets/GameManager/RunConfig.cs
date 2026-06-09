@@ -112,4 +112,17 @@ public class RunConfig : MonoBehaviour
         if (removeLevel)
             symbolLevels.Remove(symbol.symbolType);
     }
+
+    public SlotSymbolData GetSymbolData(SlotSymbolType type)
+    {
+        foreach (var symbol in selectedSymbols)
+        {
+            if (symbol == null) continue;
+
+            if (symbol.symbolType == type)
+                return symbol;
+        }
+
+        return null;
+    }
 }

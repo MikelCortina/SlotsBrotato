@@ -498,10 +498,23 @@ public class SlotMachine : MonoBehaviour
     {
         int level = RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Shield);
 
-        int shieldAmount =
+        SlotSymbolData symbolData =
+            RunConfig.Instance.GetSymbolData(SlotSymbolType.Shield);
+
+        if (symbolData == null)
+            return;
+
+        float baseValue =
+            symbolData.baseEffectValue +
+            symbolData.valuePerLevel * (level - 1);
+
+        float multiplier =
             amount >= 3
-            ? level * 5
-            : amount * level;
+            ? symbolData.jackpotMultiplier
+            : amount;
+
+        int shieldAmount =
+            Mathf.RoundToInt(baseValue * multiplier);
         var playerShield = FindFirstObjectByType<PlayerShield>();
         if (playerShield != null)
             playerShield.AddShield(shieldAmount);
@@ -509,7 +522,26 @@ public class SlotMachine : MonoBehaviour
 
     void ApplyCoins(int amount)
     {
-        int coinAmount = amount >= 3 ? 10 : amount;
+        SlotSymbolData symbolData =
+            RunConfig.Instance.GetSymbolData(SlotSymbolType.Coin);
+
+        if (symbolData == null)
+            return;
+
+        int level =
+            RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Coin);
+
+        float baseValue =
+            symbolData.baseEffectValue +
+            symbolData.valuePerLevel * (level - 1);
+
+        float multiplier =
+            amount >= 3
+            ? symbolData.jackpotMultiplier
+            : amount;
+
+        int coinAmount =
+            Mathf.RoundToInt(baseValue * multiplier);
         if (PlayerWallet.Instance != null)
             PlayerWallet.Instance.AddCoins(coinAmount);
     }
@@ -526,7 +558,27 @@ public class SlotMachine : MonoBehaviour
                 aliveEnemies++;
         }
 
-        int chains = amount >= 3 ? 10 : amount * 3;
+        SlotSymbolData symbolData =
+            RunConfig.Instance.GetSymbolData(SlotSymbolType.Static);
+
+        if (symbolData == null)
+            return;
+
+        int level =
+            RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Static);
+
+        float baseValue =
+            symbolData.baseEffectValue +
+            symbolData.valuePerLevel * (level - 1);
+
+        float multiplier =
+            amount >= 3
+            ? symbolData.jackpotMultiplier
+            : amount;
+
+        int chains =
+            Mathf.RoundToInt(baseValue * multiplier);
+
         chains = Mathf.Max(chains, aliveEnemies);
 
         if (ChainLightning.Instance != null && _playerTransform != null)
@@ -559,12 +611,25 @@ public class SlotMachine : MonoBehaviour
     void ApplyBerserk(int amount)
     {
         if (_buffSystem == null) return;
+        SlotSymbolData symbolData =
+            RunConfig.Instance.GetSymbolData(SlotSymbolType.Berserk);
 
-        int level = RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Berserk);
+        if (symbolData == null)
+            return;
 
-        float baseBuff = 10f * level;
+        int level =
+            RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Berserk);
 
-        float damageBuff = baseBuff * amount;
+        float baseValue =
+            symbolData.baseEffectValue +
+            symbolData.valuePerLevel * (level - 1);
+
+        float multiplier =
+            amount >= 3
+            ? symbolData.jackpotMultiplier
+            : amount;
+
+        float damageBuff = baseValue * multiplier;
         float duration = 5f;
 
         _buffSystem.ApplyDamageBuff(damageBuff, duration);
@@ -577,15 +642,18 @@ public class SlotMachine : MonoBehaviour
         PlayerStats stats = _playerTransform.GetComponent<PlayerStats>();
 
         if (stats == null) return;
+        SlotSymbolData symbolData = RunConfig.Instance.GetSymbolData(SlotSymbolType.Power);
+        if (symbolData == null) return;
 
         int level = RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Power);
 
-        float baseValue = 2f * level;
+        float baseValue =
+            symbolData.baseEffectValue + symbolData.valuePerLevel * (level - 1);
 
-        float damageGain =
-            amount >= 3
-            ? baseValue * 5f
-            : baseValue * amount;
+        float multiplier =
+            amount >= 3 ? symbolData.jackpotMultiplier : amount;
+
+        float damageGain = baseValue * multiplier;
 
         stats.damage += damageGain;
 

@@ -9,4 +9,9 @@ public class SlotSymbolData : ScriptableObject
 
     [Header("Activation")]
     public bool activateInstantly = false;
+
+    [Header("Effect Values")]
+    public float baseEffectValue = 1f;
+    public float valuePerLevel = 1f;
+    public float jackpotMultiplier = 5f;
 }
