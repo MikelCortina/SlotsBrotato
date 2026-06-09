@@ -12,6 +12,7 @@ public class SlotMachine : MonoBehaviour
 
     [Header("Fourth Reel")]
     public GameObject fourthReelObject;
+    public TextMeshProUGUI jackpotMessageText;
 
     [Header("UI")]
     public SlotReel[] reels;
@@ -88,6 +89,9 @@ public class SlotMachine : MonoBehaviour
         _chargeLockedFull = false;
         _isResolvingActivation = false;
         _rewindUsedThisWave = false;
+
+        if (jackpotMessageText)
+            jackpotMessageText.text = "";
 
         if (flashOverlay) flashOverlay.SetActive(false);
         if (pendingIndicator) pendingIndicator.SetActive(false);
@@ -286,7 +290,20 @@ public class SlotMachine : MonoBehaviour
             pendingIndicator.SetActive(_hasPendingSymbols);
 
         if (jackpot)
+        {
             StartCoroutine(WinFlash());
+
+            bool extended =
+                MechanicModifierManager.Instance != null &&
+                MechanicModifierManager.Instance.HasModifier(
+                    MechanicModifierType.ExtendedJackpot);
+
+            StartCoroutine(
+                ShowJackpotMessage(
+                    extended ? "EXTENDED JACKPOT!" : "JACKPOT!"
+                )
+            );
+        }
     }
 
     bool IsJackpot(List<(int reelIndex, SlotSymbolData data)> symbols)
@@ -668,4 +685,17 @@ public class SlotMachine : MonoBehaviour
                 reels[i].ForceShowLock();
         }
     }
+    IEnumerator ShowJackpotMessage(string message)
+    {
+        if (jackpotMessageText == null)
+            yield break;
+
+        jackpotMessageText.text = message;
+        jackpotMessageText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(1.2f);
+
+        jackpotMessageText.text = "";
+    }
+
 }

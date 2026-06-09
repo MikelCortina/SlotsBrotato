@@ -107,9 +107,12 @@ public class ShopManager : MonoBehaviour
                         MechanicModifierManager.Instance.HasModifier(modifier.modifier))
                         continue;
 
+                    if (MechanicModifierManager.Instance != null &&
+                        !MechanicModifierManager.Instance.HasFreeSlot())
+                        continue;
+
                     validModifiers.Add(modifier);
                 }
-
                 if (validModifiers.Count > 0)
                 {
                     MechanicModifierOfferData randomModifier =
