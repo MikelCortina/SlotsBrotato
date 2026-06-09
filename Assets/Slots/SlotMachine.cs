@@ -94,8 +94,16 @@ public class SlotMachine : MonoBehaviour
         {
             foreach (var reel in reels)
             {
-                if (reel != null)
-                    reel.ForceShowLock();
+                for (int i = 0; i < reels.Length; i++)
+                {
+                    if (reels[i] == null) continue;
+
+                    bool active = IsReelEnabledByModifier(i);
+                    reels[i].gameObject.SetActive(active);
+
+                    if (active)
+                        reels[i].ForceShowLock();
+                }
             }
         }
 
@@ -179,6 +187,8 @@ public class SlotMachine : MonoBehaviour
 
         for (int i = 0; i < reels.Length; i++)
         {
+            if (!IsReelEnabledByModifier(i)) continue;
+
             float stopDelay = reelSpinDuration + i * reelStaggerDelay;
             reels[i].StartSpin(stopDelay);
         }
@@ -595,5 +605,15 @@ public class SlotMachine : MonoBehaviour
         }
 
         return count;
+    }
+
+    bool IsReelEnabledByModifier(int index)
+    {
+        if (index < 3)
+            return true;
+
+        return MechanicModifierManager.Instance != null &&
+               MechanicModifierManager.Instance.HasModifier(
+                   MechanicModifierType.FourthReel);
     }
 }
