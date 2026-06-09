@@ -957,4 +957,14 @@ public class SlotMachine : MonoBehaviour
         jackpotMessageText.text = "";
     }
 
+    public void ClampChargeAfterChargeTimeChanged()
+    {
+        float chargeTime = GetSlotChargeTime();
+
+        _chargeTimer = Mathf.Min(_chargeTimer, chargeTime);
+        _charge = Mathf.Min(_charge, chargeTime);
+
+        UpdateChargeUI();
+    }
+
 }

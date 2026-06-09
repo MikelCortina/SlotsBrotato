@@ -142,6 +142,8 @@ public class ShopOfferUI : MonoBehaviour
 
     private void RefreshUI()
     {
+        if (descriptionText)
+            descriptionText.text = "";
 
         if (_offerType == ShopOfferType.BuyModifier)
         {
@@ -153,28 +155,10 @@ public class ShopOfferUI : MonoBehaviour
 
             if (descriptionText && _modifierOffer != null)
                 descriptionText.text = _modifierOffer.description;
-            if (descriptionText && _weapon != null)
-            {
-                int level = WeaponLevelSystem.Instance != null
-                    ? WeaponLevelSystem.Instance.GetWeaponLevel(_weapon)
-                    : 1;
-
-                float currentMultiplier = WeaponLevelSystem.Instance != null
-                    ? WeaponLevelSystem.Instance.GetWeaponScalingMultiplier(_weapon)
-                    : 1f;
-
-                float nextMultiplier =
-                    1f + level * 0.2f;
-
-                descriptionText.text =
-                    $"Mejora el escalado del arma.\n\n" +
-                    $"Mejora: Lv.{level} → Lv.{level + 1}\n" +
-                    $"Escalado actual: x{currentMultiplier:0.0}\n" +
-                    $"Nuevo escalado: x{nextMultiplier:0.0}";
-            }
 
             return;
         }
+
         if (_offerType == ShopOfferType.UpgradeWeapon)
         {
             if (iconImage && _weapon != null)
@@ -187,6 +171,25 @@ public class ShopOfferUI : MonoBehaviour
                     : 1;
 
                 titleText.text = $"Mejorar {_weapon.weaponName} Lv.{level}";
+            }
+
+            if (descriptionText && _weapon != null)
+            {
+                int level = WeaponLevelSystem.Instance != null
+                    ? WeaponLevelSystem.Instance.GetWeaponLevel(_weapon)
+                    : 1;
+
+                float currentMultiplier = WeaponLevelSystem.Instance != null
+                    ? WeaponLevelSystem.Instance.GetWeaponScalingMultiplier(_weapon)
+                    : 1f;
+
+                float nextMultiplier = 1f + level * 0.2f;
+
+                descriptionText.text =
+                    $"Mejora el escalado del arma.\n\n" +
+                    $"Mejora: Lv.{level} → Lv.{level + 1}\n" +
+                    $"Escalado actual: x{currentMultiplier:0.0}\n" +
+                    $"Nuevo escalado: x{nextMultiplier:0.0}";
             }
 
             if (costText)
@@ -228,19 +231,16 @@ public class ShopOfferUI : MonoBehaviour
                     $"{_symbol.description}\n\n" +
                     $"Nivel inicial: Lv.1\n" +
                     $"Valor: {GetSymbolValueLabel(_symbol, value)}\n" +
-$"Jackpot: {GetSymbolValueLabel(_symbol, value * _symbol.jackpotMultiplier)}";
+                    $"Jackpot: {GetSymbolValueLabel(_symbol, value * _symbol.jackpotMultiplier)}";
             }
             else
             {
                 int nextLevel = currentLevel + 1;
 
-                float currentValue =
-                    GetSymbolValue(_symbol, currentLevel);
+                float currentValue = GetSymbolValue(_symbol, currentLevel);
+                float nextValue = GetSymbolValue(_symbol, nextLevel);
+                float nextJackpotValue = nextValue * _symbol.jackpotMultiplier;
 
-                float nextValue =
-                    GetSymbolValue(_symbol, nextLevel);
-                float nextJackpotValue =
-    nextValue * _symbol.jackpotMultiplier;
                 descriptionText.text =
                     $"{_symbol.description}\n\n" +
                     $"Mejora: Lv.{currentLevel} → Lv.{nextLevel}\n" +

@@ -5,8 +5,7 @@ public class SlotSymbolData : ScriptableObject
 {
 
     public string symbolName;
-    [TextArea]
-    public string description;
+
     public SlotSymbolType symbolType;
     public Sprite icon;
 

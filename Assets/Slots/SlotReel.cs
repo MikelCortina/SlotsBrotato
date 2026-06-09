@@ -12,6 +12,9 @@ public class SlotReel : MonoBehaviour
     public Image botBlur;
     public TextMeshProUGUI symbolLevelText;
 
+    [Header("Lock Visual")]
+    public GameObject lockObject;
+
     public SlotSymbolData CurrentSymbol { get; private set; }
 
     [Header("Animación")]
@@ -187,5 +190,22 @@ public class SlotReel : MonoBehaviour
             int level = RunConfig.Instance.GetSymbolLevel(CurrentSymbol.symbolType);
             symbolLevelText.text = $"Lv.{level}";
         }
+    }
+
+    public void ForceShowLock()
+    {
+        ShowLock();
+    }
+
+    public void ShowLock()
+    {
+        if (lockObject != null)
+            lockObject.SetActive(true);
+    }
+
+    public void HideLock()
+    {
+        if (lockObject != null)
+            lockObject.SetActive(false);
     }
 }
