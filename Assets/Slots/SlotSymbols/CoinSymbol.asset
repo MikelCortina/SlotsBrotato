@@ -16,6 +16,7 @@ MonoBehaviour:
   symbolName: CoinSymbol
   symbolType: 2
   icon: {fileID: -3435608628000792942, guid: d776d5080a2adf044b7f3d885900fbd5, type: 3}
+  description: Otroga una moneda
   activateInstantly: 1
   baseEffectValue: 1
   valuePerLevel: 1

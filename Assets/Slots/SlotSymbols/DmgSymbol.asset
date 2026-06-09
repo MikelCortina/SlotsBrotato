@@ -10,14 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dca06fd1a03d7546ae102841a284ba9, type: 3}
-  m_Name: PowerSymbol
+  m_Name: DmgSymbol
   m_EditorClassIdentifier: 
-  description: "Aumenta tu da\xF1o permanente durante la run."
-  symbolName: PowerSymbol
-  symbolType: 4
-  icon: {fileID: 8701140351847246947, guid: 95e82cb4b2a42af4dbcc879343f41969, type: 3}
+  symbolName: DmgSymbol
+  symbolType: 5
+  icon: {fileID: 9173513815439557574, guid: d05dfe489c1a10f44bc4101ef3aba714, type: 3}
   description: 
   activateInstantly: 1
-  baseEffectValue: 1
-  valuePerLevel: 1
-  jackpotMultiplier: 5

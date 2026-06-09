@@ -17,6 +17,11 @@ public class GameManager : MonoBehaviour
     [Header("Fallback panel directo")]
     [SerializeField] private GameObject directGameOverPanel;
 
+    [Header("Cursor en partida")]
+    [SerializeField] private Texture2D gameplayCursor;
+    [SerializeField] private Vector2 gameplayCursorHotspot = Vector2.zero;
+    [SerializeField] private CursorMode gameplayCursorMode = CursorMode.Auto;
+
     [Header("Oleadas")]
     public int startingWave = 1;
 
@@ -74,6 +79,7 @@ public class GameManager : MonoBehaviour
             directGameOverPanel.SetActive(false);
 
         ApplyTimeScale();
+        ApplyCursorState();
         UpdateUI();
     }
 
@@ -87,6 +93,7 @@ public class GameManager : MonoBehaviour
         if (Instance == this)
             Instance = null;
 
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         Time.timeScale = 1f;
     }
 
@@ -94,6 +101,20 @@ public class GameManager : MonoBehaviour
     {
         bool isActuallyPlaying = IsWaveRunning && !IsInShop && !_isGameOver;
         Time.timeScale = isActuallyPlaying ? 1f : 0f;
+    }
+
+    void ApplyCursorState()
+    {
+        bool isActuallyPlaying = IsWaveRunning && !IsInShop && !_isGameOver;
+
+        if (isActuallyPlaying && gameplayCursor != null)
+        {
+            Cursor.SetCursor(gameplayCursor, gameplayCursorHotspot, gameplayCursorMode);
+        }
+        else
+        {
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        }
     }
 
     public void BeginRun()
@@ -120,6 +141,8 @@ public class GameManager : MonoBehaviour
             uiFlow.ShowGameplayImmediate();
         }
 
+        ApplyTimeScale();
+        ApplyCursorState();
         UpdateUI();
     }
 
@@ -157,6 +180,7 @@ public class GameManager : MonoBehaviour
                 uiFlow.ShowGameplayImmediate();
 
             ApplyTimeScale();
+            ApplyCursorState();
             UpdateUI();
         }
     }
@@ -168,6 +192,7 @@ public class GameManager : MonoBehaviour
         WaveTimeRemaining = GetWaveDuration(wave);
 
         ApplyTimeScale();
+        ApplyCursorState();
         UpdateUI();
 
         while (WaveTimeRemaining > 0f && !_isGameOver)
@@ -181,6 +206,7 @@ public class GameManager : MonoBehaviour
         IsWaveRunning = false;
 
         ApplyTimeScale();
+        ApplyCursorState();
         UpdateUI();
     }
 
@@ -190,6 +216,7 @@ public class GameManager : MonoBehaviour
         _shopClosed = false;
 
         ApplyTimeScale();
+        ApplyCursorState();
         UpdateUI();
 
         if (uiFlow != null)
@@ -204,6 +231,7 @@ public class GameManager : MonoBehaviour
             uiFlow.ShowGameplayImmediate();
 
         ApplyTimeScale();
+        ApplyCursorState();
         UpdateUI();
     }
 
@@ -278,6 +306,7 @@ public class GameManager : MonoBehaviour
 
         StopAllCoroutines();
         CleanupWaveEnemies();
+        ApplyCursorState();
         UpdateUI();
 
         StartCoroutine(ShowGameOverRoutine());
@@ -312,7 +341,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("directGameOverPanel activado");
         }
 
-        yield return null; // Deja que Unity pinte un frame antes de pausar
+        yield return null;
         Time.timeScale = 0f;
 
         Debug.Log("Time.timeScale puesto a 0 - juego pausado");
@@ -320,6 +349,7 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }

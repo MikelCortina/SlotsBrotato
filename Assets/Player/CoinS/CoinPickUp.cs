@@ -133,6 +133,9 @@ public class CoinPickup : MonoBehaviour
         if (CoinDropManager.Instance != null)
             CoinDropManager.Instance.SpawnDropFromCoin(transform.position);
 
+        if (SlotMachine.Instance != null)
+            SlotMachine.Instance.OnCoinCollected(1);
+
         Destroy(gameObject);
     }
 }

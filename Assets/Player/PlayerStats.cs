@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class PlayerStats : MonoBehaviour
 {
     [Header("Offense")]
@@ -22,7 +21,7 @@ public class PlayerStats : MonoBehaviour
     public float coinPickupRadius = 3f;
 
     [Header("Slot Machine")]
-    public float slotChargeTime = 10f; 
+    public float slotChargeTime = 10f;
 
     public float GetFinalDamage(float baseDamage)
     {
@@ -59,6 +58,7 @@ public class PlayerStats : MonoBehaviour
     {
         coinPickupRadius += amount;
     }
+
     public void ApplyPassive(PassiveData passive)
     {
         if (passive == null) return;
@@ -78,9 +78,49 @@ public class PlayerStats : MonoBehaviour
             ApplyPassive(passive);
         }
     }
+
     public void ReduceSlotChargeTime(float amount)
     {
         slotChargeTime = Mathf.Max(1f, slotChargeTime - amount);
     }
 
+    public void AddDamage(float amount)
+    {
+        damage += amount;
+    }
+
+    public void AddFireRate(float amount)
+    {
+        fireRate += amount;
+    }
+
+    public void AddMaxHealth(int amount)
+    {
+        maxHealth += amount;
+    }
+
+    public void AddMoveSpeed(float amount)
+    {
+        moveSpeed += amount;
+    }
+
+    public void AddCritChance(float amount)
+    {
+        critChance += amount;
+    }
+
+    public void AddCritMultiplier(float amount)
+    {
+        critMultiplier += amount;
+    }
+
+    public void AddRegeneration(float amount)
+    {
+        regeneration += amount;
+    }
+
+    public void AddDamageReduction(float amount)
+    {
+        damageReduction = Mathf.Clamp01(damageReduction + amount);
+    }
 }
