@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +8,7 @@ public class ShopOfferUI : MonoBehaviour
     public Image iconImage;
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI costText;
+    public TextMeshProUGUI descriptionText;
 
     private ShopOfferType _offerType;
     private SlotSymbolData _symbol;
@@ -150,6 +151,28 @@ public class ShopOfferUI : MonoBehaviour
             if (costText)
                 costText.text = $"{_cost}G";
 
+            if (descriptionText && _modifierOffer != null)
+                descriptionText.text = _modifierOffer.description;
+            if (descriptionText && _weapon != null)
+            {
+                int level = WeaponLevelSystem.Instance != null
+                    ? WeaponLevelSystem.Instance.GetWeaponLevel(_weapon)
+                    : 1;
+
+                float currentMultiplier = WeaponLevelSystem.Instance != null
+                    ? WeaponLevelSystem.Instance.GetWeaponScalingMultiplier(_weapon)
+                    : 1f;
+
+                float nextMultiplier =
+                    1f + level * 0.2f;
+
+                descriptionText.text =
+                    $"Mejora el escalado del arma.\n\n" +
+                    $"Mejora: Lv.{level} → Lv.{level + 1}\n" +
+                    $"Escalado actual: x{currentMultiplier:0.0}\n" +
+                    $"Nuevo escalado: x{nextMultiplier:0.0}";
+            }
+
             return;
         }
         if (_offerType == ShopOfferType.UpgradeWeapon)
@@ -191,6 +214,42 @@ public class ShopOfferUI : MonoBehaviour
             }
         }
 
+        if (descriptionText && _symbol != null)
+        {
+            int currentLevel = RunConfig.Instance != null
+                ? RunConfig.Instance.GetSymbolLevel(_symbol.symbolType)
+                : 1;
+
+            if (_offerType == ShopOfferType.BuySymbol)
+            {
+                float value = GetSymbolValue(_symbol, 1);
+
+                descriptionText.text =
+                    $"{_symbol.description}\n\n" +
+                    $"Nivel inicial: Lv.1\n" +
+                    $"Valor: {GetSymbolValueLabel(_symbol, value)}\n" +
+$"Jackpot: {GetSymbolValueLabel(_symbol, value * _symbol.jackpotMultiplier)}";
+            }
+            else
+            {
+                int nextLevel = currentLevel + 1;
+
+                float currentValue =
+                    GetSymbolValue(_symbol, currentLevel);
+
+                float nextValue =
+                    GetSymbolValue(_symbol, nextLevel);
+                float nextJackpotValue =
+    nextValue * _symbol.jackpotMultiplier;
+                descriptionText.text =
+                    $"{_symbol.description}\n\n" +
+                    $"Mejora: Lv.{currentLevel} → Lv.{nextLevel}\n" +
+                    $"Actual: {GetSymbolValueLabel(_symbol, currentValue)}\n" +
+                    $"Nuevo: {GetSymbolValueLabel(_symbol, nextValue)}\n" +
+                    $"Jackpot nuevo: {GetSymbolValueLabel(_symbol, nextJackpotValue)}";
+            }
+        }
+
         if (costText)
             costText.text = $"{_cost}G";
     }
@@ -206,5 +265,40 @@ public class ShopOfferUI : MonoBehaviour
 
         RefreshUI();
         gameObject.SetActive(true);
+    }
+
+    float GetSymbolValue(SlotSymbolData symbol, int level)
+    {
+        if (symbol == null)
+            return 0f;
+
+        return symbol.baseEffectValue +
+               symbol.valuePerLevel * (level - 1);
+    }
+    string GetSymbolValueLabel(SlotSymbolData symbol, float value)
+    {
+        if (symbol == null)
+            return value.ToString("0.#");
+
+        switch (symbol.symbolType)
+        {
+            case SlotSymbolType.Power:
+                return $"+{value:0.#} daño";
+
+            case SlotSymbolType.Coin:
+                return $"+{value:0.#} monedas";
+
+            case SlotSymbolType.Shield:
+                return $"+{value:0.#} escudo";
+
+            case SlotSymbolType.Berserk:
+                return $"+{value:0.#} daño temporal";
+
+            case SlotSymbolType.Static:
+                return $"{value:0.#} rayos";
+
+            default:
+                return value.ToString("0.#");
+        }
     }
 }

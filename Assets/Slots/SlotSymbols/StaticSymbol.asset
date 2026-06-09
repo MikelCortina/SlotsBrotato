@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dca06fd1a03d7546ae102841a284ba9, type: 3}
   m_Name: StaticSymbol
   m_EditorClassIdentifier: 
+  description: Lanza rayos en cadena entre enemigos.
   symbolName: StaticSymbol
   symbolType: 1
   icon: {fileID: 5149459247027304299, guid: 3c795a45565e82546a71d9943ad45e66, type: 3}
   activateInstantly: 1
+  baseEffectValue: 1
+  valuePerLevel: 1
+  jackpotMultiplier: 5

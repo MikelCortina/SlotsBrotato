@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dca06fd1a03d7546ae102841a284ba9, type: 3}
   m_Name: PowerSymbol
   m_EditorClassIdentifier: 
+  description: "Aumenta tu da\xF1o permanente durante la run."
   symbolName: PowerSymbol
   symbolType: 4
   icon: {fileID: 0}
   activateInstantly: 1
+  baseEffectValue: 1
+  valuePerLevel: 1
+  jackpotMultiplier: 5

@@ -5,5 +5,9 @@ public class MechanicModifierOfferData
 {
     public MechanicModifierType modifier;
     public string displayName;
+
+    [TextArea]
+    public string description;
+
     public int cost = 50;
 }
