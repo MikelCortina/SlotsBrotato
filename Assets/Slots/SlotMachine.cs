@@ -10,6 +10,9 @@ public class SlotMachine : MonoBehaviour
     public float maxCharge = 10f;
     public float maxOverloadReserve = 5f;
 
+    [Header("Fourth Reel")]
+    public GameObject fourthReelObject;
+
     [Header("UI")]
     public SlotReel[] reels;
     public TextMeshProUGUI timerText;
@@ -108,6 +111,7 @@ public class SlotMachine : MonoBehaviour
         }
 
         UpdateChargeUI();
+        RefreshReelVisibility();
     }
 
     void Update()
@@ -180,6 +184,7 @@ public class SlotMachine : MonoBehaviour
 
     IEnumerator DoSpin()
     {
+        RefreshReelVisibility();
         _spinning = true;
         _spinQueued = false;
 
@@ -188,6 +193,8 @@ public class SlotMachine : MonoBehaviour
         for (int i = 0; i < reels.Length; i++)
         {
             if (!IsReelEnabledByModifier(i)) continue;
+            if (reels[i] == null) continue;
+            if (!reels[i].gameObject.activeInHierarchy) continue;
 
             float stopDelay = reelSpinDuration + i * reelStaggerDelay;
             reels[i].StartSpin(stopDelay);
@@ -630,5 +637,35 @@ public class SlotMachine : MonoBehaviour
         return MechanicModifierManager.Instance != null &&
                MechanicModifierManager.Instance.HasModifier(
                    MechanicModifierType.FourthReel);
+    }
+
+    public void RefreshReelVisibility()
+    {
+        bool fourthReelActive =
+            MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(
+                MechanicModifierType.FourthReel);
+
+        if (fourthReelObject != null)
+            fourthReelObject.SetActive(fourthReelActive);
+
+        if (reels == null) return;
+
+        for (int i = 0; i < reels.Length; i++)
+        {
+            if (reels[i] == null) continue;
+
+            if (i < 3)
+            {
+                reels[i].gameObject.SetActive(true);
+                reels[i].ForceShowLock();
+                continue;
+            }
+
+            reels[i].gameObject.SetActive(fourthReelActive);
+
+            if (fourthReelActive)
+                reels[i].ForceShowLock();
+        }
     }
 }

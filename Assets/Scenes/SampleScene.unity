@@ -7331,6 +7331,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxCharge: 10
   maxOverloadReserve: 5
+  fourthReelObject: {fileID: 1465491799}
   reels:
   - {fileID: 1539462052}
   - {fileID: 958888469}

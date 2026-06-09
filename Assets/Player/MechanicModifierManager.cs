@@ -12,7 +12,7 @@ public class MechanicModifierManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        AddModifier(MechanicModifierType.FourthReel);
+
     }
 
     public bool HasModifier(MechanicModifierType modifier)
@@ -32,6 +32,7 @@ public class MechanicModifierManager : MonoBehaviour
         }
 
         activeModifiers.Add(modifier);
+        ApplyModifierEffect(modifier);
 
         Debug.Log($"Modificador activado: {modifier}");
         return true;
@@ -42,15 +43,20 @@ public class MechanicModifierManager : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         PlayerStats stats = player != null ? player.GetComponent<PlayerStats>() : null;
 
-        if (stats == null) return;
-
         switch (modifier)
         {
             case MechanicModifierType.AutoPickupCoins:
-                stats.AddCoinPickupRadius(4f);
+                if (stats != null)
+                    stats.AddCoinPickupRadius(4f);
                 break;
+
             case MechanicModifierType.SlotChargeBoost:
-                stats.ReduceSlotChargeTime(2f);
+                if (stats != null)
+                    stats.ReduceSlotChargeTime(2f);
+                break;
+
+            case MechanicModifierType.FourthReel:
+                SlotMachine.Instance?.RefreshReelVisibility();
                 break;
         }
     }

@@ -103,6 +103,12 @@ public class ShopOfferUI : MonoBehaviour
             if (MechanicModifierManager.Instance.HasModifier(_modifierOffer.modifier))
                 return;
 
+            if (!MechanicModifierManager.Instance.HasFreeSlot())
+            {
+                Debug.Log("No tienes ranuras libres para modificadores.");
+                return;
+            }
+
             if (!PlayerWallet.Instance.SpendCoins(_cost))
                 return;
 
