@@ -8876,6 +8876,9 @@ MonoBehaviour:
   reelSpinDuration: 1.2
   reelStaggerDelay: 0.18
   waveCover: {fileID: 0}
+  rewardPopupPrefab: {fileID: 8275923434840977308, guid: b119430e5f102dc4a8553499b4c573c5, type: 3}
+  rewardPopupOffset: {x: 0, y: 0.1, z: 0}
+  rewardPopupRandomX: 0.1
 --- !u!114 &955838247
 MonoBehaviour:
   m_ObjectHideFlags: 0
