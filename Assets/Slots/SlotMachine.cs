@@ -567,6 +567,9 @@ public class SlotMachine : MonoBehaviour
             case SlotSymbolType.SlotChargeUp:
                 ApplySlotChargeUp(amount);
                 break;
+            case SlotSymbolType.SpeedToDamage:
+                ApplySpeedToDamage(amount);
+                break;
 
         }
     }
@@ -794,6 +797,34 @@ public class SlotMachine : MonoBehaviour
                 _playerStats.damage += finalValue;
                 break;
         }
+    }
+    void ApplySpeedToDamage(int amount)
+    {
+        if (_playerStats == null) return;
+
+        SlotSymbolData symbolData =
+            RunConfig.Instance.GetSymbolData(SlotSymbolType.SpeedToDamage);
+
+        if (symbolData == null) return;
+
+        int level =
+            RunConfig.Instance.GetSymbolLevel(SlotSymbolType.SpeedToDamage);
+
+        float conversionRatio =
+            symbolData.baseEffectValue +
+            symbolData.valuePerLevel * (level - 1);
+
+        float multiplier =
+            amount >= 3
+            ? symbolData.jackpotMultiplier
+            : amount;
+
+        float damageGain =
+            _playerStats.moveSpeed * conversionRatio * multiplier;
+
+        _playerStats.AddDamage(damageGain);
+
+        Debug.Log($"Furia Cinética: +{damageGain} daño por velocidad");
     }
     IEnumerator WinFlash()
     {
