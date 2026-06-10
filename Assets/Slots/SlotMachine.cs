@@ -570,6 +570,9 @@ public class SlotMachine : MonoBehaviour
             case SlotSymbolType.SpeedToDamage:
                 ApplySpeedToDamage(amount);
                 break;
+            case SlotSymbolType.HealthToShield:
+                ApplyHealthToShield(amount);
+                break;
 
         }
     }
@@ -825,6 +828,39 @@ public class SlotMachine : MonoBehaviour
         _playerStats.AddDamage(damageGain);
 
         Debug.Log($"Furia Cinética: +{damageGain} daño por velocidad");
+    }
+
+    void ApplyHealthToShield(int amount)
+    {
+        if (_playerStats == null) return;
+
+        SlotSymbolData symbolData =
+            RunConfig.Instance.GetSymbolData(SlotSymbolType.HealthToShield);
+
+        if (symbolData == null) return;
+
+        int level =
+            RunConfig.Instance.GetSymbolLevel(SlotSymbolType.HealthToShield);
+
+        float conversionRatio =
+            symbolData.baseEffectValue +
+            symbolData.valuePerLevel * (level - 1);
+
+        float multiplier =
+            amount >= 3
+            ? symbolData.jackpotMultiplier
+            : amount;
+
+        int shieldGain =
+            Mathf.RoundToInt(_playerStats.maxHealth * conversionRatio * multiplier);
+
+        PlayerShield playerShield =
+            FindFirstObjectByType<PlayerShield>();
+
+        if (playerShield != null)
+            playerShield.AddShield(shieldGain);
+
+        Debug.Log($"Escudo Vital: +{shieldGain} escudo por vida máxima");
     }
     IEnumerator WinFlash()
     {

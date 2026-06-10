@@ -17,4 +17,5 @@ public enum SlotSymbolType
     PickupRadiusUp = 13,
     SlotChargeUp = 14,
     SpeedToDamage = 15,
+    HealthToShield = 16,
 }
