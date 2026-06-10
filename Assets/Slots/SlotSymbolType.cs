@@ -18,4 +18,5 @@ public enum SlotSymbolType
     SlotChargeUp = 14,
     SpeedToDamage = 15,
     HealthToShield = 16,
+    Echo = 17,
 }

@@ -51,6 +51,8 @@ public class SlotMachine : MonoBehaviour
     bool _isResolvingActivation;
     bool _rewindUsedThisWave;
 
+
+    SlotSymbolType? _lastActivatedSymbolType;
     readonly List<(int reelIndex, SlotSymbolData data)> _pendingSymbols = new();
     readonly List<(int reelIndex, SlotSymbolData data)> _autoSymbols = new();
 
@@ -481,11 +483,19 @@ public class SlotMachine : MonoBehaviour
                 yield return new WaitForSeconds(activationResolveDelay);
 
             RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
+
+            if (symbol.data.symbolType != SlotSymbolType.Echo)
+                _lastActivatedSymbolType = symbol.data.symbolType;
+
             ApplyByType(symbol.data.symbolType, amount);
         }
         else
         {
             RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
+
+            if (symbol.data.symbolType != SlotSymbolType.Echo)
+                _lastActivatedSymbolType = symbol.data.symbolType;
+
             ApplyByType(symbol.data.symbolType, amount);
         }
     }
@@ -572,6 +582,9 @@ public class SlotMachine : MonoBehaviour
                 break;
             case SlotSymbolType.HealthToShield:
                 ApplyHealthToShield(amount);
+                break;
+            case SlotSymbolType.Echo:
+                ApplyEcho(amount);
                 break;
 
         }
@@ -861,6 +874,16 @@ public class SlotMachine : MonoBehaviour
             playerShield.AddShield(shieldGain);
 
         Debug.Log($"Escudo Vital: +{shieldGain} escudo por vida máxima");
+    }
+
+    void ApplyEcho(int amount)
+    {
+        if (_lastActivatedSymbolType == null)
+            return;
+
+        Debug.Log($"Eco repite {_lastActivatedSymbolType}");
+
+        ApplyByType(_lastActivatedSymbolType.Value, amount);
     }
     IEnumerator WinFlash()
     {
