@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dca06fd1a03d7546ae102841a284ba9, type: 3}
+  m_Name: PickupRadiusSymbol
+  m_EditorClassIdentifier: 
+  symbolName: Recogida
+  symbolType: 13
+  icon: {fileID: 9173513815439557574, guid: d05dfe489c1a10f44bc4101ef3aba714, type: 3}
+  description: Aumenta el radio de recogida de monedas.
+  activateInstantly: 1
+  baseEffectValue: 0.5
+  valuePerLevel: 0.25
+  jackpotMultiplier: 5

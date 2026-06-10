@@ -567,6 +567,7 @@ public class SlotMachine : MonoBehaviour
             case SlotSymbolType.SlotChargeUp:
                 ApplySlotChargeUp(amount);
                 break;
+
         }
     }
 
@@ -762,6 +763,38 @@ public class SlotMachine : MonoBehaviour
         ClampChargeAfterChargeTimeChanged();
     }
 
+    void ApplyStatSymbol(SlotSymbolType type, int amount)
+    {
+        if (_playerStats == null)
+            return;
+
+        SlotSymbolData symbolData =
+            RunConfig.Instance.GetSymbolData(type);
+
+        if (symbolData == null)
+            return;
+
+        int level =
+            RunConfig.Instance.GetSymbolLevel(type);
+
+        float baseValue =
+            symbolData.baseEffectValue +
+            symbolData.valuePerLevel * (level - 1);
+
+        float multiplier =
+            amount >= 3
+            ? symbolData.jackpotMultiplier
+            : amount;
+
+        float finalValue = baseValue * multiplier;
+
+        switch (type)
+        {
+            case SlotSymbolType.DamageUp:
+                _playerStats.damage += finalValue;
+                break;
+        }
+    }
     IEnumerator WinFlash()
     {
         if (flashOverlay == null) yield break;

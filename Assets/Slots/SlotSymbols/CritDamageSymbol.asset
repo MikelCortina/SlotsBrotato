@@ -10,10 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dca06fd1a03d7546ae102841a284ba9, type: 3}
-  m_Name: FireRateSymbol 1
+  m_Name: CritDamageSymbol
   m_EditorClassIdentifier: 
-  symbolName: FireRateSymbol
-  symbolType: 6
-  icon: {fileID: 1719121819271388481, guid: 3bf250661e4c48d40a7dee76a667c553, type: 3}
-  description: 
+  symbolName: DmgSymbol
+  symbolType: 10
+  icon: {fileID: 9173513815439557574, guid: d05dfe489c1a10f44bc4101ef3aba714, type: 3}
+  description: "Aumenta el multiplicador de da\xF1o cr\xEDtico."
   activateInstantly: 1
+  baseEffectValue: 0.2
+  valuePerLevel: 0.1
+  jackpotMultiplier: 5
