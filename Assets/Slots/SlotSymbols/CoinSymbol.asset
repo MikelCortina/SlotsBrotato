@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dca06fd1a03d7546ae102841a284ba9, type: 3}
   m_Name: CoinSymbol
   m_EditorClassIdentifier: 
-  description: "Obtienes monedas instant\xE1neamente al activarse."
   symbolName: CoinSymbol
   symbolType: 2
   icon: {fileID: -3435608628000792942, guid: d776d5080a2adf044b7f3d885900fbd5, type: 3}
@@ -20,4 +19,4 @@ MonoBehaviour:
   activateInstantly: 1
   baseEffectValue: 1
   valuePerLevel: 1
-  jackpotMultiplier: 5
+  jackpotMultiplier: 2

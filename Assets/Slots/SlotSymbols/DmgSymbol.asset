@@ -17,3 +17,6 @@ MonoBehaviour:
   icon: {fileID: 9173513815439557574, guid: d05dfe489c1a10f44bc4101ef3aba714, type: 3}
   description: 
   activateInstantly: 1
+  baseEffectValue: 1
+  valuePerLevel: 1
+  jackpotMultiplier: 2

@@ -4,14 +4,14 @@ using UnityEngine;
 public class PlayerStats : MonoBehaviour
 {
     [Header("Offense")]
-    public float damage = 25f;
-    public float fireRate = 2f;
-    public float critChance = 0f;
+    public float damage = 25f;          // Stat ofensiva principal
+    public float fireRate = 0f;         // Bonus aditivo o multiplicativo, según diseño
+    public float critChance = 0f;       // 0..1
     public float critMultiplier = 2f;
 
     [Header("Defense")]
     public int maxHealth = 5;
-    public float damageReduction = 0f;
+    public float damageReduction = 0f;  // 0..100
     public float regeneration = 0f;
 
     [Header("Movement")]
@@ -23,41 +23,35 @@ public class PlayerStats : MonoBehaviour
     [Header("Slot Machine")]
     public float slotChargeTime = 10f;
 
-    public float GetFinalDamage(float baseDamage)
+    public float GetScaledDamage(float baseDamage, float scalingFactor, bool canCrit = true)
     {
-        float finalDamage = baseDamage + damage;
+        float finalDamage = baseDamage + (damage * scalingFactor);
 
-        if (Random.value < critChance)
+        if (canCrit && Random.value < critChance)
             finalDamage *= critMultiplier;
 
         return finalDamage;
     }
-
+    public float GetScaledFireRate(float baseFireRate, float scalingFactor)
+    {
+        return baseFireRate + (fireRate * scalingFactor);
+    }
     public int GetFinalReceivedDamage(int incomingDamage)
     {
-        float reduced = incomingDamage * (1f - damageReduction);
+        float reduced = incomingDamage * (1f - damageReduction / 100f);
         return Mathf.Max(1, Mathf.RoundToInt(reduced));
     }
 
-    public float GetMoveSpeed()
-    {
-        return moveSpeed;
-    }
+    public float GetMoveSpeed() => moveSpeed;
 
     public float GetFireRate(float weaponFireRate)
     {
         return weaponFireRate + fireRate;
     }
 
-    public float GetCoinPickupRadius()
-    {
-        return coinPickupRadius;
-    }
+    public float GetCoinPickupRadius() => coinPickupRadius;
 
-    public void AddCoinPickupRadius(float amount)
-    {
-        coinPickupRadius += amount;
-    }
+    public void AddCoinPickupRadius(float amount) => coinPickupRadius += amount;
 
     public void ApplyPassive(PassiveData passive)
     {
@@ -74,9 +68,7 @@ public class PlayerStats : MonoBehaviour
         if (passives == null) return;
 
         foreach (var passive in passives)
-        {
             ApplyPassive(passive);
-        }
     }
 
     public void ReduceSlotChargeTime(float amount)
@@ -84,43 +76,21 @@ public class PlayerStats : MonoBehaviour
         slotChargeTime = Mathf.Max(1f, slotChargeTime - amount);
     }
 
-    public void AddDamage(float amount)
-    {
-        damage += amount;
-    }
-
-    public void AddFireRate(float amount)
-    {
-        fireRate += amount;
-    }
-
-    public void AddMaxHealth(int amount)
-    {
-        maxHealth += amount;
-    }
-
-    public void AddMoveSpeed(float amount)
-    {
-        moveSpeed += amount;
-    }
+    public void AddDamage(float amount) => damage += amount;
+    public void AddFireRate(float amount) => fireRate += amount;
+    public void AddMaxHealth(int amount) => maxHealth += amount;
+    public void AddMoveSpeed(float amount) => moveSpeed += amount;
 
     public void AddCritChance(float amount)
     {
-        critChance += amount;
+        critChance = Mathf.Clamp01(critChance + amount);
     }
 
-    public void AddCritMultiplier(float amount)
-    {
-        critMultiplier += amount;
-    }
-
-    public void AddRegeneration(float amount)
-    {
-        regeneration += amount;
-    }
+    public void AddCritMultiplier(float amount) => critMultiplier += amount;
+    public void AddRegeneration(float amount) => regeneration += amount;
 
     public void AddDamageReduction(float amount)
     {
-        damageReduction = Mathf.Clamp01(damageReduction + amount);
+        damageReduction = Mathf.Clamp(damageReduction + amount, 0f, 100f);
     }
 }
