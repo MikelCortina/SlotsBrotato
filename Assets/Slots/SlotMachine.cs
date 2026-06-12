@@ -26,7 +26,7 @@ public class SlotMachine : MonoBehaviour
     public KeyCode activateKey = KeyCode.Space;
 
     [Header("Activation Timing")]
-    [Tooltip("Delay entre un s�mbolo resuelto y el siguiente.")]
+    [Tooltip("Delay entre un símbolo resuelto y el siguiente.")]
     [Min(0f)] public float activationStepDelay = 0.12f;
 
     [Tooltip("Tiempo que se espera tras el punch antes de aplicar el efecto.")]
@@ -38,6 +38,11 @@ public class SlotMachine : MonoBehaviour
 
     [Header("Wave Visuals")]
     public UnityEngine.UI.Image waveCover;
+
+    [Header("Reward Popup")]
+    [SerializeField] private RewardPopup rewardPopupPrefab;
+    [SerializeField] private Vector3 rewardPopupOffset = new Vector3(0f, 1.8f, 0f);
+    [SerializeField] private float rewardPopupRandomX = 0.35f;
 
     float _charge;
     float _overloadReserve;
@@ -74,7 +79,7 @@ public class SlotMachine : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[SlotMachine] No se encontr� ning�n GameObject con tag 'Player'");
+            Debug.LogError("[SlotMachine] No se encontró ningún GameObject con tag 'Player'");
         }
 
         _buffSystem = FindFirstObjectByType<TemporaryBuffSystem>();
@@ -102,18 +107,15 @@ public class SlotMachine : MonoBehaviour
 
         if (reels != null)
         {
-            foreach (var reel in reels)
+            for (int i = 0; i < reels.Length; i++)
             {
-                for (int i = 0; i < reels.Length; i++)
-                {
-                    if (reels[i] == null) continue;
+                if (reels[i] == null) continue;
 
-                    bool active = IsReelEnabledByModifier(i);
-                    reels[i].gameObject.SetActive(active);
+                bool active = IsReelEnabledByModifier(i);
+                reels[i].gameObject.SetActive(active);
 
-                    if (active)
-                        reels[i].ForceShowLock();
-                }
+                if (active)
+                    reels[i].ForceShowLock();
             }
         }
 
@@ -259,8 +261,7 @@ public class SlotMachine : MonoBehaviour
                 activeReelCount++;
         }
 
-        float totalDuration =
-            reelSpinDuration + (activeReelCount - 1) * reelStaggerDelay + 0.1f;
+        float totalDuration = reelSpinDuration + (activeReelCount - 1) * reelStaggerDelay + 0.1f;
         yield return new WaitForSeconds(totalDuration);
 
         CollectResults();
@@ -357,8 +358,7 @@ public class SlotMachine : MonoBehaviour
             MechanicModifierManager.Instance.HasModifier(
                 MechanicModifierType.ReducedJackpot);
 
-        Dictionary<SlotSymbolType, int> counts =
-            new Dictionary<SlotSymbolType, int>();
+        Dictionary<SlotSymbolType, int> counts = new Dictionary<SlotSymbolType, int>();
 
         foreach (var symbol in symbols)
         {
@@ -386,15 +386,7 @@ public class SlotMachine : MonoBehaviour
         for (int i = 0; i < _autoSymbols.Count; i++)
         {
             var symbol = _autoSymbols[i];
-            int jackpotValue = 3;
-
-            if (MechanicModifierManager.Instance != null &&
-                MechanicModifierManager.Instance.HasModifier(
-                    MechanicModifierType.ExtendedJackpot))
-            {
-                jackpotValue = 5;
-            }
-
+            int jackpotValue = GetJackpotAmount();
             int amount = jackpotAuto ? jackpotValue : 1;
 
             yield return StartCoroutine(ResolveSingleSymbolVisual(symbol, amount));
@@ -416,20 +408,13 @@ public class SlotMachine : MonoBehaviour
         if (_pendingIsJackpot)
         {
             Debug.Log("Activando jackpot. Pendientes: " + _pendingSymbols.Count);
+
             for (int i = 0; i < _pendingSymbols.Count; i++)
             {
                 var p = _pendingSymbols[i];
-                int jackpotValue = 3;
+                int jackpotValue = GetJackpotAmount();
 
-                if (MechanicModifierManager.Instance != null &&
-                    MechanicModifierManager.Instance.HasModifier(
-                        MechanicModifierType.ExtendedJackpot))
-                {
-                    jackpotValue = 5;
-                }
-
-                yield return StartCoroutine(
-                    ResolveSingleSymbolVisual(p, jackpotValue));
+                yield return StartCoroutine(ResolveSingleSymbolVisual(p, jackpotValue));
 
                 if (i < _pendingSymbols.Count - 1 && activationStepDelay > 0f)
                     yield return new WaitForSeconds(activationStepDelay);
@@ -478,9 +463,10 @@ public class SlotMachine : MonoBehaviour
         {
             var reel = reels[symbol.reelIndex];
             reel.PlayActivationPunch();
+        }
 
-            if (activationResolveDelay > 0f)
-                yield return new WaitForSeconds(activationResolveDelay);
+        if (activationResolveDelay > 0f)
+            yield return new WaitForSeconds(activationResolveDelay);
 
             RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
 
@@ -500,6 +486,58 @@ public class SlotMachine : MonoBehaviour
         }
     }
 
+    int GetJackpotAmount()
+    {
+        bool extended =
+            MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(
+                MechanicModifierType.ExtendedJackpot);
+
+        return extended ? 5 : 3;
+    }
+
+    SlotSymbolData GetSymbolData(SlotSymbolType type)
+    {
+        return RunConfig.Instance != null ? RunConfig.Instance.GetSymbolData(type) : null;
+    }
+
+    int GetSymbolLevel(SlotSymbolType type)
+    {
+        return RunConfig.Instance != null ? RunConfig.Instance.GetSymbolLevel(type) : 1;
+    }
+
+    float GetSymbolBaseValue(SlotSymbolType type)
+    {
+        SlotSymbolData data = GetSymbolData(type);
+        if (data == null) return 0f;
+
+        int level = GetSymbolLevel(type);
+        return data.baseEffectValue + data.valuePerLevel * (level - 1);
+    }
+
+    float GetSymbolMultiplier(SlotSymbolType type, int amount)
+    {
+        SlotSymbolData data = GetSymbolData(type);
+        if (data == null) return 0f;
+
+        return amount >= 3 ? data.jackpotMultiplier : amount;
+    }
+
+    float GetSymbolFinalValue(SlotSymbolType type, int amount)
+    {
+        SlotSymbolData data = GetSymbolData(type);
+        if (data == null) return 0f;
+
+        float baseValue = GetSymbolBaseValue(type);
+        float multiplier = GetSymbolMultiplier(type, amount);
+        return baseValue * multiplier;
+    }
+
+    int GetSymbolFinalIntValue(SlotSymbolType type, int amount)
+    {
+        return Mathf.RoundToInt(GetSymbolFinalValue(type, amount));
+    }
+
     bool AreAllSameType(List<(int reelIndex, SlotSymbolData data)> symbols)
     {
         if (symbols.Count == 0) return false;
@@ -512,6 +550,128 @@ public class SlotMachine : MonoBehaviour
         }
 
         return true;
+    }
+
+    void SpawnRewardPopup(string text, Color color)
+    {
+        if (rewardPopupPrefab == null || _playerTransform == null || string.IsNullOrEmpty(text))
+            return;
+
+        Vector3 randomOffset = new Vector3(Random.Range(-rewardPopupRandomX, rewardPopupRandomX), 0f, 0f);
+        Vector3 spawnPos = _playerTransform.position + rewardPopupOffset + randomOffset;
+
+        RewardPopup popup = Instantiate(rewardPopupPrefab, spawnPos, Quaternion.identity);
+        popup.Show(text, color);
+    }
+
+    string BuildRewardPopupText(SlotSymbolType type, int amount)
+    {
+        float value = GetSymbolFinalValue(type, amount);
+        int intValue = Mathf.RoundToInt(value);
+
+        switch (type)
+        {
+            case SlotSymbolType.Shield:
+                return $"+{intValue} Shield";
+
+            case SlotSymbolType.Coin:
+                return $"+{intValue} Coins";
+
+            case SlotSymbolType.Static:
+                return $"Static x{intValue}";
+
+            case SlotSymbolType.Berserk:
+                return $"+{value:0.#} Berserk";
+
+            case SlotSymbolType.Power:
+                return $"+{value:0.#} Damage";
+
+            case SlotSymbolType.DamageUp:
+                return $"+{value:0.#} Damage";
+
+            case SlotSymbolType.FireRateUp:
+                return $"+{value:0.##} Fire Rate";
+
+            case SlotSymbolType.MaxHealthUp:
+                return $"+{intValue} Max HP";
+
+            case SlotSymbolType.MoveSpeedUp:
+                return $"+{value:0.#} Move Speed";
+
+            case SlotSymbolType.CritChanceUp:
+                return $"+{value * 100f:0.#}% Crit";
+
+            case SlotSymbolType.CritDamageUp:
+                return $"+{value:0.#} Crit Dmg";
+
+            case SlotSymbolType.RegenUp:
+                return $"+{value:0.#} Regen";
+
+            case SlotSymbolType.DamageReductionUp:
+                return $"+{value * 100f:0.#}% DR";
+
+            case SlotSymbolType.PickupRadiusUp:
+                return $"+{value:0.#} Pickup Radius";
+
+            case SlotSymbolType.SlotChargeUp:
+                return $"-{value:0.#}s Slot Charge";
+        }
+
+        return type.ToString();
+    }
+
+    Color GetRewardPopupColor(SlotSymbolType type)
+    {
+        switch (type)
+        {
+            case SlotSymbolType.Coin:
+                return new Color(1f, 0.85f, 0.2f);
+
+            case SlotSymbolType.Shield:
+                return new Color(0.4f, 0.9f, 1f);
+
+            case SlotSymbolType.Static:
+                return new Color(0.7f, 0.5f, 1f);
+
+            case SlotSymbolType.Berserk:
+                return new Color(1f, 0.35f, 0.35f);
+
+            case SlotSymbolType.Power:
+                return new Color(1f, 0.5f, 0.2f);
+
+            case SlotSymbolType.DamageUp:
+                return new Color(1f, 0.4f, 0.4f);
+
+            case SlotSymbolType.FireRateUp:
+                return new Color(1f, 0.65f, 0.3f);
+
+            case SlotSymbolType.MaxHealthUp:
+                return new Color(0.45f, 1f, 0.45f);
+
+            case SlotSymbolType.MoveSpeedUp:
+                return new Color(0.45f, 1f, 0.8f);
+
+            case SlotSymbolType.CritChanceUp:
+                return new Color(1f, 0.5f, 0.85f);
+
+            case SlotSymbolType.CritDamageUp:
+                return new Color(1f, 0.25f, 0.75f);
+
+            case SlotSymbolType.RegenUp:
+                return new Color(0.3f, 1f, 0.55f);
+
+            case SlotSymbolType.DamageReductionUp:
+                return new Color(0.55f, 0.75f, 1f);
+
+            case SlotSymbolType.PickupRadiusUp:
+                return new Color(1f, 0.95f, 0.45f);
+
+            case SlotSymbolType.SlotChargeUp:
+                return new Color(0.55f, 1f, 1f);
+
+            default:
+                return Color.white;
+        }
     }
 
     void ApplyByType(SlotSymbolType type, int amount)
@@ -592,54 +752,19 @@ public class SlotMachine : MonoBehaviour
 
     void ApplyShield(int amount)
     {
-        int level = RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Shield);
-
-        SlotSymbolData symbolData =
-            RunConfig.Instance.GetSymbolData(SlotSymbolType.Shield);
-
-        if (symbolData == null)
-            return;
-
-        float baseValue =
-            symbolData.baseEffectValue +
-            symbolData.valuePerLevel * (level - 1);
-
-        float multiplier =
-            amount >= 3
-            ? symbolData.jackpotMultiplier
-            : amount;
-
-        int shieldAmount =
-            Mathf.RoundToInt(baseValue * multiplier);
         var playerShield = FindFirstObjectByType<PlayerShield>();
-        if (playerShield != null)
-            playerShield.AddShield(shieldAmount);
+        if (playerShield == null) return;
+
+        int shieldAmount = GetSymbolFinalIntValue(SlotSymbolType.Shield, amount);
+        playerShield.AddShield(shieldAmount);
     }
 
     void ApplyCoins(int amount)
     {
-        SlotSymbolData symbolData =
-            RunConfig.Instance.GetSymbolData(SlotSymbolType.Coin);
+        if (PlayerWallet.Instance == null) return;
 
-        if (symbolData == null)
-            return;
-
-        int level =
-            RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Coin);
-
-        float baseValue =
-            symbolData.baseEffectValue +
-            symbolData.valuePerLevel * (level - 1);
-
-        float multiplier =
-            amount >= 3
-            ? symbolData.jackpotMultiplier
-            : amount;
-
-        int coinAmount =
-            Mathf.RoundToInt(baseValue * multiplier);
-        if (PlayerWallet.Instance != null)
-            PlayerWallet.Instance.AddCoins(coinAmount);
+        int coinAmount = GetSymbolFinalIntValue(SlotSymbolType.Coin, amount);
+        PlayerWallet.Instance.AddCoins(coinAmount);
     }
 
     void ApplyStatik(int amount)
@@ -654,27 +779,7 @@ public class SlotMachine : MonoBehaviour
                 aliveEnemies++;
         }
 
-        SlotSymbolData symbolData =
-            RunConfig.Instance.GetSymbolData(SlotSymbolType.Static);
-
-        if (symbolData == null)
-            return;
-
-        int level =
-            RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Static);
-
-        float baseValue =
-            symbolData.baseEffectValue +
-            symbolData.valuePerLevel * (level - 1);
-
-        float multiplier =
-            amount >= 3
-            ? symbolData.jackpotMultiplier
-            : amount;
-
-        int chains =
-            Mathf.RoundToInt(baseValue * multiplier);
-
+        int chains = GetSymbolFinalIntValue(SlotSymbolType.Static, amount);
         chains = Mathf.Max(chains, aliveEnemies);
 
         if (ChainLightning.Instance != null && _playerTransform != null)
@@ -685,7 +790,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        float gain = amount >= 3 ? 15f : 5f * amount;
+        float gain = GetSymbolFinalValue(SlotSymbolType.DamageUp, amount);
         _playerStats.AddDamage(gain);
 
         Debug.Log($"+{gain} damage");
@@ -695,7 +800,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        float gain = amount >= 3 ? 1.5f : 0.5f * amount;
+        float gain = GetSymbolFinalValue(SlotSymbolType.FireRateUp, amount);
         _playerStats.AddFireRate(gain);
 
         Debug.Log($"+{gain} fire rate");
@@ -705,7 +810,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        int gain = amount >= 3 ? 3 : amount;
+        int gain = GetSymbolFinalIntValue(SlotSymbolType.MaxHealthUp, amount);
         _playerStats.AddMaxHealth(gain);
 
         Debug.Log($"+{gain} max health");
@@ -715,7 +820,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        float gain = amount >= 3 ? 3f : 1f * amount;
+        float gain = GetSymbolFinalValue(SlotSymbolType.MoveSpeedUp, amount);
         _playerStats.AddMoveSpeed(gain);
 
         Debug.Log($"+{gain} move speed");
@@ -725,7 +830,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        float gain = amount >= 3 ? 0.15f : 0.05f * amount;
+        float gain = GetSymbolFinalValue(SlotSymbolType.CritChanceUp, amount);
         _playerStats.AddCritChance(gain);
 
         Debug.Log($"+{gain * 100f}% crit chance");
@@ -735,7 +840,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        float gain = amount >= 3 ? 1f : 0.35f * amount;
+        float gain = GetSymbolFinalValue(SlotSymbolType.CritDamageUp, amount);
         _playerStats.AddCritMultiplier(gain);
 
         Debug.Log($"+{gain} crit multiplier");
@@ -745,7 +850,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        float gain = amount >= 3 ? 1.5f : 0.5f * amount;
+        float gain = GetSymbolFinalValue(SlotSymbolType.RegenUp, amount);
         _playerStats.AddRegeneration(gain);
 
         Debug.Log($"+{gain} regeneration");
@@ -755,7 +860,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        float gain = amount >= 3 ? 0.15f : 0.05f * amount;
+        float gain = GetSymbolFinalValue(SlotSymbolType.DamageReductionUp, amount);
         _playerStats.AddDamageReduction(gain);
 
         Debug.Log($"+{gain * 100f}% damage reduction");
@@ -765,7 +870,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        float gain = amount >= 3 ? 3f : 1f * amount;
+        float gain = GetSymbolFinalValue(SlotSymbolType.PickupRadiusUp, amount);
         _playerStats.AddCoinPickupRadius(gain);
 
         Debug.Log($"+{gain} pickup radius");
@@ -775,7 +880,7 @@ public class SlotMachine : MonoBehaviour
     {
         if (_playerStats == null) return;
 
-        float reduction = amount >= 3 ? 3f : 1f * amount;
+        float reduction = GetSymbolFinalValue(SlotSymbolType.SlotChargeUp, amount);
         _playerStats.ReduceSlotChargeTime(reduction);
 
         Debug.Log($"-{reduction}s slot charge time");
@@ -911,25 +1016,8 @@ public class SlotMachine : MonoBehaviour
     void ApplyBerserk(int amount)
     {
         if (_buffSystem == null) return;
-        SlotSymbolData symbolData =
-            RunConfig.Instance.GetSymbolData(SlotSymbolType.Berserk);
 
-        if (symbolData == null)
-            return;
-
-        int level =
-            RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Berserk);
-
-        float baseValue =
-            symbolData.baseEffectValue +
-            symbolData.valuePerLevel * (level - 1);
-
-        float multiplier =
-            amount >= 3
-            ? symbolData.jackpotMultiplier
-            : amount;
-
-        float damageBuff = baseValue * multiplier;
+        float damageBuff = GetSymbolFinalValue(SlotSymbolType.Berserk, amount);
         float duration = 5f;
 
         _buffSystem.ApplyDamageBuff(damageBuff, duration);
@@ -937,26 +1025,12 @@ public class SlotMachine : MonoBehaviour
 
     void ApplyPower(int amount)
     {
-        if (_playerTransform == null) return;
+        if (_playerStats == null) return;
 
-        PlayerStats stats = _playerTransform.GetComponent<PlayerStats>();
-        if (stats == null) return;
-        SlotSymbolData symbolData = RunConfig.Instance.GetSymbolData(SlotSymbolType.Power);
-        if (symbolData == null) return;
+        float damageGain = GetSymbolFinalValue(SlotSymbolType.Power, amount);
+        _playerStats.AddDamage(damageGain);
 
-        int level = RunConfig.Instance.GetSymbolLevel(SlotSymbolType.Power);
-
-        float baseValue =
-            symbolData.baseEffectValue + symbolData.valuePerLevel * (level - 1);
-
-        float multiplier =
-            amount >= 3 ? symbolData.jackpotMultiplier : amount;
-
-        float damageGain = baseValue * multiplier;
-
-        stats.damage += damageGain;
-
-        Debug.Log($"+{damageGain} da�o permanente");
+        Debug.Log($"+{damageGain} daño permanente");
     }
 
     public void AddCharge(float amount)
@@ -1067,6 +1141,7 @@ public class SlotMachine : MonoBehaviour
                 reels[i].ForceShowLock();
         }
     }
+
     IEnumerator ShowJackpotMessage(string message)
     {
         if (jackpotMessageText == null)
@@ -1089,5 +1164,4 @@ public class SlotMachine : MonoBehaviour
 
         UpdateChargeUI();
     }
-
 }

@@ -1,26 +1,33 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Weapon", menuName = "Weapons/Weapon")]
+[CreateAssetMenu(menuName = "Weapons/Weapon Data")]
 public class WeaponData : ScriptableObject
 {
     public string weaponName;
-    public WeaponType weaponType;
+    [TextArea] public string description;
     public Sprite icon;
 
-    [Header("Prefab visual")]
+    public WeaponType weaponType;
+
+    [Header("Damage")]
+    public float damage = 10f;
+    public float damageScalingFactor = 1f;
+
+    [Header("Fire Rate")]
+    public float fireRate = 2f;
+    public float fireRateScalingFactor = 1f;
+
+    [Header("Projectile")]
+    public float bulletSpeed = 10f;
+    public int bulletsPerShot = 1;
+    public float spreadAngle = 0f;
+    public GameObject bulletPrefab;
+
+    [Header("Prefab")]
     public GameObject weaponPrefab;
 
-    [Header("Stats")]
-    public float fireRate = 2f;
-    public float damage = 25f;
-    public float bulletSpeed = 12f;
-    public int bulletsPerShot = 1;
-    public GameObject bulletPrefab;
-    public float spreadAngle = 0f;
+    [Header("Boomerang")]
     public float boomerangDistance = 5f;
-
-    [Header("Posición en mano")]
-    public float holdRadius = 0.35f;
 
     [Header("Audio")]
     public AudioClip shootSound;

@@ -10,6 +10,7 @@ public class PlayerShooter : MonoBehaviour
     [Header("Debug / arma inicial")]
     [SerializeField] public WeaponData startWeapon;
 
+    [Header("Runtime")]
     public float _fireTimer;
     public PlayerStats _stats;
     public WeaponData _currentWeapon;
@@ -18,8 +19,11 @@ public class PlayerShooter : MonoBehaviour
     public Transform _firePoint;
     public Vector3 _weaponBaseScale = Vector3.one;
 
+    [Header("Weapon Runtime Stats")]
     public float fireRate;
+    public float fireRateScalingFactor;
     public float damage;
+    public float damageScalingFactor;
     public float bulletSpeed;
     public int bulletsPerShot;
     public GameObject bulletPrefab;
@@ -30,7 +34,7 @@ public class PlayerShooter : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip _defaultShootSound;
-    [SerializeField][Range(0f, 1f)] private float _shootSoundVolume = 0.5f;
+    [SerializeField, Range(0f, 1f)] private float _shootSoundVolume = 0.5f;
 
     void Awake()
     {
@@ -65,11 +69,7 @@ public class PlayerShooter : MonoBehaviour
             Shoot();
             PlayShootSound();
 
-            float finalFireRate = fireRate;
-
-            if (_stats != null)
-                finalFireRate = _stats.GetFireRate(fireRate);
-
+            float finalFireRate = GetFinalWeaponFireRate();
             _fireTimer = 1f / Mathf.Max(0.01f, finalFireRate);
         }
     }
@@ -80,15 +80,119 @@ public class PlayerShooter : MonoBehaviour
 
         _currentWeapon = weapon;
 
-
         fireRate = weapon.fireRate;
+        fireRateScalingFactor = weapon.fireRateScalingFactor;
+
         damage = weapon.damage;
+        damageScalingFactor = weapon.damageScalingFactor;
+
         bulletSpeed = weapon.bulletSpeed;
         bulletsPerShot = weapon.bulletsPerShot;
         bulletPrefab = weapon.bulletPrefab;
         spreadAngle = weapon.spreadAngle;
 
         EquipWeaponPrefab();
+    }
+
+    float GetFinalWeaponDamage()
+    {
+        float finalDamage = damage;
+
+        if (_stats != null)
+            finalDamage = _stats.GetScaledDamage(damage, damageScalingFactor, true);
+
+        if (WeaponLevelSystem.Instance != null && _currentWeapon != null)
+        {
+            float weaponMultiplier =
+                WeaponLevelSystem.Instance.GetWeaponScalingMultiplier(_currentWeapon);
+
+            finalDamage *= weaponMultiplier;
+        }
+
+        return finalDamage;
+    }
+
+    float GetFinalWeaponFireRate()
+    {
+        float finalFireRate = fireRate;
+
+        if (_stats != null)
+            finalFireRate = _stats.GetScaledFireRate(fireRate, fireRateScalingFactor);
+
+        return Mathf.Max(0.01f, finalFireRate);
+    }
+
+    void Shoot()
+    {
+        if (bulletPrefab == null || _firePoint == null || weaponPivot == null)
+            return;
+
+        Vector2 baseDir = weaponPivot.right.normalized;
+
+        if (weaponPivot.localScale.x < 0f)
+            baseDir = -baseDir;
+
+        if (_currentWeapon != null && _currentWeapon.weaponType == WeaponType.Boomerang)
+        {
+            ShootBoomerang(baseDir);
+            return;
+        }
+
+        ShootProjectileWeapon(baseDir);
+    }
+
+    void ShootProjectileWeapon(Vector2 baseDir)
+    {
+        int shots = Mathf.Max(1, bulletsPerShot);
+
+        bool hasDoubleShot =
+            MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(MechanicModifierType.DoubleShot);
+
+        if (hasDoubleShot)
+            shots += 1;
+
+        float finalSpreadAngle = spreadAngle;
+
+        if (hasDoubleShot && finalSpreadAngle < 8f)
+            finalSpreadAngle = 8f;
+
+        for (int i = 0; i < shots; i++)
+        {
+            float angleOffset = 0f;
+
+            if (shots > 1)
+                angleOffset = Mathf.Lerp(-finalSpreadAngle, finalSpreadAngle, (float)i / (shots - 1));
+
+            Vector2 dir = Quaternion.Euler(0f, 0f, angleOffset) * baseDir;
+
+            GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
+
+            Bullet bullet = go.GetComponent<Bullet>();
+            if (bullet == null) continue;
+
+            float finalDamage = GetFinalWeaponDamage();
+            bullet.Init(dir, bulletSpeed, finalDamage);
+        }
+    }
+
+    void ShootBoomerang(Vector2 dir)
+    {
+        if (bulletPrefab == null || _firePoint == null)
+            return;
+
+        GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
+
+        BoomerangProjectile boomerang = go.GetComponent<BoomerangProjectile>();
+        if (boomerang == null) return;
+
+        float finalDamage = GetFinalWeaponDamage();
+
+        float distance = _currentWeapon != null
+            ? _currentWeapon.boomerangDistance
+            : 5f;
+
+        boomerang.Init(transform, dir, bulletSpeed, finalDamage, distance);
     }
 
     void EquipWeaponPrefab()
@@ -130,25 +234,6 @@ public class PlayerShooter : MonoBehaviour
             _weaponSpriteRenderer.flipY = mouseOnLeft;
     }
 
-    void Shoot()
-    {
-        if (bulletPrefab == null || _firePoint == null || weaponPivot == null)
-            return;
-
-        Vector2 baseDir = weaponPivot.right.normalized;
-
-        if (weaponPivot.localScale.x < 0f)
-            baseDir = -baseDir;
-
-        if (_currentWeapon != null && _currentWeapon.weaponType == WeaponType.Boomerang)
-        {
-            ShootBoomerang(baseDir);
-            return;
-        }
-
-        ShootProjectileWeapon(baseDir);
-    }
-
     void PlayShootSound()
     {
         if (_audioSource == null) return;
@@ -161,74 +246,18 @@ public class PlayerShooter : MonoBehaviour
             _audioSource.PlayOneShot(soundToPlay, _shootSoundVolume);
     }
 
-    float GetFinalWeaponDamage()
+    public WeaponData GetCurrentWeapon()
     {
-        float finalDamage = damage;
-
-        if (WeaponLevelSystem.Instance != null && _currentWeapon != null)
-        {
-            float weaponMultiplier =
-                WeaponLevelSystem.Instance.GetWeaponScalingMultiplier(_currentWeapon);
-
-            finalDamage *= weaponMultiplier;
-        }
-
-        if (_stats != null)
-            finalDamage = _stats.GetFinalDamage(finalDamage);
-
-        return finalDamage;
+        return _currentWeapon;
     }
 
-    void ShootProjectileWeapon(Vector2 baseDir)
+    public float GetCurrentWeaponDamage()
     {
-        int shots = Mathf.Max(1, bulletsPerShot);
-
-        bool hasDoubleShot =
-            MechanicModifierManager.Instance != null &&
-            MechanicModifierManager.Instance.HasModifier(MechanicModifierType.DoubleShot);
-
-        if (hasDoubleShot)
-            shots += 1;
-
-        float finalSpreadAngle = spreadAngle;
-
-        if (hasDoubleShot && finalSpreadAngle < 8f)
-            finalSpreadAngle = 8f;
-
-        for (int i = 0; i < shots; i++)
-        {
-            float angleOffset = 0f;
-
-            if (shots > 1)
-                angleOffset = Mathf.Lerp(-finalSpreadAngle, finalSpreadAngle, (float)i / (shots - 1));
-
-            Vector2 dir = Quaternion.Euler(0f, 0f, angleOffset) * baseDir;
-
-            GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
-
-            Bullet bullet = go.GetComponent<Bullet>();
-            if (bullet == null) continue;
-
-            float finalDamage = GetFinalWeaponDamage();
-            bullet.Init(dir, bulletSpeed, finalDamage);
-        }
+        return GetFinalWeaponDamage();
     }
 
-    void ShootBoomerang(Vector2 dir)
+    public float GetCurrentWeaponFireRate()
     {
-        if (bulletPrefab == null || _firePoint == null) return;
-
-        GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
-
-        BoomerangProjectile boomerang = go.GetComponent<BoomerangProjectile>();
-        if (boomerang == null) return;
-
-        float finalDamage = GetFinalWeaponDamage();
-
-        float distance = _currentWeapon != null
-            ? _currentWeapon.boomerangDistance
-            : 5f;
-
-        boomerang.Init(transform, dir, bulletSpeed, finalDamage, distance);
+        return GetFinalWeaponFireRate();
     }
 }
