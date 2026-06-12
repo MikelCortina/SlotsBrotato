@@ -23,6 +23,10 @@ public class EnemySpawner : MonoBehaviour
     public float spawnWarningTime = 0.8f;
     public float blinkInterval = 0.1f;
 
+    [Header("Special Waves")]
+    public int specialWaveInterval = 5;
+    public float specialWaveSpawnMultiplier = 2f;
+
     [Header("Zona de Spawn")]
     public SpawnAreaMode areaMode = SpawnAreaMode.Donut;
     public float innerRadius = 7f;
@@ -77,6 +81,12 @@ public class EnemySpawner : MonoBehaviour
             int wave = GameManager.Instance.CurrentWave;
             _spawnBudget = spawnBudgetPerSecond + (wave - 1) * spawnBudgetIncreasePerWave;
 
+            if (GameManager.Instance != null &&
+                GameManager.Instance.CurrentSpecialWaveType == SpecialWaveType.Swarm)
+            {
+                _spawnBudget *= specialWaveSpawnMultiplier;
+            }
+
             while (_running && GameManager.Instance != null && GameManager.Instance.IsWaveRunning)
             {
                 _spawnBudget += Time.deltaTime;
@@ -119,7 +129,15 @@ public class EnemySpawner : MonoBehaviour
         var health = go.GetComponent<EnemyHealth>();
         if (health != null)
         {
-            health.maxHp = baseEnemyHp + (wave - 1) * hpIncreasePerWave;
+            float hp = baseEnemyHp + (wave - 1) * hpIncreasePerWave;
+
+            if (GameManager.Instance != null &&
+                GameManager.Instance.CurrentSpecialWaveType == SpecialWaveType.Tank)
+            {
+                hp *= 2f;
+            }
+
+            health.maxHp = hp;
             health.ResetHealth();
             health.SubscribeOnDeath(() =>
             {
@@ -131,7 +149,15 @@ public class EnemySpawner : MonoBehaviour
         var ctrl = go.GetComponent<EnemyController>();
         if (ctrl != null)
         {
-            ctrl.speed = baseEnemySpeed;
+            float speed = baseEnemySpeed;
+
+            if (GameManager.Instance != null &&
+                GameManager.Instance.CurrentSpecialWaveType == SpecialWaveType.Frenzy)
+            {
+                speed *= 2f;
+            }
+
+            ctrl.speed = speed;
         }
 
         var dmg = go.GetComponent<EnemyDamage>();
@@ -189,5 +215,9 @@ public class EnemySpawner : MonoBehaviour
         if (spawnCenter != null) return spawnCenter.position;
         if (_playerTransform != null) return _playerTransform.position;
         return Vector2.zero;
+    }
+    bool IsSpecialWave(int wave)
+    {
+        return specialWaveInterval > 0 && wave % specialWaveInterval == 0;
     }
 }

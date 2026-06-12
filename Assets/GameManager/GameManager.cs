@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI waveText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI specialWaveText;
     public GameUIFlowController uiFlow;
 
     [Header("Fallback panel directo")]
@@ -25,6 +26,12 @@ public class GameManager : MonoBehaviour
     [Header("Oleadas")]
     public int startingWave = 1;
 
+
+
+    [Header("Special Waves")]
+    public int specialWaveInterval = 5;
+    public SpecialWaveType CurrentSpecialWaveType { get; private set; }
+
     [Header("Tiempo tipo Brotato")]
     public float firstWaveDuration = 20f;
     public float waveDurationStep = 5f;
@@ -32,12 +39,15 @@ public class GameManager : MonoBehaviour
     public float finalWaveDuration = 90f;
     public int finalWave = 20;
 
+
+
     [Header("Escalado enemigos")]
     public int baseEnemyCount = 4;
     public int enemyCountIncreasePerWave = 2;
 
     [Header("Tienda")]
     public float shopDuration = 15f;
+
 
     public int CurrentWave { get; private set; }
     public int Score { get; private set; }
@@ -191,10 +201,20 @@ public class GameManager : MonoBehaviour
         IsInShop = false;
         WaveTimeRemaining = GetWaveDuration(wave);
 
+        CurrentSpecialWaveType = SpecialWaveType.None;
+
+        if (specialWaveInterval > 0 && wave % specialWaveInterval == 0)
+        {
+            CurrentSpecialWaveType = GetRandomSpecialWaveType();
+            Debug.Log($"Oleada especial: {CurrentSpecialWaveType}");
+        }
+
         ApplyTimeScale();
         ApplyCursorState();
         UpdateUI();
 
+        if (IsSpecialWave(wave))
+            StartCoroutine(ShowSpecialWaveMessage());
         while (WaveTimeRemaining > 0f && !_isGameOver)
         {
             WaveTimeRemaining -= Time.deltaTime;
@@ -353,6 +373,36 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+    IEnumerator ShowSpecialWaveMessage()
+    {
+        if (specialWaveText == null)
+            yield break;
+
+        specialWaveText.gameObject.SetActive(true);
+        string message = "OLEADA ESPECIAL";
+
+        switch (CurrentSpecialWaveType)
+        {
+            case SpecialWaveType.Swarm:
+                message = "OLEADA ESPECIAL - ENJAMBRE";
+                break;
+
+            case SpecialWaveType.Tank:
+                message = "OLEADA ESPECIAL - TANQUES";
+                break;
+
+            case SpecialWaveType.Frenzy:
+                message = "OLEADA ESPECIAL - FRENESI";
+                break;
+        }
+
+        specialWaveText.text = message;
+
+        yield return new WaitForSeconds(2f);
+
+        specialWaveText.text = "";
+        specialWaveText.gameObject.SetActive(false);
+    }
 
     void UpdateUI()
     {
@@ -370,5 +420,17 @@ public class GameManager : MonoBehaviour
             else
                 timerText.text = "";
         }
+    }
+
+    bool IsSpecialWave(int wave)
+    {
+        return specialWaveInterval > 0 && wave % specialWaveInterval == 0;
+    }
+
+    SpecialWaveType GetRandomSpecialWaveType()
+    {
+        int random = Random.Range(1, 4);
+
+        return (SpecialWaveType)random;
     }
 }
