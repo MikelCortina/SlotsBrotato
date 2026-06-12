@@ -25,6 +25,11 @@ public class PlayerHealth : MonoBehaviour
 
     void Awake()
     {
+        PlayerStats stats = GetComponent<PlayerStats>();
+
+        if (stats != null)
+            maxHealth = stats.maxHealth;
+
         currentHealth = maxHealth;
         if (gameOverMenu) gameOverMenu.SetActive(false);
         _shield = GetComponent<PlayerShield>();

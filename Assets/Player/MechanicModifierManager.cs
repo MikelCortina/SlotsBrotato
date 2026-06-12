@@ -5,6 +5,7 @@ public class MechanicModifierManager : MonoBehaviour
 {
     public int maxModifierSlots = 2;
     public static MechanicModifierManager Instance { get; private set; }
+    const string ModifierSlotsKey = "ModifierSlots";
 
     private readonly HashSet<MechanicModifierType> activeModifiers =
         new HashSet<MechanicModifierType>();
@@ -13,6 +14,8 @@ public class MechanicModifierManager : MonoBehaviour
     {
         Instance = this;
 
+        maxModifierSlots =
+            PlayerPrefs.GetInt(ModifierSlotsKey, maxModifierSlots);
     }
 
     public bool HasModifier(MechanicModifierType modifier)
@@ -68,5 +71,11 @@ public class MechanicModifierManager : MonoBehaviour
     public IEnumerable<MechanicModifierType> GetActiveModifiers()
     {
         return activeModifiers;
+    }
+
+    public void SaveModifierSlots()
+    {
+        PlayerPrefs.SetInt(ModifierSlotsKey, maxModifierSlots);
+        PlayerPrefs.Save();
     }
 }

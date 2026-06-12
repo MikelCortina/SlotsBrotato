@@ -18,6 +18,7 @@ public class ModifierSlotUpgradeButton : MonoBehaviour
             return;
 
         MechanicModifierManager.Instance.maxModifierSlots++;
+        MechanicModifierManager.Instance.SaveModifierSlots();
 
         RefreshUI();
     }

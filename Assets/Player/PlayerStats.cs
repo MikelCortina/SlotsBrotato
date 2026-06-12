@@ -23,6 +23,11 @@ public class PlayerStats : MonoBehaviour
     [Header("Slot Machine")]
     public float slotChargeTime = 10f;
 
+
+    void Start()
+    {
+        maxHealth += PermanentHealthUpgradeButton.GetPermanentHealthBonus();
+    }
     public float GetFinalDamage(float baseDamage)
     {
         float finalDamage = baseDamage + damage;
