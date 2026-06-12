@@ -48,6 +48,19 @@ public class Bullet : MonoBehaviour
         if (health != null)
         {
             health.TakeDamage(damage, transform.position, DamageSource.Bullet);
+            if (MechanicModifierManager.Instance != null &&
+    MechanicModifierManager.Instance.HasModifier(
+        MechanicModifierType.StunningImpact))
+            {
+                if (Random.value <= 0.20f)
+                {
+                    EnemyController controller =
+                        other.GetComponent<EnemyController>();
+
+                    if (controller != null)
+                        controller.ApplySlow(0.5f, 2f);
+                }
+            }
 
             if (MechanicModifierManager.Instance != null &&
                 MechanicModifierManager.Instance.HasModifier(

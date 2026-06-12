@@ -10,7 +10,8 @@ public class EnemyController : MonoBehaviour
     public float separationForce = 6f;
     public float arrivalRadius = 0.7f;
     public float damageInterval = 0.5f;
-
+    float _baseSpeed;
+    float _slowTimer;
     Rigidbody2D _rb;
     Transform _player;
     PlayerHealth _playerHealth;
@@ -35,8 +36,19 @@ public class EnemyController : MonoBehaviour
             _player = p.transform;
             _playerHealth = p.GetComponent<PlayerHealth>();
         }
+        _baseSpeed = speed;
     }
 
+    void Update()
+    {
+        if (_slowTimer <= 0f)
+            return;
+
+        _slowTimer -= Time.deltaTime;
+
+        if (_slowTimer <= 0f)
+            speed = _baseSpeed;
+    }
     public void SetKnockback(bool value)
     {
         _isKnockedBack = value;
@@ -101,5 +113,11 @@ public class EnemyController : MonoBehaviour
         _nextDamageTime = Time.time + damageInterval;
         _playerHealth.TakeDamage(dmg);
         Debug.Log($"Damage: {dmg} by {gameObject.name}");
+    }
+
+    public void ApplySlow(float multiplier, float duration)
+    {
+        speed = _baseSpeed * multiplier;
+        _slowTimer = duration;
     }
 }

@@ -10,4 +10,5 @@ public enum MechanicModifierType
     Rewind,
     ReducedJackpot,
     DoubleShot,
+    StunningImpact,
 }
