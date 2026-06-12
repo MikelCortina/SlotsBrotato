@@ -183,12 +183,24 @@ public class PlayerShooter : MonoBehaviour
     {
         int shots = Mathf.Max(1, bulletsPerShot);
 
+        bool hasDoubleShot =
+            MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(MechanicModifierType.DoubleShot);
+
+        if (hasDoubleShot)
+            shots += 1;
+
+        float finalSpreadAngle = spreadAngle;
+
+        if (hasDoubleShot && finalSpreadAngle < 8f)
+            finalSpreadAngle = 8f;
+
         for (int i = 0; i < shots; i++)
         {
             float angleOffset = 0f;
 
             if (shots > 1)
-                angleOffset = Mathf.Lerp(-spreadAngle, spreadAngle, (float)i / (shots - 1));
+                angleOffset = Mathf.Lerp(-finalSpreadAngle, finalSpreadAngle, (float)i / (shots - 1));
 
             Vector2 dir = Quaternion.Euler(0f, 0f, angleOffset) * baseDir;
 

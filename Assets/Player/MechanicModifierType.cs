@@ -9,4 +9,5 @@ public enum MechanicModifierType
     DamageCharge,
     Rewind,
     ReducedJackpot,
+    DoubleShot,
 }
