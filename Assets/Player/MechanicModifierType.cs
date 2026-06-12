@@ -11,4 +11,5 @@ public enum MechanicModifierType
     ReducedJackpot,
     DoubleShot,
     StunningImpact,
+    ChainBoomerang,
 }
