@@ -4183,7 +4183,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &480596089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18028,9 +18028,21 @@ MonoBehaviour:
     displayName: "Carga R\xE1pida"
     description: Reduce el tiempo necesario para cargar la slot.
     cost: 60
+  - modifier: 9
+    displayName: Doble disparo
+    description: ' El arma dispara un proyectil adicional.'
+    cost: 60
   - modifier: 3
     displayName: 4 Ruleta
     description: "A\xF1ade una cuarta ruleta a la slot."
+    cost: 60
+  - modifier: 10
+    displayName: Impacto Aturdidor
+    description: Los ataques tienen un 20% de probabilidad de ralentizar enemigos.
+    cost: 60
+  - modifier: 10
+    displayName: Impacto Aturdidor
+    description: El boomerang rebota hacia enemigos cercanos antes de volver.
     cost: 60
   weaponSystem: {fileID: 809848647}
   weaponUpgradeBaseCost: 40
