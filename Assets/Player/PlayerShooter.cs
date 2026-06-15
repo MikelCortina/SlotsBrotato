@@ -128,10 +128,20 @@ public class PlayerShooter : MonoBehaviour
         if (bulletPrefab == null || _firePoint == null || weaponPivot == null)
             return;
 
-        Vector2 baseDir = weaponPivot.right.normalized;
+        // ? Dirección real desde el firePoint hacia el cursor en espacio mundo
+        Vector2 baseDir;
 
-        if (weaponPivot.localScale.x < 0f)
-            baseDir = -baseDir;
+        if (weaponAim != null && weaponAim.TryGetMouseWorldPosition(out Vector3 mouseWorld))
+        {
+            baseDir = ((Vector2)(mouseWorld - _firePoint.position)).normalized;
+        }
+        else
+        {
+            // Fallback: usar weaponPivot.right con corrección de flip
+            baseDir = weaponPivot.right.normalized;
+            if (weaponPivot.localScale.x < 0f)
+                baseDir = -baseDir;
+        }
 
         if (_currentWeapon != null && _currentWeapon.weaponType == WeaponType.Boomerang)
         {
@@ -141,7 +151,6 @@ public class PlayerShooter : MonoBehaviour
 
         ShootProjectileWeapon(baseDir);
     }
-
     void ShootProjectileWeapon(Vector2 baseDir)
     {
         int shots = Mathf.Max(1, bulletsPerShot);
