@@ -99,14 +99,48 @@ public class CoinPickup : MonoBehaviour
         {
             Vector2 direction = (playerTransform.position - transform.position).normalized;
             currentSpeed = Mathf.Min(currentSpeed + acceleration * Time.deltaTime, maxSpeed);
-            transform.position += (Vector3)direction * currentSpeed * Time.deltaTime;
 
-            float newDistance = Vector2.Distance(transform.position, playerTransform.position);
-            if (newDistance <= minCollectionDistance)
+            float step = currentSpeed * Time.deltaTime;
+            float dist = Vector2.Distance(transform.position, playerTransform.position);
+
+            // Evitar overshooting
+            if (step >= dist)
+            {
+                transform.position = playerTransform.position;
+                CollectCoin();
+                return;
+            }
+
+            transform.position += (Vector3)direction * step;
+
+            if (dist <= minCollectionDistance)
+                CollectCoin();
+        }
+    }
+
+    // ? Activa el pull directo saltándose la oscilación, con timeScale = 1 todavía activo
+    public void ForceCollect()
+    {
+        if (isCollected) return;
+
+        if (playerTransform == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null)
             {
                 CollectCoin();
+                return;
             }
+
+            playerTransform = player.transform;
+            if (!player.TryGetComponent<AudioSource>(out playerAudioSource))
+                playerAudioSource = player.GetComponentInChildren<AudioSource>();
         }
+
+        // Saltar oscilación y arrancar pull directo, un poco más rápido para que se vea snappy
+        isOscillating = false;
+        isPulled = true;
+        currentSpeed = pullSpeed * 2f;
     }
 
     private void CollectCoin()
@@ -127,8 +161,6 @@ public class CoinPickup : MonoBehaviour
         {
             Debug.LogWarning("No audio source or collect sound assigned");
         }
-
-    
 
         if (CoinDropManager.Instance != null)
             CoinDropManager.Instance.SpawnDropFromCoin(transform.position);

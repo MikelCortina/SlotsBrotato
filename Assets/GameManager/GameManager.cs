@@ -26,8 +26,6 @@ public class GameManager : MonoBehaviour
     [Header("Oleadas")]
     public int startingWave = 1;
 
-
-
     [Header("Special Waves")]
     public int specialWaveInterval = 5;
 
@@ -42,15 +40,12 @@ public class GameManager : MonoBehaviour
     public float finalWaveDuration = 90f;
     public int finalWave = 20;
 
-
-
     [Header("Escalado enemigos")]
     public int baseEnemyCount = 4;
     public int enemyCountIncreasePerWave = 2;
 
     [Header("Tienda")]
     public float shopDuration = 15f;
-
 
     public int CurrentWave { get; private set; }
     public int Score { get; private set; }
@@ -121,13 +116,9 @@ public class GameManager : MonoBehaviour
         bool isActuallyPlaying = IsWaveRunning && !IsInShop && !_isGameOver;
 
         if (isActuallyPlaying && gameplayCursor != null)
-        {
             Cursor.SetCursor(gameplayCursor, gameplayCursorHotspot, gameplayCursorMode);
-        }
         else
-        {
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-        }
     }
 
     public void BeginRun()
@@ -159,6 +150,54 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
+    IEnumerator RunWave(int wave)
+    {
+        IsWaveRunning = true;
+        IsInShop = false;
+        WaveTimeRemaining = GetWaveDuration(wave);
+
+        CurrentSpecialWaveType = SpecialWaveType.None;
+
+        if (specialWaveInterval > 0 && wave % specialWaveInterval == 0)
+        {
+            CurrentSpecialWaveType = GetRandomSpecialWaveType();
+            Debug.Log($"Oleada especial: {CurrentSpecialWaveType}");
+        }
+
+        if (bossSpawner != null && wave % 5 == 0)
+            bossSpawner.TrySpawnBoss(wave);
+
+        ApplyTimeScale();
+        ApplyCursorState();
+        UpdateUI();
+
+        if (IsSpecialWave(wave))
+            StartCoroutine(ShowSpecialWaveMessage());
+
+        while (WaveTimeRemaining > 0f && !_isGameOver)
+        {
+            WaveTimeRemaining -= Time.deltaTime;
+            UpdateUI();
+            yield return null;
+        }
+
+        WaveTimeRemaining = 0f;
+        IsWaveRunning = false;
+
+        // ? Enemigos desaparecen
+        CleanupWaveEnemies();
+
+        // ? Activar pull en monedas
+        CollectAllCoins();
+
+        // ? Mantener timeScale = 1 manualmente para que Update() de monedas siga corriendo
+        //    NO llamamos ApplyTimeScale() aquí todavía
+        Time.timeScale = 1f;
+
+        ApplyCursorState();
+        UpdateUI();
+    }
+
     IEnumerator GameLoop()
     {
         while (true)
@@ -173,10 +212,13 @@ public class GameManager : MonoBehaviour
             if (_isGameOver)
                 yield break;
 
-            CleanupWaveEnemies();
-
+            // ? Zoom out con timeScale = 1, monedas se recogen durante esto
             if (uiFlow != null)
                 yield return uiFlow.PlayWaveEndTransition(CurrentWave);
+
+            // ? Ahora sí aplicar timeScale correctamente (pasará a 0 para la tienda)
+            ApplyTimeScale();
+            ApplyCursorState();
 
             if (_isGameOver)
                 yield break;
@@ -196,44 +238,6 @@ public class GameManager : MonoBehaviour
             ApplyCursorState();
             UpdateUI();
         }
-    }
-
-    IEnumerator RunWave(int wave)
-    {
-        IsWaveRunning = true;
-        IsInShop = false;
-        WaveTimeRemaining = GetWaveDuration(wave);
-
-        CurrentSpecialWaveType = SpecialWaveType.None;
-
-        if (specialWaveInterval > 0 && wave % specialWaveInterval == 0)
-        {
-            CurrentSpecialWaveType = GetRandomSpecialWaveType();
-            Debug.Log($"Oleada especial: {CurrentSpecialWaveType}");
-        }
-        if (bossSpawner != null && wave % 5 == 0)
-        {
-            bossSpawner.TrySpawnBoss(wave);
-        }
-        ApplyTimeScale();
-        ApplyCursorState();
-        UpdateUI();
-
-        if (IsSpecialWave(wave))
-            StartCoroutine(ShowSpecialWaveMessage());
-        while (WaveTimeRemaining > 0f && !_isGameOver)
-        {
-            WaveTimeRemaining -= Time.deltaTime;
-            UpdateUI();
-            yield return null;
-        }
-
-        WaveTimeRemaining = 0f;
-        IsWaveRunning = false;
-
-        ApplyTimeScale();
-        ApplyCursorState();
-        UpdateUI();
     }
 
     IEnumerator RunShop()
@@ -272,6 +276,13 @@ public class GameManager : MonoBehaviour
         LiveEnemies.Clear();
         EnemiesAlive = 0;
         UpdateUI();
+    }
+
+    public void CollectAllCoins()
+    {
+        CoinPickup[] coins = FindObjectsByType<CoinPickup>(FindObjectsSortMode.None);
+        foreach (CoinPickup coin in coins)
+            coin.ForceCollect();
     }
 
     public void ContinueFromShop()
@@ -320,8 +331,7 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        if (_isGameOver)
-            return;
+        if (_isGameOver) return;
 
         Debug.Log("GameManager -> GameOver()");
 
@@ -379,6 +389,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+
     IEnumerator ShowSpecialWaveMessage()
     {
         if (specialWaveText == null)
@@ -392,11 +403,9 @@ public class GameManager : MonoBehaviour
             case SpecialWaveType.Swarm:
                 message = "OLEADA ESPECIAL - ENJAMBRE";
                 break;
-
             case SpecialWaveType.Tank:
                 message = "OLEADA ESPECIAL - TANQUES";
                 break;
-
             case SpecialWaveType.Frenzy:
                 message = "OLEADA ESPECIAL - FRENESI";
                 break;
@@ -436,7 +445,6 @@ public class GameManager : MonoBehaviour
     SpecialWaveType GetRandomSpecialWaveType()
     {
         int random = Random.Range(1, 4);
-
         return (SpecialWaveType)random;
     }
 }

@@ -16670,7 +16670,7 @@ MonoBehaviour:
   specialWaveText: {fileID: 480596089}
   uiFlow: {fileID: 1007749511}
   directGameOverPanel: {fileID: 1242824830}
-  gameplayCursor: {fileID: 2800000, guid: 49e3e6d2dfa0315478cb0bb080b975c8, type: 3}
+  gameplayCursor: {fileID: 0}
   gameplayCursorHotspot: {x: 0, y: 0}
   gameplayCursorMode: 0
   startingWave: 1
