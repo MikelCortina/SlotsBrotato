@@ -16,7 +16,7 @@ MonoBehaviour:
   description: 
   icon: {fileID: -9057444008558310320, guid: 0515d3661934ef643bec5230a0702c73, type: 3}
   weaponType: 0
-  damage: 25
+  damage: 50
   damageScalingFactor: 1
   fireRate: 2
   fireRateScalingFactor: 0.1
