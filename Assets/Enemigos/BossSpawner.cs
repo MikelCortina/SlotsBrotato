@@ -22,6 +22,18 @@ public class BossSpawner : MonoBehaviour
         GameObject boss = Instantiate(bossPrefab, position, Quaternion.identity);
 
         GameManager.Instance?.RegisterEnemy(boss);
+        EnemyHealth health = boss.GetComponent<EnemyHealth>();
+
+        if (health != null)
+        {
+            health.SubscribeOnDeath(() =>
+            {
+                BossEnemy bossEnemy = boss.GetComponent<BossEnemy>();
+
+                if (bossEnemy != null)
+                    bossEnemy.GiveBossReward();
+            });
+        }
 
         Debug.Log($"Boss spawneado en oleada {wave}");
     }
