@@ -10,4 +10,7 @@ public class MechanicModifierOfferData
     public string description;
 
     public int cost = 50;
+
+    [Header("Unlock")]
+    public int unlockWave = 1;
 }

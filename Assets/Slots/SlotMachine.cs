@@ -463,10 +463,9 @@ public class SlotMachine : MonoBehaviour
         {
             var reel = reels[symbol.reelIndex];
             reel.PlayActivationPunch();
-        }
 
-        if (activationResolveDelay > 0f)
-            yield return new WaitForSeconds(activationResolveDelay);
+            if (activationResolveDelay > 0f)
+                yield return new WaitForSeconds(activationResolveDelay);
 
             RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
 
