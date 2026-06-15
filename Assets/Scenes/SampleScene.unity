@@ -10577,6 +10577,7 @@ MonoBehaviour:
   enemyPrefab: {fileID: 6964806071213379794, guid: db01582ad918cc04d98806971fc1f7f1, type: 3}
   spitterEnemyPrefab: {fileID: 6964806071213379794, guid: d9572ee9706dc2446a299e2c58620623, type: 3}
   ringSpitterEnemyPrefab: {fileID: 6964806071213379794, guid: 4767348ac53ce6244872c5365e7c61d1, type: 3}
+  dasherEnemyPrefab: {fileID: 6964806071213379794, guid: ae3484db16b8d754583c79b4933cc414, type: 3}
   minSpawnInterval: 0.3
   maxSpawnInterval: 0.8
   spawnGraceTime: 1
@@ -16672,7 +16673,7 @@ MonoBehaviour:
   gameplayCursor: {fileID: 2800000, guid: 49e3e6d2dfa0315478cb0bb080b975c8, type: 3}
   gameplayCursorHotspot: {x: 0, y: 0}
   gameplayCursorMode: 0
-  startingWave: 10
+  startingWave: 12
   specialWaveInterval: 5
   bossSpawner: {fileID: 1925141406}
   firstWaveDuration: 15

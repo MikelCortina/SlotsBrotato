@@ -8,9 +8,8 @@ public class EnemySpawner : MonoBehaviour
 
     [Header("Enemy Types")]
     public GameObject spitterEnemyPrefab;
-
     public GameObject ringSpitterEnemyPrefab;
-
+    public GameObject dasherEnemyPrefab;
     [Header("Spawn")]
     public float minSpawnInterval = 0.2f;
     public float maxSpawnInterval = 0.8f;
@@ -130,15 +129,23 @@ public class EnemySpawner : MonoBehaviour
 
         GameObject prefabToSpawn = enemyPrefab;
 
-        if (wave >= 10 &&
-            ringSpitterEnemyPrefab != null &&
-            Random.value < 0.10f)
+        float roll = Random.value;
+
+        if (wave >= 12 &&
+            dasherEnemyPrefab != null &&
+            roll < 0.08f)
+        {
+            prefabToSpawn = dasherEnemyPrefab;
+        }
+        else if (wave >= 10 &&
+                 ringSpitterEnemyPrefab != null &&
+                 roll < 0.18f)
         {
             prefabToSpawn = ringSpitterEnemyPrefab;
         }
         else if (wave >= 5 &&
                  spitterEnemyPrefab != null &&
-                 Random.value < 0.20f)
+                 roll < 0.38f)
         {
             prefabToSpawn = spitterEnemyPrefab;
         }
