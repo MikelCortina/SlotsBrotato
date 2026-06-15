@@ -9332,8 +9332,8 @@ MonoBehaviour:
   reelSpinDuration: 1.2
   reelStaggerDelay: 0.18
   waveCover: {fileID: 0}
-  rewardPopupPrefab: {fileID: 0}
-  rewardPopupOffset: {x: 0, y: 1.8, z: 0}
+  rewardPopupPrefab: {fileID: 8275923434840977308, guid: b119430e5f102dc4a8553499b4c573c5, type: 3}
+  rewardPopupOffset: {x: 0, y: 0, z: 0}
   rewardPopupRandomX: 0.35
 --- !u!114 &955838247
 MonoBehaviour:
@@ -16673,7 +16673,7 @@ MonoBehaviour:
   gameplayCursor: {fileID: 2800000, guid: 49e3e6d2dfa0315478cb0bb080b975c8, type: 3}
   gameplayCursorHotspot: {x: 0, y: 0}
   gameplayCursorMode: 0
-  startingWave: 12
+  startingWave: 1
   specialWaveInterval: 5
   bossSpawner: {fileID: 1925141406}
   firstWaveDuration: 15
