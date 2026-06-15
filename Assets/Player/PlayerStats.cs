@@ -4,14 +4,14 @@ using UnityEngine;
 public class PlayerStats : MonoBehaviour
 {
     [Header("Offense")]
-    public float damage = 25f;          // Stat ofensiva principal
-    public float fireRate = 0f;         // Bonus aditivo o multiplicativo, seg�n dise�o
-    public float critChance = 0f;       // 0..1
+    public float damage = 25f;
+    public float fireRate = 0f;
+    public float critChance = 0f;
     public float critMultiplier = 2f;
 
     [Header("Defense")]
     public int maxHealth = 5;
-    public float damageReduction = 0f;  // 0..100
+    public float damageReduction = 0f;
     public float regeneration = 0f;
 
     [Header("Movement")]
@@ -28,7 +28,9 @@ public class PlayerStats : MonoBehaviour
     {
         maxHealth += PermanentHealthUpgradeButton.GetPermanentHealthBonus();
     }
-    public float GetFinalDamage(float baseDamage)
+
+    // ✅ FIX: añadidos scalingFactor y canCrit como parámetros
+    public float GetFinalDamage(float baseDamage, float scalingFactor, bool canCrit)
     {
         float finalDamage = baseDamage + (damage * scalingFactor);
 
@@ -37,10 +39,12 @@ public class PlayerStats : MonoBehaviour
 
         return finalDamage;
     }
+
     public float GetScaledFireRate(float baseFireRate, float scalingFactor)
     {
         return baseFireRate + (fireRate * scalingFactor);
     }
+
     public int GetFinalReceivedDamage(int incomingDamage)
     {
         float reduced = incomingDamage * (1f - damageReduction / 100f);

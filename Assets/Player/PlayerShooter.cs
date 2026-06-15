@@ -99,7 +99,8 @@ public class PlayerShooter : MonoBehaviour
         float finalDamage = damage;
 
         if (_stats != null)
-            finalDamage = _stats.GetScaledDamage(damage, damageScalingFactor, true);
+            // ? FIX: GetScaledDamage ? GetFinalDamage (nombre correcto)
+            finalDamage = _stats.GetFinalDamage(damage, damageScalingFactor, true);
 
         if (WeaponLevelSystem.Instance != null && _currentWeapon != null)
         {

@@ -468,22 +468,13 @@ public class SlotMachine : MonoBehaviour
         if (activationResolveDelay > 0f)
             yield return new WaitForSeconds(activationResolveDelay);
 
-            RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
+        // ✅ These three lines belong OUTSIDE the delay if-block, always run
+        RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
 
-            if (symbol.data.symbolType != SlotSymbolType.Echo)
-                _lastActivatedSymbolType = symbol.data.symbolType;
+        if (symbol.data.symbolType != SlotSymbolType.Echo)
+            _lastActivatedSymbolType = symbol.data.symbolType;
 
-            ApplyByType(symbol.data.symbolType, amount);
-        }
-        else
-        {
-            RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
-
-            if (symbol.data.symbolType != SlotSymbolType.Echo)
-                _lastActivatedSymbolType = symbol.data.symbolType;
-
-            ApplyByType(symbol.data.symbolType, amount);
-        }
+        ApplyByType(symbol.data.symbolType, amount);
     }
 
     int GetJackpotAmount()
