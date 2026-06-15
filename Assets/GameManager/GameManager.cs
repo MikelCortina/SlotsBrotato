@@ -184,20 +184,21 @@ public class GameManager : MonoBehaviour
         WaveTimeRemaining = 0f;
         IsWaveRunning = false;
 
-        // ? Enemigos desaparecen
-        CleanupWaveEnemies();
+        // ? Bloquear movimiento del jugador
+        PlayerController pc = GetPlayerController();
+        if (pc != null) pc.IsMovementLocked = true;
 
-        // ? Activar pull en monedas
+        // ? Monedas empiezan a recogerse
         CollectAllCoins();
 
-        // ? Mantener timeScale = 1 manualmente para que Update() de monedas siga corriendo
-        //    NO llamamos ApplyTimeScale() aquí todavía
+        // ? Mantener timeScale = 1 para monedas y cadena de enemigos
         Time.timeScale = 1f;
-
         ApplyCursorState();
         UpdateUI();
-    }
 
+        // ? Enemigos se destruyen en cadena
+        yield return CleanupWaveEnemiesChained();
+    }
     IEnumerator GameLoop()
     {
         while (true)
@@ -216,7 +217,7 @@ public class GameManager : MonoBehaviour
             if (uiFlow != null)
                 yield return uiFlow.PlayWaveEndTransition(CurrentWave);
 
-            // ? Ahora sí aplicar timeScale correctamente (pasará a 0 para la tienda)
+            // ? Ahora sí aplicar timeScale (pasa a 0 para la tienda)
             ApplyTimeScale();
             ApplyCursorState();
 
@@ -231,6 +232,10 @@ public class GameManager : MonoBehaviour
             CurrentWave++;
             IsWaveRunning = true;
 
+            // ? Desbloquear movimiento al empezar nueva ronda
+            PlayerController pc = GetPlayerController();
+            if (pc != null) pc.IsMovementLocked = false;
+
             if (uiFlow != null)
                 uiFlow.ShowGameplayImmediate();
 
@@ -238,6 +243,38 @@ public class GameManager : MonoBehaviour
             ApplyCursorState();
             UpdateUI();
         }
+    }
+
+    IEnumerator CleanupWaveEnemiesChained()
+    {
+        float delayBetween = 0.05f;
+
+        // Ordenar por distancia al jugador (opcional, más cercano primero)
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            LiveEnemies.Sort((a, b) =>
+            {
+                if (a == null) return 1;
+                if (b == null) return -1;
+                float dA = Vector2.Distance(a.transform.position, player.transform.position);
+                float dB = Vector2.Distance(b.transform.position, player.transform.position);
+                return dA.CompareTo(dB);
+            });
+        }
+
+        for (int i = LiveEnemies.Count - 1; i >= 0; i--)
+        {
+            if (LiveEnemies[i] != null)
+            {
+                Destroy(LiveEnemies[i]);
+                yield return new WaitForSeconds(delayBetween);
+            }
+        }
+
+        LiveEnemies.Clear();
+        EnemiesAlive = 0;
+        UpdateUI();
     }
 
     IEnumerator RunShop()
@@ -264,7 +301,13 @@ public class GameManager : MonoBehaviour
         ApplyCursorState();
         UpdateUI();
     }
-
+    // Añade este helper en GameManager
+    private PlayerController GetPlayerController()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return null;
+        return player.GetComponent<PlayerController>();
+    }
     void CleanupWaveEnemies()
     {
         for (int i = LiveEnemies.Count - 1; i >= 0; i--)

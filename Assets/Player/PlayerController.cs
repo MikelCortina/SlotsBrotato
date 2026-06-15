@@ -8,6 +8,9 @@ public class PlayerController : MonoBehaviour
     public float acceleration = 18f;
     public float deceleration = 22f;
 
+    // ? Bloqueo externo de movimiento
+    public bool IsMovementLocked { get; set; } = false;
+
     private Rigidbody2D _rb;
     private PlayerStats _stats;
     private Vector2 _input;
@@ -21,6 +24,13 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // ? Si está bloqueado, ignorar input
+        if (IsMovementLocked)
+        {
+            _input = Vector2.zero;
+            return;
+        }
+
         _input = new Vector2(
             Input.GetAxisRaw("Horizontal"),
             Input.GetAxisRaw("Vertical")
