@@ -56,6 +56,9 @@ public class SlotMachine : MonoBehaviour
     bool _isResolvingActivation;
     bool _rewindUsedThisWave;
 
+   
+    public bool IsChargeLocked { get; set; } = false;
+
 
     SlotSymbolType? _lastActivatedSymbolType;
     readonly List<(int reelIndex, SlotSymbolData data)> _pendingSymbols = new();
@@ -65,6 +68,8 @@ public class SlotMachine : MonoBehaviour
     Transform _playerTransform;
     PlayerStats _playerStats;
     TemporaryBuffSystem _buffSystem;
+
+
 
     void Awake()
     {
@@ -125,6 +130,9 @@ public class SlotMachine : MonoBehaviour
 
     void Update()
     {
+        if (IsChargeLocked) return;
+
+
         if (_hasPendingSymbols && !_isResolvingActivation && Input.GetKeyDown(activateKey))
         {
             StartCoroutine(ActivatePendingSymbolsRoutine());
@@ -157,9 +165,21 @@ public class SlotMachine : MonoBehaviour
 
         UpdateChargeUI();
     }
+    public void ResetChargeForNewWave()
+    {
+        _charge = 0f;
+        _chargeTimer = 0f;
+        _overloadReserve = 0f;
+        _spinQueued = false;
+        _chargeLockedFull = false;
+
+        UpdateChargeUI();
+    }
 
     public void OnCoinCollected(int amount)
     {
+
+        if (IsChargeLocked) return;
         if (amount <= 0) return;
 
         float chargeTime = GetSlotChargeTime();

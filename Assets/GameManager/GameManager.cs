@@ -184,6 +184,7 @@ public class GameManager : MonoBehaviour
         WaveTimeRemaining = 0f;
         IsWaveRunning = false;
 
+        if (SlotMachine.Instance != null) SlotMachine.Instance.IsChargeLocked = true;
         // ? Bloquear movimiento del jugador
         PlayerController pc = GetPlayerController();
         if (pc != null) pc.IsMovementLocked = true;
@@ -232,6 +233,11 @@ public class GameManager : MonoBehaviour
             CurrentWave++;
             IsWaveRunning = true;
 
+            if (SlotMachine.Instance != null)
+            {
+                SlotMachine.Instance.IsChargeLocked = false;
+                SlotMachine.Instance.ResetChargeForNewWave();
+            }
             // ? Desbloquear movimiento al empezar nueva ronda
             PlayerController pc = GetPlayerController();
             if (pc != null) pc.IsMovementLocked = false;
