@@ -467,14 +467,16 @@ public class SlotMachine : MonoBehaviour
             if (activationResolveDelay > 0f)
                 yield return new WaitForSeconds(activationResolveDelay);
 
-        // ✅ These three lines belong OUTSIDE the delay if-block, always run
+        } // ← ✅ AÑADE ESTA LLAVE para cerrar el if exterior
+
+        // Estas tres líneas se ejecutan siempre (fuera del if de reel null-check)
         RunConfig.Instance?.RegisterActivatedSymbol(symbol.data);
 
         if (symbol.data.symbolType != SlotSymbolType.Echo)
             _lastActivatedSymbolType = symbol.data.symbolType;
 
         ApplyByType(symbol.data.symbolType, amount);
-    }
+    } // ← cierra el método
 
     int GetJackpotAmount()
     {
