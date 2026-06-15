@@ -6,6 +6,10 @@ public class EnemySpawner : MonoBehaviour
     [Header("Prefab")]
     public GameObject enemyPrefab;
 
+    [Header("Enemy Types")]
+    public GameObject spitterEnemyPrefab;
+    public GameObject ringSpitterEnemyPrefab;
+    public GameObject dasherEnemyPrefab;
     [Header("Spawn")]
     public float minSpawnInterval = 0.2f;
     public float maxSpawnInterval = 0.8f;
@@ -123,7 +127,30 @@ public class EnemySpawner : MonoBehaviour
         if (GameManager.Instance == null || !GameManager.Instance.IsWaveRunning)
             yield break;
 
-        GameObject go = Instantiate(enemyPrefab, pos, Quaternion.identity);
+        GameObject prefabToSpawn = enemyPrefab;
+
+        float roll = Random.value;
+
+        if (wave >= 12 &&
+            dasherEnemyPrefab != null &&
+            roll < 0.08f)
+        {
+            prefabToSpawn = dasherEnemyPrefab;
+        }
+        else if (wave >= 10 &&
+                 ringSpitterEnemyPrefab != null &&
+                 roll < 0.18f)
+        {
+            prefabToSpawn = ringSpitterEnemyPrefab;
+        }
+        else if (wave >= 5 &&
+                 spitterEnemyPrefab != null &&
+                 roll < 0.38f)
+        {
+            prefabToSpawn = spitterEnemyPrefab;
+        }
+
+        GameObject go = Instantiate(prefabToSpawn, pos, Quaternion.identity);
         GameManager.Instance.RegisterEnemy(go);
 
         var health = go.GetComponent<EnemyHealth>();

@@ -30,6 +30,9 @@ public class GameManager : MonoBehaviour
 
     [Header("Special Waves")]
     public int specialWaveInterval = 5;
+
+    [Header("Boss")]
+    public BossSpawner bossSpawner;
     public SpecialWaveType CurrentSpecialWaveType { get; private set; }
 
     [Header("Tiempo tipo Brotato")]
@@ -208,7 +211,10 @@ public class GameManager : MonoBehaviour
             CurrentSpecialWaveType = GetRandomSpecialWaveType();
             Debug.Log($"Oleada especial: {CurrentSpecialWaveType}");
         }
-
+        if (bossSpawner != null && wave % 5 == 0)
+        {
+            bossSpawner.TrySpawnBoss(wave);
+        }
         ApplyTimeScale();
         ApplyCursorState();
         UpdateUI();

@@ -79,6 +79,12 @@ public class ShopManager : MonoBehaviour
         List<SlotSymbolData> availableSymbols =
             new List<SlotSymbolData>(allSymbols);
 
+        availableSymbols.RemoveAll(symbol =>
+    symbol == null ||
+    (GameManager.Instance != null &&
+     GameManager.Instance.CurrentWave < symbol.unlockWave)
+);
+
         List<MechanicModifierOfferData> availableModifiers =
             allModifiers != null
                 ? new List<MechanicModifierOfferData>(allModifiers)
@@ -102,6 +108,9 @@ public class ShopManager : MonoBehaviour
                 foreach (var modifier in availableModifiers)
                 {
                     if (modifier == null) continue;
+                    if (GameManager.Instance != null &&
+    GameManager.Instance.CurrentWave < modifier.unlockWave)
+                        continue;
 
                     if (MechanicModifierManager.Instance != null &&
                         MechanicModifierManager.Instance.HasModifier(modifier.modifier))

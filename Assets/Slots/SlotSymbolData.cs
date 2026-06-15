@@ -20,4 +20,7 @@ public class SlotSymbolData : ScriptableObject
     public float baseEffectValue = 1f;
     public float valuePerLevel = 1f;
     public float jackpotMultiplier = 5f;
+
+    [Header("Unlock")]
+    public int unlockWave = 1;
 }

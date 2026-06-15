@@ -32,6 +32,11 @@ public class PlayerStats : MonoBehaviour
     // ✅ FIX: añadidos scalingFactor y canCrit como parámetros
     public float GetFinalDamage(float baseDamage, float scalingFactor, bool canCrit)
     {
+        return GetScaledDamage(baseDamage, 1f, true);
+    }
+
+    public float GetScaledDamage(float baseDamage, float scalingFactor, bool canCrit)
+    {
         float finalDamage = baseDamage + (damage * scalingFactor);
 
         if (canCrit && Random.value < critChance)
