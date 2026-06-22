@@ -257,6 +257,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 2
   projectilePrefab: {fileID: 2148095309717484689, guid: 99ebaf0fc6e34554699d015727ef31b3, type: 3}
-  shootInterval: 2
+  shootInterval: 4
   projectileDamage: 1
   fleeDistance: 4
