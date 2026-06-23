@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 public class WaveVoucherManager : MonoBehaviour
@@ -13,18 +13,38 @@ public class WaveVoucherManager : MonoBehaviour
     [Header("UI")]
     public TextMeshProUGUI vouchersText;
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            vouchers = 0;
+            PlayerPrefs.SetInt(VouchersKey, 0);
+            PlayerPrefs.SetInt("PermanentHealthBonus", 0);
+            PlayerPrefs.Save();
+            UpdateUI();
+
+            // Resetea la vida del jugador a su valor base
+            PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.ResetHealth();
+            }
+
+            Debug.Log("Vales y bonus reseteados a 0");
+        }
+    }
     void Awake()
     {
         Instance = this;
         vouchers = PlayerPrefs.GetInt(VouchersKey, 0);
         UpdateUI();
     }
-
     public void AddVoucher(int amount)
     {
         vouchers += amount;
         Save();
         UpdateUI();
+        Debug.Log($"AddVoucher llamado: +{amount} | Total: {vouchers}", this);
     }
 
     public bool SpendVoucher(int amount)
@@ -37,6 +57,8 @@ public class WaveVoucherManager : MonoBehaviour
         UpdateUI();
         return true;
     }
+
+
 
     void Save()
     {

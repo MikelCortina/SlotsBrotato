@@ -12,15 +12,20 @@ public class PermanentHealthUpgradeButton : MonoBehaviour
     public void BuyUpgrade()
     {
         if (WaveVoucherManager.Instance == null) return;
-
         if (!WaveVoucherManager.Instance.SpendVoucher(voucherCost))
             return;
 
         int currentBonus = PlayerPrefs.GetInt(HealthUpgradeKey, 0);
         currentBonus += healthBonus;
-
         PlayerPrefs.SetInt(HealthUpgradeKey, currentBonus);
         PlayerPrefs.Save();
+
+        // Actualiza la vida del jugador en tiempo real
+        PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.AddMaxHealth(healthBonus);
+        }
 
         RefreshUI();
     }
@@ -29,6 +34,8 @@ public class PermanentHealthUpgradeButton : MonoBehaviour
     {
         RefreshUI();
     }
+
+
 
     public void RefreshUI()
     {

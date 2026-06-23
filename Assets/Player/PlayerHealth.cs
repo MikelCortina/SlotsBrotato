@@ -26,9 +26,14 @@ public class PlayerHealth : MonoBehaviour
     void Awake()
     {
         PlayerStats stats = GetComponent<PlayerStats>();
-
         if (stats != null)
             maxHealth = stats.maxHealth;
+
+        BoosterData active = BoosterManager.Instance?.GetActiveBooster();
+        Debug.Log("BoosterManager existe: " + (BoosterManager.Instance != null));
+        Debug.Log("Booster activo: " + (active != null ? active.boosterName : "ninguno"));
+        if (active != null)
+            maxHealth += active.bonusMaxHealth;
 
         currentHealth = maxHealth;
         if (gameOverMenu) gameOverMenu.SetActive(false);
@@ -36,6 +41,21 @@ public class PlayerHealth : MonoBehaviour
         UpdateUI();
     }
 
+    public void RefreshMaxHealthFromStats()
+    {
+        PlayerStats stats = GetComponent<PlayerStats>();
+
+        if (stats != null)
+            maxHealth = stats.maxHealth;
+
+        BoosterData active = BoosterManager.Instance?.GetActiveBooster();
+
+        if (active != null)
+            maxHealth += active.bonusMaxHealth;
+
+        currentHealth = maxHealth;
+        UpdateUI();
+    }
     public void TakeDamage(float damage)
     {
         if (_isDead) return;
@@ -61,10 +81,32 @@ public class PlayerHealth : MonoBehaviour
         if (gameOverMenu) gameOverMenu.SetActive(true);
     }
 
+    public void AddMaxHealth(int amount)
+    {
+        maxHealth += amount;
+        currentHealth += amount;
+        UpdateUI();
+    }
+
+    public void ResetHealth()
+    {
+        PlayerStats stats = GetComponent<PlayerStats>();
+        maxHealth = stats != null ? stats.maxHealth : 5;
+        currentHealth = maxHealth;
+        UpdateUI();
+    }
 
 
     private void UpdateUI()
     {
-        if (healthText) healthText.text = $"Vida: {currentHealth}/{maxHealth}";
+        if (healthText)
+        {
+            healthText.text = $"Vida: {currentHealth}/{maxHealth}";
+            Debug.Log("UI actualizada: " + healthText.text);
+        }
+        else
+        {
+            Debug.Log("healthText es NULL, no hay referencia al texto");
+        }
     }
 }

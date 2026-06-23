@@ -24,11 +24,6 @@ public class PlayerStats : MonoBehaviour
     public float slotChargeTime = 10f;
 
 
-    void Start()
-    {
-        maxHealth += PermanentHealthUpgradeButton.GetPermanentHealthBonus();
-    }
-
     // ✅ FIX: añadidos scalingFactor y canCrit como parámetros
     public float GetFinalDamage(float baseDamage, float scalingFactor, bool canCrit)
     {
