@@ -393,6 +393,9 @@ public class GameManager : MonoBehaviour
         CleanupWaveEnemies();
         ApplyCursorState();
         UpdateUI();
+        // Deshabilitar inputs del jugador
+        PlayerController pc = GetPlayerController();
+        if (pc != null) pc.enabled = false;
 
         StartCoroutine(ShowGameOverRoutine());
     }

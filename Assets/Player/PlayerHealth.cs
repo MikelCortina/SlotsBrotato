@@ -77,8 +77,25 @@ public class PlayerHealth : MonoBehaviour
     private void Die()
     {
         _isDead = true;
-        Time.timeScale = 0f;
-        if (gameOverMenu) gameOverMenu.SetActive(true);
+
+        // Deshabilitar inputs del jugador inmediatamente
+        var playerController = GetComponent<PlayerController>();
+        if (playerController != null) playerController.enabled = false;
+
+        // Delegar todo al GameManager
+        if (GameManager.Instance != null)
+            GameManager.Instance.GameOver();
+        else
+        {
+            // Fallback si no hay GameManager
+            if (gameOverMenu)
+            {
+                gameOverMenu.SetActive(true);
+                CanvasGroup cg = gameOverMenu.GetComponent<CanvasGroup>();
+                if (cg != null) { cg.alpha = 1f; cg.interactable = true; cg.blocksRaycasts = true; }
+            }
+            Time.timeScale = 0f;
+        }
     }
 
     public void AddMaxHealth(int amount)
