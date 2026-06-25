@@ -7,6 +7,10 @@ public class PlayerShooter : MonoBehaviour
     [SerializeField] public WeaponPivotAim weaponAim;
     [SerializeField] public bool autoFire = true;
 
+    [Header("Melee Visual")]
+    [SerializeField] private GameObject meleeSlashPrefab;
+    [SerializeField] private float meleeSlashDistance = 1.2f;
+
     [Header("Debug / arma inicial")]
     [SerializeField] public WeaponData startWeapon;
 
@@ -125,8 +129,17 @@ public class PlayerShooter : MonoBehaviour
 
     void Shoot()
     {
-        if (bulletPrefab == null || _firePoint == null || weaponPivot == null)
+        if (weaponPivot == null)
             return;
+
+        if (_currentWeapon == null)
+            return;
+
+        if (_currentWeapon.weaponType != WeaponType.Melee)
+        {
+            if (bulletPrefab == null || _firePoint == null)
+                return;
+        }
 
         // ? Dirección real desde el firePoint hacia el cursor en espacio mundo
         Vector2 baseDir;
@@ -146,6 +159,12 @@ public class PlayerShooter : MonoBehaviour
         if (_currentWeapon != null && _currentWeapon.weaponType == WeaponType.Boomerang)
         {
             ShootBoomerang(baseDir);
+            return;
+        }
+
+        if (_currentWeapon != null && _currentWeapon.weaponType == WeaponType.Melee)
+        {
+            MeleeAttack(baseDir);
             return;
         }
 
@@ -203,6 +222,37 @@ public class PlayerShooter : MonoBehaviour
             : 5f;
 
         boomerang.Init(transform, dir, bulletSpeed, finalDamage, distance);
+    }
+
+    void MeleeAttack(Vector2 baseDir)
+    {
+        SpawnMeleeSlash(baseDir);
+
+        float attackRange = 2f;
+        float attackAngle = 90f;
+        float finalDamage = GetFinalWeaponDamage();
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRange);
+
+        foreach (Collider2D hit in hits)
+        {
+            EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
+
+            if (enemy == null)
+                enemy = hit.GetComponentInParent<EnemyHealth>();
+
+            if (enemy == null)
+                continue;
+
+            Vector2 dirToEnemy = ((Vector2)enemy.transform.position - (Vector2)transform.position).normalized;
+
+            float angle = Vector2.Angle(baseDir, dirToEnemy);
+
+            if (angle <= attackAngle * 0.5f)
+            {
+                enemy.TakeDamage(finalDamage);
+            }
+        }
     }
 
     void EquipWeaponPrefab()
@@ -269,5 +319,21 @@ public class PlayerShooter : MonoBehaviour
     public float GetCurrentWeaponFireRate()
     {
         return GetFinalWeaponFireRate();
+    }
+
+    void SpawnMeleeSlash(Vector2 baseDir)
+    {
+        if (meleeSlashPrefab == null)
+            return;
+
+        Vector3 spawnPos = transform.position + (Vector3)(baseDir.normalized * meleeSlashDistance);
+
+        float angle = Mathf.Atan2(baseDir.y, baseDir.x) * Mathf.Rad2Deg;
+
+        Instantiate(
+            meleeSlashPrefab,
+            spawnPos,
+            Quaternion.Euler(0f, 0f, angle)
+        );
     }
 }

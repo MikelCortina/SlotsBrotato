@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d663da1cc532fe45aa528dc1e02f64d, type: 3}
+  m_Name: Espada
+  m_EditorClassIdentifier: 
+  weaponName: Espada
+  description: Ataque cuerpo a cuerpo.
+  icon: {fileID: -6112874056674720241, guid: 6b3860a40657c674d928c232e3979be2, type: 3}
+  weaponType: 2
+  damage: 35
+  damageScalingFactor: 1
+  fireRate: 2
+  fireRateScalingFactor: 1
+  bulletSpeed: 0
+  bulletsPerShot: 1
+  spreadAngle: 0
+  bulletPrefab: {fileID: 0}
+  weaponPrefab: {fileID: 308692976387637143, guid: fc11842cc838e4b49971a55510ffbc06, type: 3}
+  boomerangDistance: 5
+  shootSound: {fileID: 0}
