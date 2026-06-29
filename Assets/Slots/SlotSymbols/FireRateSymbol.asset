@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   symbolName: FireRateSymbol
   symbolType: 6
-  icon: {fileID: 1719121819271388481, guid: 3bf250661e4c48d40a7dee76a667c553, type: 3}
+  icon: {fileID: 7211672175836992918, guid: dac149b1445783f4a85594cb0d2e2e36, type: 3}
   description: 
   activateInstantly: 1
   baseEffectValue: 0.1
   valuePerLevel: 0.1
   jackpotMultiplier: 2
+  unlockWave: 1
