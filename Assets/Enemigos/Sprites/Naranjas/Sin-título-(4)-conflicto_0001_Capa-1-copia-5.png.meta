@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 6ca5ab6759b133347aca6fd99d84bafc
+guid: 892f55ca5f8d777479dddcb45282d15a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6470460504253458178
-    second: 3_0
+      213: 6091770460139157420
+    second: "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_0"
+  - first:
+      213: 1269566514757109386
+    second: "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_1"
+  - first:
+      213: -4873342012702101277
+    second: "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_2"
+  - first:
+      213: 3356250026176877538
+    second: "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_3"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +55,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -97,7 +106,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: WebGL
+    buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -110,7 +119,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: Android
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -139,13 +148,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 3_0
+      name: "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_0"
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 256
-        height: 382
+        y: 49
+        width: 15
+        height: 20
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +163,74 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ef817ce047e4436a0800000000000000
-      internalID: -6470460504253458178
+      spriteID: ca7ffc935f05a8450800000000000000
+      internalID: 6091770460139157420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_1"
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 42
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8604dac4086e9110800000000000000
+      internalID: 1269566514757109386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_2"
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 44
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e077ef62496e5cb0800000000000000
+      internalID: -4873342012702101277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_3"
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 0
+        width: 286
+        height: 416
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e31babdd9bc39e20800000000000000
+      internalID: 3356250026176877538
       vertices: []
       indices: 
       edges: []
@@ -164,7 +239,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +249,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      3_0: -6470460504253458178
+      "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_0": 6091770460139157420
+      "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_1": 1269566514757109386
+      "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_2": -4873342012702101277
+      "Sin-t\xEDtulo-(4)-conflicto_0001_Capa-1-copia-5_3": 3356250026176877538
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

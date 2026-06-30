@@ -10,9 +10,18 @@ public class EnemyController : MonoBehaviour
     public float separationForce = 6f;
     public float arrivalRadius = 0.7f;
     public float damageInterval = 0.5f;
+
+    [Header("Bounce")]
+    public float bounceHeight = 0.4f;
+    public float bounceFrequency = 2.5f;
+    public Transform visualRoot; // Arrastra aquí el hijo con el SpriteRenderer y Animator
+
     float _baseSpeed;
     float _slowTimer;
+    float _bounceTime;
+
     Rigidbody2D _rb;
+    Animator _animator;
     Transform _player;
     PlayerHealth _playerHealth;
     EnemyDamage _enemyDamage;
@@ -26,6 +35,12 @@ public class EnemyController : MonoBehaviour
         _rb.gravityScale = 0f;
         _rb.freezeRotation = true;
         _enemyDamage = GetComponent<EnemyDamage>();
+
+        // Si no asignas visualRoot en el Inspector, busca el Animator en el hijo
+        if (visualRoot != null)
+            _animator = visualRoot.GetComponent<Animator>();
+        else
+            _animator = GetComponent<Animator>();
     }
 
     void Start()
@@ -41,14 +56,25 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        if (_slowTimer <= 0f)
-            return;
+        // Slow timer
+        if (_slowTimer > 0f)
+        {
+            _slowTimer -= Time.deltaTime;
+            if (_slowTimer <= 0f)
+                speed = _baseSpeed;
+        }
 
-        _slowTimer -= Time.deltaTime;
+        // Rebote visual — solo mueve el hijo, el padre (física) no se toca
+        _bounceTime += Time.deltaTime * bounceFrequency * Mathf.PI * 2f;
+        float normalizedSine = (Mathf.Sin(_bounceTime) + 1f) * 0.5f; // 0 = suelo, 1 = cima
 
-        if (_slowTimer <= 0f)
-            speed = _baseSpeed;
+        if (visualRoot != null)
+            visualRoot.localPosition = new Vector3(0f, normalizedSine * bounceHeight, 0f);
+
+        if (_animator != null)
+            _animator.SetFloat("bouncePhase", normalizedSine);
     }
+
     public void SetKnockback(bool value)
     {
         _isKnockedBack = value;
@@ -90,12 +116,6 @@ public class EnemyController : MonoBehaviour
         );
 
         _rb.MovePosition(pos + _currentVelocity * Time.fixedDeltaTime);
-
-        if (_currentVelocity.sqrMagnitude > 0.01f)
-        {
-            float angle = Mathf.Atan2(_currentVelocity.y, _currentVelocity.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
-        }
     }
 
     void OnTriggerStay2D(Collider2D collision)
@@ -109,7 +129,6 @@ public class EnemyController : MonoBehaviour
         if (Time.time < _nextDamageTime) return;
 
         float dmg = _enemyDamage != null ? _enemyDamage.damage : 1f;
-
         _nextDamageTime = Time.time + damageInterval;
         _playerHealth.TakeDamage(dmg);
         Debug.Log($"Damage: {dmg} by {gameObject.name}");

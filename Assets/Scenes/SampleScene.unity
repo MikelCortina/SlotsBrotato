@@ -19529,7 +19529,7 @@ MonoBehaviour:
   startingWave: 1
   specialWaveInterval: 5
   bossSpawner: {fileID: 1925141406}
-  firstWaveDuration: 15
+  firstWaveDuration: 38.8
   waveDurationStep: 5
   maxNormalWaveDuration: 60
   finalWaveDuration: 90

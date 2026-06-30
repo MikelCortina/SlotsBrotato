@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: 6ca5ab6759b133347aca6fd99d84bafc
+guid: 29453b2cf2fe91549ad96772fe224d18
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6470460504253458178
-    second: 3_0
+      213: 7973408879103044543
+    second: "Sin-t\xEDtulo-(4)-conflicto_0003_Capa-1-copia-7_0"
+  - first:
+      213: 6015464034558940560
+    second: "Sin-t\xEDtulo-(4)-conflicto_0003_Capa-1-copia-7_1"
+  - first:
+      213: -3779279334711326338
+    second: "Sin-t\xEDtulo-(4)-conflicto_0003_Capa-1-copia-7_2"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +52,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -97,7 +103,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: WebGL
+    buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -110,7 +116,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: Android
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -139,13 +145,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 3_0
+      name: "Sin-t\xEDtulo-(4)-conflicto_0003_Capa-1-copia-7_0"
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 256
-        height: 382
+        y: 39
+        width: 16
+        height: 20
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +160,52 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ef817ce047e4436a0800000000000000
-      internalID: -6470460504253458178
+      spriteID: fbbe1ef612d37ae60800000000000000
+      internalID: 7973408879103044543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Sin-t\xEDtulo-(4)-conflicto_0003_Capa-1-copia-7_1"
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 36
+        width: 14
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 095160b0ba83b7350800000000000000
+      internalID: 6015464034558940560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Sin-t\xEDtulo-(4)-conflicto_0003_Capa-1-copia-7_2"
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 0
+        width: 318
+        height: 337
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e798e83f77d4d8bc0800000000000000
+      internalID: -3779279334711326338
       vertices: []
       indices: 
       edges: []
@@ -164,7 +214,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +224,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      3_0: -6470460504253458178
+      "Sin-t\xEDtulo-(4)-conflicto_0003_Capa-1-copia-7_0": 7973408879103044543
+      "Sin-t\xEDtulo-(4)-conflicto_0003_Capa-1-copia-7_1": 6015464034558940560
+      "Sin-t\xEDtulo-(4)-conflicto_0003_Capa-1-copia-7_2": -3779279334711326338
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
