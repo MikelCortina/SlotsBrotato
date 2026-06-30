@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class PreRunSymbolButton : MonoBehaviour
+public class PreRunSymbolButton : MonoBehaviour,
+    IPointerEnterHandler,
+    IPointerExitHandler
 {
     [Header("Symbol")]
     public SlotSymbolData symbolData;
@@ -54,5 +57,23 @@ public class PreRunSymbolButton : MonoBehaviour
     {
         if (selectedFrame)
             selectedFrame.SetActive(_isSelected);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (SymbolTooltipUI.Instance == null)
+            return;
+
+        SymbolTooltipUI.Instance.Show(
+            symbolData,
+            Input.mousePosition + new Vector3(20f, -20f, 0f)
+        );
+    }
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (SymbolTooltipUI.Instance == null)
+            return;
+
+        SymbolTooltipUI.Instance.Hide();
     }
 }
