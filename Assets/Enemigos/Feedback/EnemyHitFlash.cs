@@ -1,24 +1,20 @@
-using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(EnemyHealth))]
 public class EnemyHitFlash : MonoBehaviour
 {
-    [Header("Flash")]
-    [SerializeField] private Color flashColor = Color.white;
-    [SerializeField] private float flashDuration = 0.08f;
+    [Header("Animator")]
+    [SerializeField] private Animator targetAnimator;
+    [SerializeField] private string hitTriggerName = "Hit";
 
-    private SpriteRenderer _sr;
-    private Color _originalColor;
-    private Coroutine _flashRoutine;
     private EnemyHealth _health;
 
     void Awake()
     {
-        _sr = GetComponent<SpriteRenderer>();
-        _originalColor = _sr.color;
         _health = GetComponent<EnemyHealth>();
+
+        if (targetAnimator == null)
+            targetAnimator = GetComponentInChildren<Animator>();
     }
 
     void OnEnable()
@@ -35,17 +31,16 @@ public class EnemyHitFlash : MonoBehaviour
 
     private void HandleDamaged(float amount, float currentHp)
     {
-        if (_flashRoutine != null)
-            StopCoroutine(_flashRoutine);
+        if (targetAnimator == null)
+        {
+            Debug.LogWarning($"{name}: targetAnimator es null");
+            return;
+        }
 
-        _flashRoutine = StartCoroutine(Flash());
+        Debug.Log($"{name}: Trigger lanzado -> {hitTriggerName}");
+        targetAnimator.ResetTrigger(hitTriggerName);
+        targetAnimator.SetTrigger(hitTriggerName);
     }
 
-    private IEnumerator Flash()
-    {
-        _sr.color = flashColor;
-        yield return new WaitForSeconds(flashDuration);
-        _sr.color = _originalColor;
-        _flashRoutine = null;
-    }
+
 }

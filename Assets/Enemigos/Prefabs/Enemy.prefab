@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8735416672367327392}
   - component: {fileID: 5816935239957371402}
+  - component: {fileID: 467307768426152503}
   - component: {fileID: 1549634066566050112}
   m_Layer: 0
   m_Name: GameObject
@@ -88,6 +89,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &467307768426152503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2704113114439285392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f81ddaaa13aed84888915861ec3ad82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyHealth: {fileID: 0}
 --- !u!95 &1549634066566050112
 Animator:
   serializedVersion: 7
@@ -237,8 +251,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdb3ec6afcc766946ad37806b7bbd718, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flashColor: {r: 1, g: 1, b: 1, a: 0.6039216}
-  flashDuration: 0.05
+  targetAnimator: {fileID: 1549634066566050112}
+  hitTriggerName: Hit
 --- !u!114 &5704340328708446050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,6 +266,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 50
+  visualAnimator: {fileID: 1549634066566050112}
+  deathTrigger: Die
 --- !u!114 &6058993248186953044
 MonoBehaviour:
   m_ObjectHideFlags: 0
