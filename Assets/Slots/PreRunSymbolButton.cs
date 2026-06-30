@@ -17,12 +17,29 @@ public class PreRunSymbolButton : MonoBehaviour
         if (iconImage && symbolData)
             iconImage.sprite = symbolData.icon;
 
+        if (SymbolUnlockManager.Instance != null &&
+            !SymbolUnlockManager.Instance.IsUnlocked(symbolData))
+        {
+            _isSelected = false;
+
+            if (iconImage != null)
+                iconImage.color = Color.gray;
+        }
+
         UpdateVisual();
     }
 
     public void ToggleSelection()
     {
-        if (symbolData == null) return;
+        if (symbolData == null)
+            return;
+
+        if (SymbolUnlockManager.Instance != null &&
+            !SymbolUnlockManager.Instance.IsUnlocked(symbolData))
+        {
+            Debug.Log("Símbolo bloqueado.");
+            return;
+        }
 
         _isSelected = !_isSelected;
 
@@ -33,7 +50,6 @@ public class PreRunSymbolButton : MonoBehaviour
 
         UpdateVisual();
     }
-
     private void UpdateVisual()
     {
         if (selectedFrame)

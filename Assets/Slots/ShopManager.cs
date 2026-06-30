@@ -80,10 +80,10 @@ public class ShopManager : MonoBehaviour
             new List<SlotSymbolData>(allSymbols);
 
         availableSymbols.RemoveAll(symbol =>
-    symbol == null ||
-    (GameManager.Instance != null &&
-     GameManager.Instance.CurrentWave < symbol.unlockWave)
-);
+            symbol == null ||
+            (SymbolUnlockManager.Instance != null &&
+             !SymbolUnlockManager.Instance.IsUnlocked(symbol))
+        );
 
         List<MechanicModifierOfferData> availableModifiers =
             allModifiers != null
