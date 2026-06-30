@@ -20,3 +20,4 @@ MonoBehaviour:
   baseEffectValue: 1
   valuePerLevel: 1
   jackpotMultiplier: 2
+  unlockWave: 3

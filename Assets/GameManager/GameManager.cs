@@ -380,6 +380,11 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+
+        if (SymbolUnlockManager.Instance != null)
+        {
+            SymbolUnlockManager.Instance.UnlockSymbolsUpToWave(CurrentWave);
+        }
         if (_isGameOver) return;
 
         Debug.Log("GameManager -> GameOver()");
