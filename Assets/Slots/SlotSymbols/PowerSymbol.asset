@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   symbolName: PowerSymbol
   symbolType: 4
-  icon: {fileID: 8701140351847246947, guid: 95e82cb4b2a42af4dbcc879343f41969, type: 3}
+  icon: {fileID: -5637732320426474309, guid: c0e2793c5eddcb74da87462abb7d438a, type: 3}
   description: 
   activateInstantly: 1
   baseEffectValue: 1
   valuePerLevel: 1
   jackpotMultiplier: 2
+  unlockWave: 1

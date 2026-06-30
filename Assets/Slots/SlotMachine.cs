@@ -56,7 +56,11 @@ public class SlotMachine : MonoBehaviour
     bool _isResolvingActivation;
     bool _rewindUsedThisWave;
 
-   
+
+    [Header("Spin Animation")]
+    [SerializeField] private Animator spinAnimator;         // ← NUEVO
+    [SerializeField] private string spinAnimationTrigger = "SpinStart"; // ← NUEVO (nombre del trigger en el Animator)
+
     public bool IsChargeLocked { get; set; } = false;
 
 
@@ -254,7 +258,11 @@ public class SlotMachine : MonoBehaviour
         if (segmentedChargeBar != null)
             segmentedChargeBar.SetByValues(_chargeTimer, _overloadReserve, chargeTime);
     }
-
+    // Llamado desde el Animation Event
+    public void OnSpinAnimationReady()
+    {
+        StartCoroutine(SpinReels());
+    }
     IEnumerator DoSpin()
     {
         RefreshReelVisibility();
@@ -263,6 +271,15 @@ public class SlotMachine : MonoBehaviour
 
         if (waveCover) waveCover.gameObject.SetActive(true);
 
+        // Dispara la animación — los reels arrancan desde el Animation Event
+        if (spinAnimator != null)
+            spinAnimator.SetTrigger(spinAnimationTrigger);
+
+        // Espera a que SpinReels termine (lo lanzará el Animation Event)
+        yield return new WaitUntil(() => !_spinning);
+    }
+    IEnumerator SpinReels()
+    {
         for (int i = 0; i < reels.Length; i++)
         {
             if (!IsReelEnabledByModifier(i)) continue;
@@ -274,12 +291,8 @@ public class SlotMachine : MonoBehaviour
         }
 
         int activeReelCount = 0;
-
         for (int i = 0; i < reels.Length; i++)
-        {
-            if (IsReelEnabledByModifier(i))
-                activeReelCount++;
-        }
+            if (IsReelEnabledByModifier(i)) activeReelCount++;
 
         float totalDuration = reelSpinDuration + (activeReelCount - 1) * reelStaggerDelay + 0.1f;
         yield return new WaitForSeconds(totalDuration);
@@ -309,7 +322,7 @@ public class SlotMachine : MonoBehaviour
         }
 
         UpdateChargeUI();
-        _spinning = false;
+        _spinning = false;  // ← aquí se desbloquea el WaitUntil de DoSpin
     }
 
     void CollectResults()
