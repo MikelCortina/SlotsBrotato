@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f81ddaaa13aed84888915861ec3ad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyHealth: {fileID: 0}
+  enemyHealth: {fileID: 5704340328708446050}
 --- !u!95 &1549634066566050112
 Animator:
   serializedVersion: 7
@@ -280,15 +280,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d695157a6f5e34459eef8381a7fa2b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1.25
-  acceleration: 4
+  speed: 10
+  acceleration: 10
   separationRadius: 1.2
   separationForce: 6
   arrivalRadius: 0.7
   damageInterval: 1
-  bounceHeight: 1
+  bounceHeight: 2
   bounceFrequency: 1
   visualRoot: {fileID: 8735416672367327392}
+  moveStartThreshold: 0.2
+  moveEndThreshold: 0.95
 --- !u!212 &1132406168940409485
 SpriteRenderer:
   m_ObjectHideFlags: 0

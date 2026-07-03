@@ -25,6 +25,15 @@ public class SlotReel : MonoBehaviour
     public float activationPunchScale = 1.28f;
     public float activationPunchDuration = 0.16f;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip reelTickClip;
+    [Range(0f, 1f)] public float reelTickVolume = 0.4f;
+    public AudioClip reelStopClip;
+    [Range(0f, 1f)] public float reelStopVolume = 0.6f;
+    public float pitchMin = 0.96f;
+    public float pitchMax = 1.04f;
+
     private bool _spinning;
     private int _displayIndex;
     private Coroutine _scaleRoutine;
@@ -33,6 +42,9 @@ public class SlotReel : MonoBehaviour
     {
         BuildSymbolPool();
         SetInitialSymbol();
+
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
     }
 
     void BuildSymbolPool()
@@ -95,6 +107,8 @@ public class SlotReel : MonoBehaviour
             if (displayImage)
                 displayImage.sprite = currentSymbols[_displayIndex].icon;
 
+            PlayReelTick();
+
             if (displayImage)
                 PlayScalePunch(1.08f, 0.07f);
 
@@ -111,8 +125,26 @@ public class SlotReel : MonoBehaviour
         SetBlurVisible(false);
         _spinning = false;
 
+        PlayReelStop();
+
         if (displayImage)
             PlayScalePunch(1.18f, 0.12f);
+    }
+
+    void PlayReelTick()
+    {
+        if (audioSource == null || reelTickClip == null) return;
+
+        audioSource.pitch = Random.Range(pitchMin, pitchMax);
+        audioSource.PlayOneShot(reelTickClip, reelTickVolume);
+    }
+
+    void PlayReelStop()
+    {
+        if (audioSource == null || reelStopClip == null) return;
+
+        audioSource.pitch = 1f;
+        audioSource.PlayOneShot(reelStopClip, reelStopVolume);
     }
 
     void SetBlurVisible(bool visible)

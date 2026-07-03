@@ -9471,6 +9471,7 @@ GameObject:
   - component: {fileID: 809848647}
   - component: {fileID: 809848648}
   - component: {fileID: 809848649}
+  - component: {fileID: 809848650}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -9598,12 +9599,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 983dc39a48fa5884ea927fe5e0396f46, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e5a7cde401286ff468c09faef155cabc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 19.2, y: 10.8}
+  m_Size: {x: 4.4444447, y: 4.4444447}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -9835,6 +9836,28 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!95 &809848650
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 809848636}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 23275763adcc7504b9285fb2876ed542, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &848715207
 GameObject:
   m_ObjectHideFlags: 0
@@ -11292,6 +11315,13 @@ MonoBehaviour:
   slowScrollInterval: 0.12
   activationPunchScale: 1.28
   activationPunchDuration: 0.16
+  audioSource: {fileID: 2059314402}
+  reelTickClip: {fileID: 8300000, guid: 215475c4b0c1e3f4ea616da393bcee7f, type: 3}
+  reelTickVolume: 0.4
+  reelStopClip: {fileID: 8300000, guid: 8cffe9cfc4f1cf94d9f8cb35e907eaf3, type: 3}
+  reelStopVolume: 0.6
+  pitchMin: 0.96
+  pitchMax: 1.04
 --- !u!114 &958888470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15339,6 +15369,13 @@ MonoBehaviour:
   slowScrollInterval: 0.12
   activationPunchScale: 1.28
   activationPunchDuration: 0.16
+  audioSource: {fileID: 0}
+  reelTickClip: {fileID: 0}
+  reelTickVolume: 0.8
+  reelStopClip: {fileID: 0}
+  reelStopVolume: 1
+  pitchMin: 0.96
+  pitchMax: 1.04
 --- !u!114 &1340027035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16858,6 +16895,13 @@ MonoBehaviour:
   slowScrollInterval: 0.12
   activationPunchScale: 1.28
   activationPunchDuration: 0.16
+  audioSource: {fileID: 2059314402}
+  reelTickClip: {fileID: 8300000, guid: 215475c4b0c1e3f4ea616da393bcee7f, type: 3}
+  reelTickVolume: 0.4
+  reelStopClip: {fileID: 8300000, guid: 8cffe9cfc4f1cf94d9f8cb35e907eaf3, type: 3}
+  reelStopVolume: 0.6
+  pitchMin: 0.96
+  pitchMax: 1.04
 --- !u!114 &1465491802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17179,6 +17223,13 @@ MonoBehaviour:
   slowScrollInterval: 0.12
   activationPunchScale: 1.28
   activationPunchDuration: 0.16
+  audioSource: {fileID: 2059314402}
+  reelTickClip: {fileID: 8300000, guid: 215475c4b0c1e3f4ea616da393bcee7f, type: 3}
+  reelTickVolume: 0.4
+  reelStopClip: {fileID: 8300000, guid: 8cffe9cfc4f1cf94d9f8cb35e907eaf3, type: 3}
+  reelStopVolume: 0.6
+  pitchMin: 0.96
+  pitchMax: 1.04
 --- !u!114 &1532927245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17333,6 +17384,13 @@ MonoBehaviour:
   slowScrollInterval: 0.12
   activationPunchScale: 1.28
   activationPunchDuration: 0.16
+  audioSource: {fileID: 0}
+  reelTickClip: {fileID: 0}
+  reelTickVolume: 0.8
+  reelStopClip: {fileID: 0}
+  reelStopVolume: 1
+  pitchMin: 0.96
+  pitchMax: 1.04
 --- !u!114 &1539462053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18915,6 +18973,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aec3d61f883b6146aebd6dc9f860c4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioSource: {fileID: 2059314402}
+  buttonClickSfx: {fileID: 8300000, guid: bb7622cf7b04c0a49a3f9b32e62cba8b, type: 3}
 --- !u!1 &1608442811
 GameObject:
   m_ObjectHideFlags: 0
