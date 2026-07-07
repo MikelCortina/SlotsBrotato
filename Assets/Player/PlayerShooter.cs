@@ -4,6 +4,7 @@ public class PlayerShooter : MonoBehaviour
 {
     [Header("Referencias")]
     [SerializeField] public Transform weaponPivot;
+    [SerializeField] private float weaponOrbitRadius = 1.2f;
     [SerializeField] public WeaponPivotAim weaponAim;
     [SerializeField] public bool autoFire = true;
 
@@ -29,6 +30,7 @@ public class PlayerShooter : MonoBehaviour
     public float damage;
     public float damageScalingFactor;
     public float bulletSpeed;
+    public float bulletRange;   // NUEVO
     public int bulletsPerShot;
     public GameObject bulletPrefab;
     public float spreadAngle;
@@ -91,6 +93,7 @@ public class PlayerShooter : MonoBehaviour
         damageScalingFactor = weapon.damageScalingFactor;
 
         bulletSpeed = weapon.bulletSpeed;
+        bulletRange = weapon.bulletRange;   // NUEVO
         bulletsPerShot = weapon.bulletsPerShot;
         bulletPrefab = weapon.bulletPrefab;
         spreadAngle = weapon.spreadAngle;
@@ -201,7 +204,7 @@ public class PlayerShooter : MonoBehaviour
             if (bullet == null) continue;
 
             float finalDamage = GetFinalWeaponDamage();
-            bullet.Init(dir, bulletSpeed, finalDamage);
+            bullet.Init(dir, bulletSpeed, finalDamage, bulletRange);
         }
     }
 
@@ -267,7 +270,7 @@ public class PlayerShooter : MonoBehaviour
             return;
 
         GameObject weaponGO = Instantiate(_currentWeapon.weaponPrefab, weaponPivot);
-        weaponGO.transform.localPosition = Vector3.zero;
+        weaponGO.transform.localPosition = new Vector3(weaponOrbitRadius, 0f, 0f);
         weaponGO.transform.localRotation = Quaternion.identity;
         weaponGO.transform.localScale = Vector3.one * 0.5f;
 

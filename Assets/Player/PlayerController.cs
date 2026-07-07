@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(PlayerStats))]
@@ -10,25 +11,33 @@ public class PlayerController : MonoBehaviour
     public float acceleration = 18f;
     public float deceleration = 22f;
 
+    [Header("Aim")]
+    [SerializeField] private WeaponPivotAim weaponAim;
+
+    [Header("Flip")]
+    [SerializeField] private SpriteRenderer mainSpriteRenderer;
+    [SerializeField] private List<SpriteRenderer> spritesToFlip = new List<SpriteRenderer>();
+    [SerializeField] private float flipDeadZone = 0.15f;
+
     public bool IsMovementLocked { get; set; } = false;
 
     private Rigidbody2D _rb;
     private PlayerStats _stats;
     private Animator _animator;
-    private SpriteRenderer _spriteRenderer;
 
     private Vector2 _input;
     private Vector2 _currentVelocity;
-
-    private int _lastHorizontalDirection = 1; // 1 derecha, -1 izquierda
     private bool _wasMovingLastFrame = false;
+    private bool _isFacingLeft = false;
 
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _stats = GetComponent<PlayerStats>();
         _animator = GetComponent<Animator>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
+
+        if (mainSpriteRenderer == null)
+            mainSpriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -76,12 +85,7 @@ public class PlayerController : MonoBehaviour
         bool isMovingDown = _input.y < -0.01f;
         bool isMovingUp = _input.y > 0.01f;
 
-        if (_input.x > 0.01f)
-            _lastHorizontalDirection = 1;
-        else if (_input.x < -0.01f)
-            _lastHorizontalDirection = -1;
-
-        _spriteRenderer.flipX = (_lastHorizontalDirection == -1);
+        UpdateFlipFromMouse();
 
         bool isMovingSide = isMoving && (
             (hasHorizontal && !isMovingDown && !isMovingUp) ||
@@ -103,19 +107,38 @@ public class PlayerController : MonoBehaviour
             _animator.ResetTrigger("StartMoveUpSide");
 
             if (isMovingDown)
-            {
                 _animator.SetTrigger("StartMoveDownSide");
-            }
             else if (isMovingUp)
-            {
                 _animator.SetTrigger("StartMoveUpSide");
-            }
             else
-            {
                 _animator.SetTrigger("StartMoveSide");
-            }
         }
 
         _wasMovingLastFrame = isMoving;
+    }
+
+    void UpdateFlipFromMouse()
+    {
+        if (weaponAim == null)
+            return;
+
+        if (!weaponAim.TryGetMouseWorldPosition(out Vector3 mouseWorld))
+            return;
+
+        float deltaX = mouseWorld.x - transform.position.x;
+
+        if (deltaX < -flipDeadZone)
+            _isFacingLeft = true;
+        else if (deltaX > flipDeadZone)
+            _isFacingLeft = false;
+
+        if (mainSpriteRenderer != null)
+            mainSpriteRenderer.flipX = _isFacingLeft;
+
+        for (int i = 0; i < spritesToFlip.Count; i++)
+        {
+            if (spritesToFlip[i] != null)
+                spritesToFlip[i].flipX = _isFacingLeft;
+        }
     }
 }

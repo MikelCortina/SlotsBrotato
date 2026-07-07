@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6b3860a40657c674d928c232e3979be2
+guid: 90e355602b394f644b85647475230761
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6112874056674720241
-    second: R-removebg-preview_0
+      213: -8673768133540144964
+    second: Rio_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -109,17 +109,43 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: R-removebg-preview_0
+      name: Rio_0
       rect:
         serializedVersion: 2
-        x: 5
-        y: 10
-        width: 479
-        height: 479
+        x: 1029
+        y: 844
+        width: 142
+        height: 2229
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f06c33fce65ba2ba0800000000000000
-      internalID: -6112874056674720241
+      spriteID: cb89c3096d590a780800000000000000
+      internalID: -8673768133540144964
       vertices: []
       indices: 
       edges: []
@@ -148,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      R-removebg-preview_0: -6112874056674720241
+      Rio_0: -8673768133540144964
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

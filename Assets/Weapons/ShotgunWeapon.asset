@@ -20,7 +20,8 @@ MonoBehaviour:
   damageScalingFactor: 1
   fireRate: 0.8
   fireRateScalingFactor: 0.1
-  bulletSpeed: 10
+  bulletSpeed: 12.5
+  bulletRange: 4
   bulletsPerShot: 5
   spreadAngle: 25
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}

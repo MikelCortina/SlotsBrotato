@@ -19,6 +19,7 @@ public class WeaponData : ScriptableObject
 
     [Header("Projectile")]
     public float bulletSpeed = 10f;
+    public float bulletRange = 8f;   // NUEVO
     public int bulletsPerShot = 1;
     public float spreadAngle = 0f;
     public GameObject bulletPrefab;

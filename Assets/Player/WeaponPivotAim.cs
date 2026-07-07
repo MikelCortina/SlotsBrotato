@@ -54,8 +54,11 @@ public class WeaponPivotAim : MonoBehaviour
         float u = Mathf.InverseLerp(rect.xMin, rect.xMax, localPoint.x);
         float v = Mathf.InverseLerp(rect.yMin, rect.yMax, localPoint.y);
 
-        Vector3 viewportPoint = new Vector3(u, v, gameCamera.nearClipPlane);
-        worldPos = gameCamera.ViewportToWorldPoint(viewportPoint);
+        if (u < 0f || u > 1f || v < 0f || v > 1f)
+            return false;
+
+        float distance = Mathf.Abs(gameCamera.transform.position.z);
+        worldPos = gameCamera.ViewportToWorldPoint(new Vector3(u, v, distance));
         worldPos.z = 0f;
 
         return true;

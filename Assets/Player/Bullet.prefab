@@ -106,6 +106,8 @@ MonoBehaviour:
   speed: 25
   damage: 25
   maxLifetime: 4
+  maxDistance: 8
+  slowDownStartPercent: 0.8
   rotationOffset: -90
   hitEnemySfx: {fileID: 8300000, guid: 10c65f5fd1800054a9dd71fdac451369, type: 3}
   hitVolume: 1.5
@@ -217,7 +219,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.025
+  m_Time: 0.075
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
