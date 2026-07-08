@@ -19,6 +19,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private List<SpriteRenderer> spritesToFlip = new List<SpriteRenderer>();
     [SerializeField] private float flipDeadZone = 0.15f;
 
+    [Header("Local Flip Children")]
+    [SerializeField] private List<Transform> childrenToMirrorLocally = new List<Transform>();
+    [SerializeField] private bool mirrorChildScaleX = false;
+    [SerializeField] private float rightFacingXOffset = 0f;
+    [SerializeField] private float leftFacingXOffset = 0f;
+
     public bool IsMovementLocked { get; set; } = false;
 
     private Rigidbody2D _rb;
@@ -27,8 +33,10 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 _input;
     private Vector2 _currentVelocity;
-    private bool _wasMovingLastFrame = false;
     private bool _isFacingLeft = false;
+
+    private Dictionary<Transform, Vector3> _initialLocalPositions = new Dictionary<Transform, Vector3>();
+    private Dictionary<Transform, Vector3> _initialLocalScales = new Dictionary<Transform, Vector3>();
 
     void Awake()
     {
@@ -38,6 +46,8 @@ public class PlayerController : MonoBehaviour
 
         if (mainSpriteRenderer == null)
             mainSpriteRenderer = GetComponent<SpriteRenderer>();
+
+        CacheChildrenLocalData();
     }
 
     void Update()
@@ -76,45 +86,28 @@ public class PlayerController : MonoBehaviour
         _rb.linearVelocity = _currentVelocity;
     }
 
+    void CacheChildrenLocalData()
+    {
+        _initialLocalPositions.Clear();
+        _initialLocalScales.Clear();
+
+        for (int i = 0; i < childrenToMirrorLocally.Count; i++)
+        {
+            Transform child = childrenToMirrorLocally[i];
+            if (child == null)
+                continue;
+
+            _initialLocalPositions[child] = child.localPosition;
+            _initialLocalScales[child] = child.localScale;
+        }
+    }
+
     void UpdateAnimationAndFlip()
     {
         bool isMoving = _input.sqrMagnitude > 0.01f;
-        bool startedMovingThisFrame = !_wasMovingLastFrame && isMoving;
-
-        bool hasHorizontal = Mathf.Abs(_input.x) > 0.01f;
-        bool isMovingDown = _input.y < -0.01f;
-        bool isMovingUp = _input.y > 0.01f;
 
         UpdateFlipFromMouse();
-
-        bool isMovingSide = isMoving && (
-            (hasHorizontal && !isMovingDown && !isMovingUp) ||
-            (!hasHorizontal && !isMovingDown && !isMovingUp)
-        );
-
-        bool isMovingDownSide = isMoving && isMovingDown;
-        bool isMovingUpSide = isMoving && isMovingUp;
-
         _animator.SetBool("IsMoving", isMoving);
-        _animator.SetBool("IsMovingSide", isMovingSide);
-        _animator.SetBool("IsMovingDownSide", isMovingDownSide);
-        _animator.SetBool("IsMovingUpSide", isMovingUpSide);
-
-        if (startedMovingThisFrame)
-        {
-            _animator.ResetTrigger("StartMoveSide");
-            _animator.ResetTrigger("StartMoveDownSide");
-            _animator.ResetTrigger("StartMoveUpSide");
-
-            if (isMovingDown)
-                _animator.SetTrigger("StartMoveDownSide");
-            else if (isMovingUp)
-                _animator.SetTrigger("StartMoveUpSide");
-            else
-                _animator.SetTrigger("StartMoveSide");
-        }
-
-        _wasMovingLastFrame = isMoving;
     }
 
     void UpdateFlipFromMouse()
@@ -139,6 +132,38 @@ public class PlayerController : MonoBehaviour
         {
             if (spritesToFlip[i] != null)
                 spritesToFlip[i].flipX = _isFacingLeft;
+        }
+
+        ApplyLocalMirrorToChildren();
+    }
+
+    void ApplyLocalMirrorToChildren()
+    {
+        float direction = _isFacingLeft ? 1f : -1f;
+        float extraOffset = _isFacingLeft ? leftFacingXOffset : rightFacingXOffset;
+
+        foreach (Transform child in childrenToMirrorLocally)
+        {
+            if (child == null || !_initialLocalPositions.ContainsKey(child))
+                continue;
+
+            Vector3 baseLocalPos = _initialLocalPositions[child];
+
+            child.localPosition = new Vector3(
+                Mathf.Abs(baseLocalPos.x) * direction + extraOffset,
+                baseLocalPos.y,
+                baseLocalPos.z
+            );
+
+            if (mirrorChildScaleX && _initialLocalScales.ContainsKey(child))
+            {
+                Vector3 baseScale = _initialLocalScales[child];
+                child.localScale = new Vector3(
+                    Mathf.Abs(baseScale.x) * direction,
+                    baseScale.y,
+                    baseScale.z
+                );
+            }
         }
     }
 }
