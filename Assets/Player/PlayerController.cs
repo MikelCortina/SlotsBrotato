@@ -1,31 +1,22 @@
 using UnityEngine;
-using System.Collections.Generic;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(PlayerStats))]
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(SpriteRenderer))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float acceleration = 18f;
     public float deceleration = 22f;
 
-    [Header("Aim")]
-    [SerializeField] private WeaponPivotAim weaponAim;
-
-    [Header("Flip")]
-    [SerializeField] private SpriteRenderer mainSpriteRenderer;
-    [SerializeField] private List<SpriteRenderer> spritesToFlip = new List<SpriteRenderer>();
-    [SerializeField] private float flipDeadZone = 0.15f;
-
-    [Header("Local Flip Children")]
-    [SerializeField] private List<Transform> childrenToMirrorLocally = new List<Transform>();
-    [SerializeField] private bool mirrorChildScaleX = false;
-    [SerializeField] private float rightFacingXOffset = 0f;
-    [SerializeField] private float leftFacingXOffset = 0f;
+    [Header("Mouse from RawImage")]
+    [SerializeField] private RawImage gameplayRawImage;
+    [SerializeField] private Camera renderTextureCamera;
+    [SerializeField] private Canvas canvas;
 
     public bool IsMovementLocked { get; set; } = false;
+    public bool IsFacingLeft { get; private set; }
 
     private Rigidbody2D _rb;
     private PlayerStats _stats;
@@ -33,21 +24,14 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 _input;
     private Vector2 _currentVelocity;
-    private bool _isFacingLeft = false;
-
-    private Dictionary<Transform, Vector3> _initialLocalPositions = new Dictionary<Transform, Vector3>();
-    private Dictionary<Transform, Vector3> _initialLocalScales = new Dictionary<Transform, Vector3>();
+    private Vector3 _initialScale;
 
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _stats = GetComponent<PlayerStats>();
         _animator = GetComponent<Animator>();
-
-        if (mainSpriteRenderer == null)
-            mainSpriteRenderer = GetComponent<SpriteRenderer>();
-
-        CacheChildrenLocalData();
+        _initialScale = transform.localScale;
     }
 
     void Update()
@@ -55,7 +39,8 @@ public class PlayerController : MonoBehaviour
         if (IsMovementLocked)
         {
             _input = Vector2.zero;
-            UpdateAnimationAndFlip();
+            UpdateAnimation();
+            UpdateFlipByMouse();
             return;
         }
 
@@ -64,7 +49,8 @@ public class PlayerController : MonoBehaviour
             Input.GetAxisRaw("Vertical")
         ).normalized;
 
-        UpdateAnimationAndFlip();
+        UpdateAnimation();
+        UpdateFlipByMouse();
     }
 
     void FixedUpdate()
@@ -86,84 +72,64 @@ public class PlayerController : MonoBehaviour
         _rb.linearVelocity = _currentVelocity;
     }
 
-    void CacheChildrenLocalData()
-    {
-        _initialLocalPositions.Clear();
-        _initialLocalScales.Clear();
-
-        for (int i = 0; i < childrenToMirrorLocally.Count; i++)
-        {
-            Transform child = childrenToMirrorLocally[i];
-            if (child == null)
-                continue;
-
-            _initialLocalPositions[child] = child.localPosition;
-            _initialLocalScales[child] = child.localScale;
-        }
-    }
-
-    void UpdateAnimationAndFlip()
+    void UpdateAnimation()
     {
         bool isMoving = _input.sqrMagnitude > 0.01f;
-
-        UpdateFlipFromMouse();
         _animator.SetBool("IsMoving", isMoving);
     }
 
-    void UpdateFlipFromMouse()
+    void UpdateFlipByMouse()
     {
-        if (weaponAim == null)
+        if (!TryGetMouseWorldPositionFromRawImage(out Vector3 mouseWorld))
             return;
 
-        if (!weaponAim.TryGetMouseWorldPosition(out Vector3 mouseWorld))
-            return;
+        IsFacingLeft = mouseWorld.x < transform.position.x;
 
-        float deltaX = mouseWorld.x - transform.position.x;
+        Vector3 scale = transform.localScale;
+        scale.x = IsFacingLeft
+            ? -Mathf.Abs(_initialScale.x)
+            : Mathf.Abs(_initialScale.x);
 
-        if (deltaX < -flipDeadZone)
-            _isFacingLeft = true;
-        else if (deltaX > flipDeadZone)
-            _isFacingLeft = false;
-
-        if (mainSpriteRenderer != null)
-            mainSpriteRenderer.flipX = _isFacingLeft;
-
-        for (int i = 0; i < spritesToFlip.Count; i++)
-        {
-            if (spritesToFlip[i] != null)
-                spritesToFlip[i].flipX = _isFacingLeft;
-        }
-
-        ApplyLocalMirrorToChildren();
+        transform.localScale = scale;
     }
 
-    void ApplyLocalMirrorToChildren()
+    bool TryGetMouseWorldPositionFromRawImage(out Vector3 worldPos)
     {
-        float direction = _isFacingLeft ? 1f : -1f;
-        float extraOffset = _isFacingLeft ? leftFacingXOffset : rightFacingXOffset;
+        worldPos = Vector3.zero;
 
-        foreach (Transform child in childrenToMirrorLocally)
-        {
-            if (child == null || !_initialLocalPositions.ContainsKey(child))
-                continue;
+        if (gameplayRawImage == null || renderTextureCamera == null)
+            return false;
 
-            Vector3 baseLocalPos = _initialLocalPositions[child];
+        RectTransform rt = gameplayRawImage.rectTransform;
 
-            child.localPosition = new Vector3(
-                Mathf.Abs(baseLocalPos.x) * direction + extraOffset,
-                baseLocalPos.y,
-                baseLocalPos.z
-            );
+        Camera uiCamera = null;
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            uiCamera = canvas.worldCamera;
 
-            if (mirrorChildScaleX && _initialLocalScales.ContainsKey(child))
-            {
-                Vector3 baseScale = _initialLocalScales[child];
-                child.localScale = new Vector3(
-                    Mathf.Abs(baseScale.x) * direction,
-                    baseScale.y,
-                    baseScale.z
-                );
-            }
-        }
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                rt,
+                Input.mousePosition,
+                uiCamera,
+                out Vector2 localPoint))
+            return false;
+
+        if (!rt.rect.Contains(localPoint))
+            return false;
+
+        Vector2 point01 = localPoint - rt.rect.min;
+        float u = point01.x / rt.rect.width;
+        float v = point01.y / rt.rect.height;
+
+        Rect uv = gameplayRawImage.uvRect;
+        u = uv.x + u * uv.width;
+        v = uv.y + v * uv.height;
+
+        worldPos = renderTextureCamera.ViewportToWorldPoint(new Vector3(
+            u,
+            v,
+            Mathf.Abs(renderTextureCamera.transform.position.z)
+        ));
+
+        return true;
     }
 }

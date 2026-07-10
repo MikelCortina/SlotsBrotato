@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: 136ba779b4c171645a0daa49a41a9e44
+guid: 87e6fa9191f09b346a06a35ac001a984
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2181066478969543227
-    second: Pump_0
-  - first:
-      213: 1155053387946240998
-    second: Pump_1
+      213: -976089716982131766
+    second: Boca_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -54,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 225
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -116,45 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pump_0
+      name: Boca_0
       rect:
         serializedVersion: 2
-        x: 792
-        y: 824
-        width: 8
-        height: 8
+        x: 468
+        y: 397
+        width: 77
+        height: 107
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b3add762864b44e10800000000000000
-      internalID: 2181066478969543227
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pump_1
-      rect:
-        serializedVersion: 2
-        x: 74
-        y: 473
-        width: 828
-        height: 208
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 6eba525cfe2970010800000000000000
-      internalID: 1155053387946240998
+      spriteID: ac35e5ee29b3472f0800000000000000
+      internalID: -976089716982131766
       vertices: []
       indices: 
       edges: []
@@ -164,7 +139,7 @@ TextureImporter:
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    internalID: 0
     vertices: []
     indices: 
     edges: []
@@ -173,8 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Pump_0: 2181066478969543227
-      Pump_1: 1155053387946240998
+      Boca_0: -976089716982131766
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

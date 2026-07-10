@@ -17,29 +17,34 @@ public class EnemyController : MonoBehaviour
     public Transform visualRoot;
 
     [Header("Jump Timing")]
-    [Range(0f, 1f)] public float idlePortion = 0.35f;   // tiempo quieto antes del salto
-    [Range(0f, 1f)] public float movePortion = 0.65f;   // tiempo moviéndose
+    [Range(0f, 1f)] public float idlePortion = 0.35f;
+    [Range(0f, 1f)] public float movePortion = 0.65f;
 
-    float _baseSpeed;
-    float _slowTimer;
-    float _cycleTime;
-    float _cyclePhase;
-    float _bouncePhase;
+    private float _baseSpeed;
+    private float _slowTimer;
+    private float _cycleTime;
+    private float _cyclePhase;
+    private float _bouncePhase;
 
-    Rigidbody2D _rb;
-    Animator _animator;
-    Transform _player;
-    PlayerHealth _playerHealth;
-    EnemyDamage _enemyDamage;
-    float _nextDamageTime;
-    bool _isKnockedBack;
-    Vector2 _currentVelocity;
+    private Rigidbody2D _rb;
+    private Animator _animator;
+    private Transform _player;
+    private PlayerHealth _playerHealth;
+    private EnemyDamage _enemyDamage;
+    private float _nextDamageTime;
+
+    private Vector2 _currentVelocity;
+
+    private bool _isKnockedBack;
+    private Vector2 _knockbackVelocity;
+    private float _knockbackTimer;
 
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _rb.gravityScale = 0f;
         _rb.freezeRotation = true;
+
         _enemyDamage = GetComponent<EnemyDamage>();
 
         if (visualRoot != null)
@@ -72,16 +77,23 @@ public class EnemyController : MonoBehaviour
                 speed = _baseSpeed;
         }
 
+        if (_isKnockedBack)
+        {
+            _knockbackTimer -= Time.deltaTime;
+            if (_knockbackTimer <= 0f)
+                EndKnockback();
+        }
+
         float cycleDuration = 1f / bounceFrequency;
         _cycleTime += Time.deltaTime;
         _cyclePhase = (_cycleTime / cycleDuration) % 1f;
 
-        bool isMovingPhase = _cyclePhase >= idlePortion;
+        bool isMovingPhase = _cyclePhase >= idlePortion && !_isKnockedBack;
 
         if (isMovingPhase)
         {
             float movePhase = (_cyclePhase - idlePortion) / Mathf.Max(0.0001f, movePortion);
-            _bouncePhase = Mathf.Sin(movePhase * Mathf.PI); // 0 -> 1 -> 0
+            _bouncePhase = Mathf.Sin(movePhase * Mathf.PI);
         }
         else
         {
@@ -95,32 +107,53 @@ public class EnemyController : MonoBehaviour
             _animator.SetFloat("bouncePhase", _bouncePhase);
     }
 
-    public void SetKnockback(bool value)
+    public void StartKnockback(Vector2 velocity, float duration)
     {
-        _isKnockedBack = value;
-        if (value)
-            _currentVelocity = Vector2.zero;
+        _isKnockedBack = true;
+        _knockbackVelocity = velocity;
+        _knockbackTimer = duration;
+
+        _currentVelocity = Vector2.zero;
+        _rb.linearVelocity = Vector2.zero;
+    }
+
+    private void EndKnockback()
+    {
+        _isKnockedBack = false;
+        _knockbackTimer = 0f;
+        _knockbackVelocity = Vector2.zero;
+        _currentVelocity = Vector2.zero;
+        _rb.linearVelocity = Vector2.zero;
     }
 
     void FixedUpdate()
     {
-        if (_isKnockedBack) return;
         if (_player == null) return;
+
+        Vector2 pos = _rb.position;
+
+        if (_isKnockedBack)
+        {
+            _rb.MovePosition(pos + _knockbackVelocity * Time.fixedDeltaTime);
+            return;
+        }
 
         bool canMove = _cyclePhase >= idlePortion;
 
         if (!canMove)
         {
             _currentVelocity = Vector2.zero;
+            _rb.linearVelocity = Vector2.zero;
             return;
         }
 
-        Vector2 pos = _rb.position;
         Vector2 toPlayer = (Vector2)_player.position - pos;
         float dist = toPlayer.magnitude;
         float speedMult = dist < arrivalRadius ? dist / arrivalRadius : 1f;
 
-        Vector2 desiredVelocity = toPlayer.normalized * speed * speedMult;
+        Vector2 desiredVelocity = dist > 0.001f
+            ? toPlayer.normalized * speed * speedMult
+            : Vector2.zero;
 
         Vector2 sepForce = Vector2.zero;
         Collider2D[] neighbors = Physics2D.OverlapCircleAll(pos, separationRadius);
@@ -167,5 +200,14 @@ public class EnemyController : MonoBehaviour
     {
         speed = _baseSpeed * multiplier;
         _slowTimer = duration;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, separationRadius);
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, arrivalRadius);
     }
 }

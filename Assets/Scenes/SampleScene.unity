@@ -4000,7 +4000,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: e2f39dd0204e3284dbf4be26748fdd1c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5014,7 +5014,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &315845067
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7258,8 +7258,9 @@ GameObject:
   - component: {fileID: 477142604}
   - component: {fileID: 477142605}
   - component: {fileID: 477142606}
+  - component: {fileID: 477142607}
   m_Layer: 0
-  m_Name: Pump
+  m_Name: WeaponPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7274,9 +7275,9 @@ Transform:
   m_GameObject: {fileID: 477142603}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.10700001, y: 1.0600091, z: 0}
+  m_LocalPosition: {x: 0.1, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 809848641}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7287,7 +7288,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 477142603}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -7347,47 +7348,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b45da813c122f3b40a1410ada87bfa25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponAim: {fileID: 1936309017}
-  spriteRendererToFlip: {fileID: 477142605}
-  bodyAnimator: {fileID: 809848650}
-  animatorLayer: 0
-  idleStateName: Base Layer.IdlePlayer
+  weaponAim: {fileID: 477142607}
+  playerShooter: {fileID: 809848639}
   angleOffset: 0
   maxUpAngle: 90
   maxDownAngle: 90
-  flipDeadZone: 0.15
-  leftOffsetX: -0.2
-  downForwardOffsetY: -0.1
-  downForwardOffsetX: 0.1
-  upOffsetY: 0.25
   upOffsetX: 0
-  useIdleBobbing: 1
-  idleBobAmount: {x: 0, y: -0.05}
-  idleBobSpeedMultiplier: 1
-  idleBobCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: -1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  upOffsetY: 0.2
+  downOffsetX: 0.02
+  downOffsetY: -0.06
+  enableRecoil: 1
+  recoilDistanceX: -0.08
+  recoilDistanceY: 0.02
+  recoilReturnSpeed: 18
+  recoilSnappiness: 30
+  recoilAngleKick: 6
+  recoilAngleReturnSpeed: 16
+  recoilAngleSnappiness: 28
+--- !u!114 &477142607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477142603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88754c91f3d60a64e98fe79b4e88b384, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponPivot: {fileID: 0}
+  weaponSprite: {fileID: 0}
+  renderTextureRect: {fileID: 734169031}
+  gameCamera: {fileID: 1695375334}
+  uiCanvas: {fileID: 733434914}
 --- !u!1 &480596088
 GameObject:
   m_ObjectHideFlags: 0
@@ -12629,15 +12623,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acceleration: 36
   deceleration: 42
-  weaponAim: {fileID: 1936309017}
-  mainSpriteRenderer: {fileID: 0}
-  spritesToFlip: []
-  flipDeadZone: 0.15
-  childrenToMirrorLocally:
-  - {fileID: 1627840224}
-  mirrorChildScaleX: 0
-  rightFacingXOffset: -0.1
-  leftFacingXOffset: -0.15
+  gameplayRawImage: {fileID: 734169032}
+  renderTextureCamera: {fileID: 1695375334}
+  canvas: {fileID: 120417465}
 --- !u!114 &809848639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12650,9 +12638,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6bfa9ca309dc1a4397ed5a4903afda8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponPivot: {fileID: 1936309016}
-  weaponOrbitRadius: 1
-  weaponAim: {fileID: 1936309017}
+  weaponPivot: {fileID: 477142604}
+  weaponOrbitRadius: 0
+  weaponAim: {fileID: 477142607}
   autoFire: 1
   meleeSlashPrefab: {fileID: 7501758475988855061, guid: 96011464f85fa3546b07639aa0bba25f, type: 3}
   meleeSlashDistance: 1.2
@@ -12672,6 +12660,8 @@ MonoBehaviour:
   bulletsPerShot: 2
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
   spreadAngle: 25
+  singleShotBloomAngle: 0
+  bulletSize: 0
   _audioSource: {fileID: 809848649}
   _defaultShootSound: {fileID: 0}
   _shootSoundVolume: 0.5
@@ -12740,12 +12730,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.011, y: -100.005, z: 0}
-  m_LocalScale: {x: 0.39999998, y: 0.39999998, z: 0.39999998}
+  m_LocalScale: {x: 0.4, y: 0.39999998, z: 0.39999998}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 477142604}
   - {fileID: 2122602198}
-  - {fileID: 1936309016}
   - {fileID: 1934441788}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -25155,6 +25144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerRb: {fileID: 809848637}
+  playerVisual: {fileID: 809848641}
   bones:
   - {fileID: 1662422546}
   - {fileID: 185859229}
@@ -25171,10 +25161,9 @@ MonoBehaviour:
   - {fileID: 641996518}
   - {fileID: 92504156}
   - {fileID: 2131043827}
-  facingRight: 1
   maxAnglePerBone: 25
-  horizontalInfluence: 6
-  verticalInfluence: 3
+  horizontalInfluence: 2
+  verticalInfluence: 1.25
   followSpeed: 12
   damping: 8
   delayPerBone: 0.85
@@ -27015,7 +27004,7 @@ RectTransform:
   m_GameObject: {fileID: 1751419094}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.74999994, y: 0.74999994, z: 0.74999994}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 239166854}
@@ -30652,55 +30641,6 @@ Transform:
   - {fileID: 1627840224}
   m_Father: {fileID: 809848641}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1936309015
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1936309016}
-  - component: {fileID: 1936309017}
-  m_Layer: 6
-  m_Name: WeaponPivot
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1936309016
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1936309015}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 809848641}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1936309017
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1936309015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88754c91f3d60a64e98fe79b4e88b384, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponPivot: {fileID: 1936309016}
-  weaponSprite: {fileID: 0}
-  renderTextureRect: {fileID: 734169031}
-  gameCamera: {fileID: 1695375334}
-  uiCanvas: {fileID: 733434914}
 --- !u!1 &1936484095
 GameObject:
   m_ObjectHideFlags: 0
@@ -33513,7 +33453,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.107, y: 1.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 809848641}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -33529,47 +33469,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b45da813c122f3b40a1410ada87bfa25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponAim: {fileID: 1936309017}
-  spriteRendererToFlip: {fileID: 2122602200}
-  bodyAnimator: {fileID: 809848650}
-  animatorLayer: 0
-  idleStateName: Base Layer.IdlePlayer
+  weaponAim: {fileID: 477142607}
+  playerShooter: {fileID: 809848639}
   angleOffset: 0
   maxUpAngle: 50
   maxDownAngle: 50
-  flipDeadZone: 0.15
-  leftOffsetX: -0.2
-  downForwardOffsetY: -0.1
-  downForwardOffsetX: 0.1
-  upOffsetY: 0.25
   upOffsetX: 0
-  useIdleBobbing: 1
-  idleBobAmount: {x: 0, y: -0.05}
-  idleBobSpeedMultiplier: 1
-  idleBobCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: -1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  upOffsetY: 0.2
+  downOffsetX: 0.02
+  downOffsetY: -0.06
+  enableRecoil: 1
+  recoilDistanceX: -0.08
+  recoilDistanceY: 0.02
+  recoilReturnSpeed: 18
+  recoilSnappiness: 30
+  recoilAngleKick: 6
+  recoilAngleReturnSpeed: 16
+  recoilAngleSnappiness: 28
 --- !u!212 &2122602200
 SpriteRenderer:
   m_ObjectHideFlags: 0

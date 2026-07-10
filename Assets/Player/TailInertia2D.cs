@@ -5,10 +5,8 @@ public class TailChainInertia2D : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Rigidbody2D playerRb;
+    [SerializeField] private Transform playerVisual;
     [SerializeField] private List<Transform> bones = new List<Transform>();
-
-    [Header("Facing")]
-    [SerializeField] private bool facingRight = true;
 
     [Header("Motion")]
     [SerializeField] private float maxAnglePerBone = 25f;
@@ -56,14 +54,9 @@ public class TailChainInertia2D : MonoBehaviour
         }
     }
 
-    public void SetFacing(bool isFacingRight)
-    {
-        facingRight = isFacingRight;
-    }
-
     void LateUpdate()
     {
-        if (playerRb == null || bones == null || bones.Count < 2)
+        if (playerRb == null || playerVisual == null || bones == null || bones.Count < 2)
             return;
 
         Vector2 v = playerRb.linearVelocity;
@@ -77,15 +70,15 @@ public class TailChainInertia2D : MonoBehaviour
         if (!hasInertiaMotion)
             v = Vector2.zero;
 
-        float facingSign = facingRight ? 1f : -1f;
+        float facingSign = Mathf.Sign(playerVisual.localScale.x);
 
-        // Horizontal sí depende del facing
-        float horizontalAngle = -v.x * facingSign * horizontalInfluence;
+        float moveX = v.x * facingSign;
+        float moveY = v.y;
+
+        float horizontalAngle = -moveX * horizontalInfluence;
         horizontalAngle = Mathf.Clamp(horizontalAngle, -maxHorizontalAngle, maxHorizontalAngle);
 
-        // Vertical NO depende del facing
-        // Al caer (v.y < 0) se abre hacia afuera.
-        float verticalAngle = v.y * verticalInfluence;
+        float verticalAngle = moveY * verticalInfluence;
         verticalAngle = Mathf.Clamp(verticalAngle, -maxVerticalAngle, maxVerticalAngle);
 
         float baseTarget = horizontalAngle + verticalAngle;

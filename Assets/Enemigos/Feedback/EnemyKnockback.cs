@@ -1,7 +1,5 @@
-using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(EnemyHealth))]
 [RequireComponent(typeof(EnemyController))]
 public class EnemyKnockback : MonoBehaviour
@@ -10,14 +8,11 @@ public class EnemyKnockback : MonoBehaviour
     [SerializeField] private float knockbackForce = 3.5f;
     [SerializeField] private float knockbackDuration = 0.08f;
 
-    private Rigidbody2D _rb;
     private EnemyHealth _health;
     private EnemyController _controller;
-    private Coroutine _routine;
 
     void Awake()
     {
-        _rb = GetComponent<Rigidbody2D>();
         _health = GetComponent<EnemyHealth>();
         _controller = GetComponent<EnemyController>();
     }
@@ -42,29 +37,14 @@ public class EnemyKnockback : MonoBehaviour
 
     public void Play(Vector2 hitFromPosition)
     {
-        if (_routine != null)
-            StopCoroutine(_routine);
-
-        _routine = StartCoroutine(KnockbackRoutine(hitFromPosition));
-    }
-
-    private IEnumerator KnockbackRoutine(Vector2 hitFromPosition)
-    {
-        if (_controller != null)
-            _controller.SetKnockback(true);
-
         Vector2 dir = ((Vector2)transform.position - hitFromPosition).normalized;
+
         if (dir.sqrMagnitude < 0.0001f)
             dir = Vector2.up;
 
-        _rb.linearVelocity = Vector2.zero;
-        _rb.AddForce(dir * knockbackForce, ForceMode2D.Impulse);
-
-        yield return new WaitForSeconds(knockbackDuration);
+        Vector2 knockbackVelocity = dir * knockbackForce;
 
         if (_controller != null)
-            _controller.SetKnockback(false);
-
-        _routine = null;
+            _controller.StartKnockback(knockbackVelocity, knockbackDuration);
     }
 }

@@ -14,16 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponName: RifleWeapon
   description: 
-  icon: {fileID: -9057444008558310320, guid: 0515d3661934ef643bec5230a0702c73, type: 3}
+  icon: {fileID: 21300000, guid: 1d20e79067bfdde4582b2089ba11e7d7, type: 3}
   weaponType: 0
   damage: 50
   damageScalingFactor: 1
-  fireRate: 2
+  fireRate: 8
   fireRateScalingFactor: 0.1
-  bulletSpeed: 12
+  bulletSpeed: 20
+  bulletRange: 5
   bulletsPerShot: 1
   spreadAngle: 0
+  singleShotBloomAngle: 20
+  bulletSize: 0.75
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
   weaponPrefab: {fileID: 1855688961912401076, guid: 116c7012ed8314f43b085b2c963b98a9, type: 3}
   boomerangDistance: 5
+  boomerangThrownWeaponSprite: {fileID: 0}
   shootSound: {fileID: 8300000, guid: e0ce80b2dae256f4c8cf8b94d9ca4d12, type: 3}

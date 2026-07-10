@@ -1,13 +1,16 @@
 fileFormatVersion: 2
-guid: 136ba779b4c171645a0daa49a41a9e44
+guid: ece5c4de8c0958f4793be4de536c38b6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2181066478969543227
-    second: Pump_0
+      213: 1075100307197171685
+    second: ShootVFXYellow_0
   - first:
-      213: 1155053387946240998
-    second: Pump_1
+      213: -8837630025995736466
+    second: ShootVFXYellow_1
+  - first:
+      213: -5843119016366250359
+    second: ShootVFXYellow_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -49,9 +52,9 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -116,45 +119,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pump_0
+      name: ShootVFXYellow_0
       rect:
         serializedVersion: 2
-        x: 792
-        y: 824
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 274
+        y: 409
+        width: 89
+        height: 106
+      alignment: 9
+      pivot: {x: 0.057005465, y: 0.556355}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b3add762864b44e10800000000000000
-      internalID: 2181066478969543227
+      spriteID: 5e7966488068bee00800000000000000
+      internalID: 1075100307197171685
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pump_1
+      name: ShootVFXYellow_1
       rect:
         serializedVersion: 2
-        x: 74
-        y: 473
-        width: 828
-        height: 208
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 380
+        y: 391
+        width: 151
+        height: 154
+      alignment: 9
+      pivot: {x: 0.03317948, y: 0.5077576}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6eba525cfe2970010800000000000000
-      internalID: 1155053387946240998
+      spriteID: e6aa23ca05e6a5580800000000000000
+      internalID: -8837630025995736466
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShootVFXYellow_2
+      rect:
+        serializedVersion: 2
+        x: 535
+        y: 370
+        width: 178
+        height: 184
+      alignment: 9
+      pivot: {x: 0.0033085856, y: 0.5259721}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 986e829763219eea0800000000000000
+      internalID: -5843119016366250359
       vertices: []
       indices: 
       edges: []
@@ -163,8 +188,8 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    spriteID: d7a7a078d62b9ff438af8456b685b13d
+    internalID: 0
     vertices: []
     indices: 
     edges: []
@@ -173,8 +198,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Pump_0: 2181066478969543227
-      Pump_1: 1155053387946240998
+      ShootVFXYellow_0: 1075100307197171685
+      ShootVFXYellow_1: -8837630025995736466
+      ShootVFXYellow_2: -5843119016366250359
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

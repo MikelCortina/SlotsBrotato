@@ -23,24 +23,50 @@ public class Bullet : MonoBehaviour
     private bool _fired;
     private Vector3 _startPosition;
     private float _baseSpeed;
+    private Vector3 _originalPrefabScale;
     private Vector3 _initialScale;
 
-    public void Init(Vector2 dir, float spd, float dmg, float distance)
+    private TrailRenderer _trailRenderer;
+    private float _baseTrailWidth;
+
+    private bool _hasHit;
+
+    void Awake()
+    {
+        _originalPrefabScale = transform.localScale;
+
+        _trailRenderer = GetComponent<TrailRenderer>();
+        if (_trailRenderer != null)
+            _baseTrailWidth = _trailRenderer.widthMultiplier;
+    }
+
+    public void Init(Vector2 dir, float spd, float dmg, float distance, float sizeMultiplier)
     {
         _direction = dir.normalized;
+
         speed = spd;
         _baseSpeed = spd;
         damage = dmg;
         maxDistance = distance;
-        _startPosition = transform.position;
+
+        transform.localScale = _originalPrefabScale * sizeMultiplier;
         _initialScale = transform.localScale;
+
+        if (_trailRenderer != null)
+        {
+            _trailRenderer.widthMultiplier = _baseTrailWidth * sizeMultiplier;
+            _trailRenderer.Clear();
+        }
+
+        _startPosition = transform.position;
         _lifetime = 0f;
         _fired = true;
+        _hasHit = false;
     }
 
     void Update()
     {
-        if (!_fired) return;
+        if (!_fired || _hasHit) return;
 
         _lifetime += Time.deltaTime;
         if (_lifetime >= maxLifetime)
@@ -56,6 +82,10 @@ public class Bullet : MonoBehaviour
         {
             transform.position = _startPosition + (Vector3)(_direction * maxDistance);
             transform.localScale = Vector3.zero;
+
+            if (_trailRenderer != null)
+                _trailRenderer.widthMultiplier = 0f;
+
             Destroy(gameObject);
             return;
         }
@@ -74,10 +104,19 @@ public class Bullet : MonoBehaviour
 
             currentSpeed = Mathf.Lerp(_baseSpeed, 0f, t);
             transform.localScale = Vector3.Lerp(_initialScale, Vector3.zero, t);
+
+            if (_trailRenderer != null)
+            {
+                float currentSizeFactor = 1f - t;
+                _trailRenderer.widthMultiplier = (_baseTrailWidth * _initialScale.x) * currentSizeFactor;
+            }
         }
         else
         {
             transform.localScale = _initialScale;
+
+            if (_trailRenderer != null)
+                _trailRenderer.widthMultiplier = _baseTrailWidth * _initialScale.x;
         }
 
         float moveThisFrame = currentSpeed * Time.deltaTime;
@@ -86,6 +125,10 @@ public class Bullet : MonoBehaviour
         {
             transform.position = _startPosition + (Vector3)(_direction * maxDistance);
             transform.localScale = Vector3.zero;
+
+            if (_trailRenderer != null)
+                _trailRenderer.widthMultiplier = 0f;
+
             Destroy(gameObject);
             return;
         }
@@ -98,32 +141,30 @@ public class Bullet : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Enemy")) return;
+        if (_hasHit) return;
 
-        var health = other.GetComponent<EnemyHealth>();
-        if (health != null)
+        EnemyHealth health = other.GetComponentInParent<EnemyHealth>();
+        if (health == null) return;
+
+        _hasHit = true;
+
+        health.TakeDamage(damage, transform.position, DamageSource.Bullet);
+
+        if (MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(MechanicModifierType.StunningImpact))
         {
-            health.TakeDamage(damage, transform.position, DamageSource.Bullet);
-
-            if (MechanicModifierManager.Instance != null &&
-                MechanicModifierManager.Instance.HasModifier(
-                    MechanicModifierType.StunningImpact))
+            if (UnityEngine.Random.value <= 0.20f)
             {
-                if (Random.value <= 0.20f)
-                {
-                    EnemyController controller = other.GetComponent<EnemyController>();
-
-                    if (controller != null)
-                        controller.ApplySlow(0.5f, 2f);
-                }
+                EnemyController controller = other.GetComponentInParent<EnemyController>();
+                if (controller != null)
+                    controller.ApplySlow(0.5f, 2f);
             }
+        }
 
-            if (MechanicModifierManager.Instance != null &&
-                MechanicModifierManager.Instance.HasModifier(
-                    MechanicModifierType.DamageCharge))
-            {
-                SlotMachine.Instance?.AddCharge(0.25f);
-            }
+        if (MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(MechanicModifierType.DamageCharge))
+        {
+            SlotMachine.Instance?.AddCharge(0.25f);
         }
 
         if (AudioManager.Instance != null)

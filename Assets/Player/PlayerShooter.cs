@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerShooter : MonoBehaviour
@@ -30,17 +31,27 @@ public class PlayerShooter : MonoBehaviour
     public float damage;
     public float damageScalingFactor;
     public float bulletSpeed;
-    public float bulletRange;   // NUEVO
+    public float bulletRange;
     public int bulletsPerShot;
     public GameObject bulletPrefab;
     public float spreadAngle;
-
-    private SpriteRenderer _weaponSpriteRenderer;
+    public float singleShotBloomAngle;
+    public float bulletSize = 1f;
 
     [Header("Audio")]
     [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip _defaultShootSound;
     [SerializeField, Range(0f, 1f)] private float _shootSoundVolume = 0.5f;
+
+    public float LastShootTime { get; private set; } = -999f;
+
+    public event Action OnShoot;
+
+    private float _lastSingleShotBloomAngle = float.NaN;
+
+    private bool _boomerangInFlight = false;
+    private SpriteRenderer _weaponSpriteRenderer;
+    private Sprite _defaultWeaponSprite;
 
     void Awake()
     {
@@ -62,22 +73,33 @@ public class PlayerShooter : MonoBehaviour
 
     void Update()
     {
-        UpdateWeaponFlip();
-
         _fireTimer -= Time.deltaTime;
 
         bool shootPressed = autoFire
             ? Input.GetMouseButton(0)
             : Input.GetMouseButtonDown(0);
 
+        if (_boomerangInFlight)
+            return;
+
         if (shootPressed && _fireTimer <= 0f)
         {
             Shoot();
             PlayShootSound();
+            LastShootTime = Time.time;
+            OnShoot?.Invoke();
 
             float finalFireRate = GetFinalWeaponFireRate();
             _fireTimer = 1f / Mathf.Max(0.01f, finalFireRate);
         }
+    }
+
+    void PlayWeaponParticles(Vector2 shootDir)
+    {
+        if (_currentWeaponInstance == null)
+            return;
+
+        _currentWeaponInstance.PlayShootParticles(shootDir);
     }
 
     public void ApplyWeaponData(WeaponData weapon)
@@ -93,10 +115,15 @@ public class PlayerShooter : MonoBehaviour
         damageScalingFactor = weapon.damageScalingFactor;
 
         bulletSpeed = weapon.bulletSpeed;
-        bulletRange = weapon.bulletRange;   // NUEVO
+        bulletRange = weapon.bulletRange;
         bulletsPerShot = weapon.bulletsPerShot;
         bulletPrefab = weapon.bulletPrefab;
         spreadAngle = weapon.spreadAngle;
+        singleShotBloomAngle = weapon.singleShotBloomAngle;
+        bulletSize = weapon.bulletSize;
+
+        _lastSingleShotBloomAngle = float.NaN;
+        _boomerangInFlight = false;
 
         EquipWeaponPrefab();
     }
@@ -106,7 +133,6 @@ public class PlayerShooter : MonoBehaviour
         float finalDamage = damage;
 
         if (_stats != null)
-            // ? FIX: GetScaledDamage ? GetFinalDamage (nombre correcto)
             finalDamage = _stats.GetFinalDamage(damage, damageScalingFactor, true);
 
         if (WeaponLevelSystem.Instance != null && _currentWeapon != null)
@@ -132,10 +158,13 @@ public class PlayerShooter : MonoBehaviour
 
     void Shoot()
     {
-        if (weaponPivot == null)
+        if (_currentWeapon == null)
             return;
 
-        if (_currentWeapon == null)
+        if (weaponAim == null)
+            return;
+
+        if (!weaponAim.TryGetMouseWorldPosition(out Vector3 mouseWorld))
             return;
 
         if (_currentWeapon.weaponType != WeaponType.Melee)
@@ -144,28 +173,24 @@ public class PlayerShooter : MonoBehaviour
                 return;
         }
 
-        // ? Dirección real desde el firePoint hacia el cursor en espacio mundo
         Vector2 baseDir;
 
-        if (weaponAim != null && weaponAim.TryGetMouseWorldPosition(out Vector3 mouseWorld))
-        {
+        if (_firePoint != null)
             baseDir = ((Vector2)(mouseWorld - _firePoint.position)).normalized;
-        }
+        else if (weaponPivot != null)
+            baseDir = ((Vector2)(mouseWorld - weaponPivot.position)).normalized;
         else
-        {
-            // Fallback: usar weaponPivot.right con corrección de flip
-            baseDir = weaponPivot.right.normalized;
-            if (weaponPivot.localScale.x < 0f)
-                baseDir = -baseDir;
-        }
+            return;
 
-        if (_currentWeapon != null && _currentWeapon.weaponType == WeaponType.Boomerang)
+        PlayWeaponParticles(baseDir);
+
+        if (_currentWeapon.weaponType == WeaponType.Boomerang)
         {
             ShootBoomerang(baseDir);
             return;
         }
 
-        if (_currentWeapon != null && _currentWeapon.weaponType == WeaponType.Melee)
+        if (_currentWeapon.weaponType == WeaponType.Melee)
         {
             MeleeAttack(baseDir);
             return;
@@ -173,6 +198,7 @@ public class PlayerShooter : MonoBehaviour
 
         ShootProjectileWeapon(baseDir);
     }
+
     void ShootProjectileWeapon(Vector2 baseDir)
     {
         int shots = Mathf.Max(1, bulletsPerShot);
@@ -191,12 +217,42 @@ public class PlayerShooter : MonoBehaviour
 
         for (int i = 0; i < shots; i++)
         {
-            float angleOffset = 0f;
+            float shotAngleOffset = 0f;
 
             if (shots > 1)
-                angleOffset = Mathf.Lerp(-finalSpreadAngle, finalSpreadAngle, (float)i / (shots - 1));
+            {
+                shotAngleOffset = Mathf.Lerp(
+                    -finalSpreadAngle,
+                    finalSpreadAngle,
+                    (float)i / (shots - 1)
+                );
+            }
+            else if (singleShotBloomAngle > 0f)
+            {
+                float newAngle;
+                float minAngleDifference = 0.25f;
+                int safety = 0;
 
-            Vector2 dir = Quaternion.Euler(0f, 0f, angleOffset) * baseDir;
+                do
+                {
+                    newAngle = UnityEngine.Random.Range(
+                        -singleShotBloomAngle,
+                        singleShotBloomAngle
+                    );
+
+                    safety++;
+                }
+                while (
+                    !float.IsNaN(_lastSingleShotBloomAngle) &&
+                    Mathf.Abs(newAngle - _lastSingleShotBloomAngle) < minAngleDifference &&
+                    safety < 10
+                );
+
+                shotAngleOffset = newAngle;
+                _lastSingleShotBloomAngle = shotAngleOffset;
+            }
+
+            Vector2 dir = Quaternion.Euler(0f, 0f, shotAngleOffset) * baseDir;
 
             GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
 
@@ -204,16 +260,20 @@ public class PlayerShooter : MonoBehaviour
             if (bullet == null) continue;
 
             float finalDamage = GetFinalWeaponDamage();
-            bullet.Init(dir, bulletSpeed, finalDamage, bulletRange);
+            bullet.Init(dir, bulletSpeed, finalDamage, bulletRange, bulletSize);
         }
     }
 
     void ShootBoomerang(Vector2 dir)
     {
+        if (_boomerangInFlight)
+            return;
+
         if (bulletPrefab == null || _firePoint == null)
             return;
 
         GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
+        go.transform.localScale *= bulletSize;
 
         BoomerangProjectile boomerang = go.GetComponent<BoomerangProjectile>();
         if (boomerang == null) return;
@@ -224,7 +284,35 @@ public class PlayerShooter : MonoBehaviour
             ? _currentWeapon.boomerangDistance
             : 5f;
 
+        _boomerangInFlight = true;
+        SetBoomerangWeaponThrownVisual(true);
+
+        boomerang.OnBoomerangFinished += HandleBoomerangFinished;
         boomerang.Init(transform, dir, bulletSpeed, finalDamage, distance);
+    }
+
+    void HandleBoomerangFinished(BoomerangProjectile boomerang, bool returnedToOwner)
+    {
+        if (boomerang != null)
+            boomerang.OnBoomerangFinished -= HandleBoomerangFinished;
+
+        _boomerangInFlight = false;
+        SetBoomerangWeaponThrownVisual(false);
+    }
+
+    void SetBoomerangWeaponThrownVisual(bool thrown)
+    {
+        if (_weaponSpriteRenderer == null)
+            return;
+
+        if (!thrown)
+        {
+            _weaponSpriteRenderer.sprite = _defaultWeaponSprite;
+            return;
+        }
+
+        if (_currentWeapon != null && _currentWeapon.boomerangThrownWeaponSprite != null)
+            _weaponSpriteRenderer.sprite = _currentWeapon.boomerangThrownWeaponSprite;
     }
 
     void MeleeAttack(Vector2 baseDir)
@@ -248,13 +336,10 @@ public class PlayerShooter : MonoBehaviour
                 continue;
 
             Vector2 dirToEnemy = ((Vector2)enemy.transform.position - (Vector2)transform.position).normalized;
-
             float angle = Vector2.Angle(baseDir, dirToEnemy);
 
             if (angle <= attackAngle * 0.5f)
-            {
                 enemy.TakeDamage(finalDamage);
-            }
         }
     }
 
@@ -265,6 +350,8 @@ public class PlayerShooter : MonoBehaviour
 
         _firePoint = null;
         _weaponSpriteRenderer = null;
+        _defaultWeaponSprite = null;
+        _boomerangInFlight = false;
 
         if (_currentWeapon == null || _currentWeapon.weaponPrefab == null || weaponPivot == null)
             return;
@@ -272,29 +359,17 @@ public class PlayerShooter : MonoBehaviour
         GameObject weaponGO = Instantiate(_currentWeapon.weaponPrefab, weaponPivot);
         weaponGO.transform.localPosition = new Vector3(weaponOrbitRadius, 0f, 0f);
         weaponGO.transform.localRotation = Quaternion.identity;
-        weaponGO.transform.localScale = Vector3.one * 0.5f;
 
         _currentWeaponInstance = weaponGO.GetComponent<WeaponInstance>();
 
         if (_currentWeaponInstance != null)
             _firePoint = _currentWeaponInstance.firePoint;
 
-        _weaponSpriteRenderer = weaponGO.GetComponentInChildren<SpriteRenderer>();
         _weaponBaseScale = weaponGO.transform.localScale;
-    }
 
-    void UpdateWeaponFlip()
-    {
-        if (_currentWeaponInstance == null || weaponAim == null || weaponPivot == null)
-            return;
-
-        if (!weaponAim.TryGetMouseWorldPosition(out Vector3 mouseWorld))
-            return;
-
-        bool mouseOnLeft = mouseWorld.x < weaponPivot.position.x;
-
+        _weaponSpriteRenderer = weaponGO.GetComponentInChildren<SpriteRenderer>();
         if (_weaponSpriteRenderer != null)
-            _weaponSpriteRenderer.flipY = mouseOnLeft;
+            _defaultWeaponSprite = _weaponSpriteRenderer.sprite;
     }
 
     void PlayShootSound()
@@ -331,12 +406,10 @@ public class PlayerShooter : MonoBehaviour
 
         Vector3 spawnPos = transform.position + (Vector3)(baseDir.normalized * meleeSlashDistance);
 
-        float angle = Mathf.Atan2(baseDir.y, baseDir.x) * Mathf.Rad2Deg;
-
         Instantiate(
             meleeSlashPrefab,
             spawnPos,
-            Quaternion.Euler(0f, 0f, angle)
+            Quaternion.identity
         );
     }
 }

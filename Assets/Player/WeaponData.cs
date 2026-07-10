@@ -19,9 +19,11 @@ public class WeaponData : ScriptableObject
 
     [Header("Projectile")]
     public float bulletSpeed = 10f;
-    public float bulletRange = 8f;   // NUEVO
+    public float bulletRange = 8f;
     public int bulletsPerShot = 1;
     public float spreadAngle = 0f;
+    public float singleShotBloomAngle = 0f;
+    public float bulletSize = 1f;
     public GameObject bulletPrefab;
 
     [Header("Prefab")]
@@ -29,6 +31,7 @@ public class WeaponData : ScriptableObject
 
     [Header("Boomerang")]
     public float boomerangDistance = 5f;
+    public Sprite boomerangThrownWeaponSprite; // NUEVO
 
     [Header("Audio")]
     public AudioClip shootSound;

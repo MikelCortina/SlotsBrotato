@@ -14,16 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponName: Boomerang
   description: 
-  icon: {fileID: 3548383687872758137, guid: 7992d39aeee6dc24497ae33074b8ad11, type: 3}
+  icon: {fileID: 21300000, guid: e2f39dd0204e3284dbf4be26748fdd1c, type: 3}
   weaponType: 1
   damage: 20
   damageScalingFactor: 1
   fireRate: 0.8
   fireRateScalingFactor: 0.1
-  bulletSpeed: 9
+  bulletSpeed: 10
+  bulletRange: 5
   bulletsPerShot: 1
   spreadAngle: 0
+  singleShotBloomAngle: 0
+  bulletSize: 1.5
   bulletPrefab: {fileID: 2148095309717484689, guid: a9284964cf47e574cb37b6d3fb9babb4, type: 3}
   weaponPrefab: {fileID: 1855688961912401076, guid: e45de4123ffba3443a043a70e9e11937, type: 3}
-  boomerangDistance: 6
+  boomerangDistance: 4
+  boomerangThrownWeaponSprite: {fileID: 21300000, guid: 87e6fa9191f09b346a06a35ac001a984, type: 3}
   shootSound: {fileID: 8300000, guid: bfb4389b1ea54d043851752b44d97f0e, type: 3}

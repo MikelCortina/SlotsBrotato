@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,9 @@ public class BoomerangProjectile : MonoBehaviour
     public float maxDistance = 5f;
     public float returnDistance = 0.4f;
 
+    [Header("Rotation")]
+    public float spinSpeed = 720f;
+
     [Header("Chain Boomerang")]
     public float chainSearchRadius = 5f;
     public int maxChainTargets = 2;
@@ -17,8 +21,11 @@ public class BoomerangProjectile : MonoBehaviour
     private Vector2 _startPosition;
     private bool _returning;
     private int _chainCount;
+    private bool _hasReturnedToOwner;
 
     private readonly HashSet<EnemyHealth> _hitEnemies = new HashSet<EnemyHealth>();
+
+    public event Action<BoomerangProjectile, bool> OnBoomerangFinished;
 
     public void Init(Transform owner, Vector2 direction, float spd, float dmg, float distance)
     {
@@ -30,6 +37,7 @@ public class BoomerangProjectile : MonoBehaviour
         _startPosition = transform.position;
         _returning = false;
         _chainCount = 0;
+        _hasReturnedToOwner = false;
         _hitEnemies.Clear();
     }
 
@@ -37,9 +45,11 @@ public class BoomerangProjectile : MonoBehaviour
     {
         if (_owner == null)
         {
-            Destroy(gameObject);
+            NotifyAndDestroy(false);
             return;
         }
+
+        transform.Rotate(0f, 0f, spinSpeed * Time.deltaTime, Space.Self);
 
         if (!_returning)
         {
@@ -54,15 +64,16 @@ public class BoomerangProjectile : MonoBehaviour
             transform.position += (Vector3)(toOwner * speed * Time.deltaTime);
 
             if (Vector2.Distance(transform.position, _owner.position) <= returnDistance)
-                Destroy(gameObject);
+            {
+                _hasReturnedToOwner = true;
+                NotifyAndDestroy(true);
+            }
         }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Enemy")) return;
-
-        EnemyHealth health = other.GetComponent<EnemyHealth>();
+        EnemyHealth health = other.GetComponentInParent<EnemyHealth>();
         if (health == null) return;
         if (_hitEnemies.Contains(health)) return;
 
@@ -98,33 +109,30 @@ public class BoomerangProjectile : MonoBehaviour
             return;
         }
 
-        Vector2 toEnemy =
-            ((Vector2)nextEnemy.transform.position - (Vector2)transform.position).normalized;
+        Vector2 targetPosition = nextEnemy.transform.position;
+        Vector2 toEnemy = (targetPosition - (Vector2)transform.position).normalized;
 
         _direction = toEnemy;
         _startPosition = transform.position;
         _chainCount++;
+        _returning = false;
     }
 
     EnemyHealth FindNextEnemy()
     {
-        Collider2D[] hits =
-            Physics2D.OverlapCircleAll(transform.position, chainSearchRadius);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, chainSearchRadius);
 
         EnemyHealth bestEnemy = null;
         float bestDistance = float.MaxValue;
 
         foreach (var hit in hits)
         {
-            if (!hit.CompareTag("Enemy")) continue;
-
-            EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
+            EnemyHealth enemy = hit.GetComponentInParent<EnemyHealth>();
             if (enemy == null) continue;
             if (_hitEnemies.Contains(enemy)) continue;
             if (enemy.currentHealth <= 0) continue;
 
-            float distance =
-                Vector2.Distance(transform.position, enemy.transform.position);
+            float distance = Vector2.Distance(transform.position, enemy.transform.position);
 
             if (distance < bestDistance)
             {
@@ -134,5 +142,25 @@ public class BoomerangProjectile : MonoBehaviour
         }
 
         return bestEnemy;
+    }
+
+    void NotifyAndDestroy(bool returnedToOwner)
+    {
+        OnBoomerangFinished?.Invoke(this, returnedToOwner);
+        Destroy(gameObject);
+    }
+
+    void OnDestroy()
+    {
+        if (!_hasReturnedToOwner && _owner != null)
+        {
+            OnBoomerangFinished?.Invoke(this, false);
+        }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, chainSearchRadius);
     }
 }
