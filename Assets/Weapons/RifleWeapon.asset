@@ -16,7 +16,7 @@ MonoBehaviour:
   description: 
   icon: {fileID: 21300000, guid: 1d20e79067bfdde4582b2089ba11e7d7, type: 3}
   weaponType: 0
-  damage: 50
+  damage: 1
   damageScalingFactor: 1
   fireRate: 8
   fireRateScalingFactor: 0.1
@@ -24,7 +24,7 @@ MonoBehaviour:
   bulletRange: 5
   bulletsPerShot: 1
   spreadAngle: 0
-  singleShotBloomAngle: 20
+  singleShotBloomAngle: 0
   bulletSize: 0.75
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
   weaponPrefab: {fileID: 1855688961912401076, guid: 116c7012ed8314f43b085b2c963b98a9, type: 3}

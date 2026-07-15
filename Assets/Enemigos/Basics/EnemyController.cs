@@ -20,11 +20,21 @@ public class EnemyController : MonoBehaviour
     [Range(0f, 1f)] public float idlePortion = 0.35f;
     [Range(0f, 1f)] public float movePortion = 0.65f;
 
+    [Header("Hit Reaction")]
+    public float hitGroundLockTime = 0.10f;
+    public float hitFallSmoothTime = 0.05f;
+    public float maxHitFallSpeed = 20f;
+
     private float _baseSpeed;
     private float _slowTimer;
     private float _cycleTime;
     private float _cyclePhase;
     private float _bouncePhase;
+    private float _hitGroundLockTimer;
+
+    private float _visualY;
+    private float _visualYVelocity;
+    private bool _recoveringToGround;
 
     private Rigidbody2D _rb;
     private Animator _animator;
@@ -66,6 +76,9 @@ public class EnemyController : MonoBehaviour
 
         float cycleDuration = 1f / bounceFrequency;
         _cycleTime = Random.Range(0f, cycleDuration);
+
+        if (visualRoot != null)
+            _visualY = visualRoot.localPosition.y;
     }
 
     void Update()
@@ -84,6 +97,15 @@ public class EnemyController : MonoBehaviour
                 EndKnockback();
         }
 
+        if (_hitGroundLockTimer > 0f)
+            _hitGroundLockTimer -= Time.deltaTime;
+
+        if (_recoveringToGround)
+        {
+            UpdateRecoverToGround();
+            return;
+        }
+
         float cycleDuration = 1f / bounceFrequency;
         _cycleTime += Time.deltaTime;
         _cyclePhase = (_cycleTime / cycleDuration) % 1f;
@@ -100,11 +122,40 @@ public class EnemyController : MonoBehaviour
             _bouncePhase = 0f;
         }
 
+        _visualY = _bouncePhase * bounceHeight;
+        ApplyVisualY();
+    }
+
+    private void UpdateRecoverToGround()
+    {
+        _bouncePhase = 0f;
+
+        _visualY = Mathf.SmoothDamp(
+            _visualY,
+            0f,
+            ref _visualYVelocity,
+            hitFallSmoothTime,
+            maxHitFallSpeed,
+            Time.deltaTime
+        );
+
+        if (Mathf.Abs(_visualY) <= 0.01f)
+        {
+            _visualY = 0f;
+            _visualYVelocity = 0f;
+            _recoveringToGround = false;
+        }
+
+        ApplyVisualY();
+    }
+
+    private void ApplyVisualY()
+    {
         if (visualRoot != null)
-            visualRoot.localPosition = new Vector3(0f, _bouncePhase * bounceHeight, 0f);
+            visualRoot.localPosition = new Vector3(0f, _visualY, 0f);
 
         if (_animator != null)
-            _animator.SetFloat("bouncePhase", _bouncePhase);
+            _animator.SetFloat("bouncePhase", bounceHeight > 0.0001f ? _visualY / bounceHeight : 0f);
     }
 
     public void StartKnockback(Vector2 velocity, float duration)
@@ -138,7 +189,7 @@ public class EnemyController : MonoBehaviour
             return;
         }
 
-        bool canMove = _cyclePhase >= idlePortion;
+        bool canMove = _cyclePhase >= idlePortion && _hitGroundLockTimer <= 0f;
 
         if (!canMove)
         {
@@ -200,6 +251,23 @@ public class EnemyController : MonoBehaviour
     {
         speed = _baseSpeed * multiplier;
         _slowTimer = duration;
+    }
+
+    public void OnReceiveDamageBounceReset(float customLockTime = -1f)
+    {
+        _cycleTime = 0f;
+        _cyclePhase = 0f;
+        _bouncePhase = 0f;
+
+        _hitGroundLockTimer = customLockTime > 0f ? customLockTime : hitGroundLockTime;
+
+        if (visualRoot != null)
+            _visualY = visualRoot.localPosition.y;
+        else
+            _visualY = 0f;
+
+        _visualYVelocity = 0f;
+        _recoveringToGround = true;
     }
 
     void OnDrawGizmosSelected()

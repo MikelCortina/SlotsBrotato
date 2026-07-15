@@ -116,7 +116,13 @@ public class RotateToMouseRenderTexture : MonoBehaviour
         targetLocalPos.y += downOffsetY * downT;
 
         if (enableRecoil)
-            targetLocalPos += _currentRecoilOffset;
+        {
+            targetLocalPos += new Vector3(
+                _currentRecoilOffset.x * facingSign,
+                _currentRecoilOffset.y,
+                0f
+            );
+        }
 
         transform.localPosition = targetLocalPos;
     }
@@ -156,16 +162,12 @@ public class RotateToMouseRenderTexture : MonoBehaviour
         if (!enableRecoil)
             return;
 
-        float facingSign = 1f;
-        if (transform.parent != null)
-            facingSign = Mathf.Sign(transform.parent.localScale.x);
-
         _targetRecoilOffset += new Vector3(
-        recoilDistanceX * facingSign,
-        recoilDistanceY,
-        0f
+            recoilDistanceX,
+            recoilDistanceY,
+            0f
         );
 
-        _targetRecoilAngle += recoilAngleKick * -facingSign;
+        _targetRecoilAngle += recoilAngleKick;
     }
 }

@@ -2,28 +2,35 @@ using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Animator))]
 public class DasherEnemyController : MonoBehaviour
 {
-    [Header("Move")]
-    public float moveSpeed = 2.5f;
-    public float acceleration = 8f;
-
     [Header("Dash")]
     public float dashTriggerDistance = 5f;
-    public float chargeTime = 1f;
     public float dashSpeed = 12f;
     public float dashDuration = 0.25f;
     public float recoveryTime = 1f;
 
+    [Header("Animation")]
+    public string dashStartTrigger = "DashStart";
+    public string isDashingBool = "IsDashing";
+
     Rigidbody2D _rb;
+    Animator _animator;
     Transform _player;
-    Vector2 _currentVelocity;
-    bool _isDashing;
+
     bool _isBusy;
+    bool _isDashing;
+    bool _dashRoutineRunning;
+    bool _dashStartedByAnimation;
+
+    Vector2 _storedDashDirection;
 
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
+
         _rb.gravityScale = 0f;
         _rb.freezeRotation = true;
     }
@@ -39,44 +46,47 @@ public class DasherEnemyController : MonoBehaviour
     void FixedUpdate()
     {
         if (_player == null) return;
-        if (_isBusy || _isDashing) return;
+        if (_isBusy || _dashRoutineRunning) return;
 
-        Vector2 pos = _rb.position;
-        Vector2 toPlayer = (Vector2)_player.position - pos;
-        float distance = toPlayer.magnitude;
+        float distance = Vector2.Distance(_rb.position, _player.position);
 
         if (distance <= dashTriggerDistance)
         {
-            StartCoroutine(DashRoutine(toPlayer.normalized));
-            return;
+            _storedDashDirection = ((Vector2)_player.position - _rb.position).normalized;
+            StartCoroutine(DashRoutine());
         }
-
-        Vector2 desiredVelocity = toPlayer.normalized * moveSpeed;
-
-        _currentVelocity = Vector2.MoveTowards(
-            _currentVelocity,
-            desiredVelocity,
-            acceleration * Time.fixedDeltaTime
-        );
-
-        _rb.MovePosition(pos + _currentVelocity * Time.fixedDeltaTime);
     }
 
-    IEnumerator DashRoutine(Vector2 dashDirection)
+    IEnumerator DashRoutine()
     {
+        _dashRoutineRunning = true;
         _isBusy = true;
-        _currentVelocity = Vector2.zero;
+        _isDashing = false;
+        _dashStartedByAnimation = false;
 
-        yield return new WaitForSeconds(chargeTime);
+        _rb.linearVelocity = Vector2.zero;
+
+        if (_animator != null)
+        {
+            _animator.ResetTrigger(dashStartTrigger);
+            _animator.SetTrigger(dashStartTrigger);
+            _animator.SetBool(isDashingBool, false);
+        }
+
+        while (!_dashStartedByAnimation)
+            yield return null;
 
         _isDashing = true;
+
+        if (_animator != null)
+            _animator.SetBool(isDashingBool, true);
 
         float elapsed = 0f;
 
         while (elapsed < dashDuration)
         {
             _rb.MovePosition(
-                _rb.position + dashDirection * dashSpeed * Time.fixedDeltaTime
+                _rb.position + _storedDashDirection * dashSpeed * Time.fixedDeltaTime
             );
 
             elapsed += Time.fixedDeltaTime;
@@ -84,9 +94,19 @@ public class DasherEnemyController : MonoBehaviour
         }
 
         _isDashing = false;
+        _rb.linearVelocity = Vector2.zero;
+
+        if (_animator != null)
+            _animator.SetBool(isDashingBool, false);
 
         yield return new WaitForSeconds(recoveryTime);
 
         _isBusy = false;
+        _dashRoutineRunning = false;
+    }
+
+    public void AnimationEvent_BeginDash()
+    {
+        _dashStartedByAnimation = true;
     }
 }
