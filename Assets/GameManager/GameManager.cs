@@ -47,6 +47,10 @@ public class GameManager : MonoBehaviour
     [Header("Tienda")]
     public float shopDuration = 15f;
 
+
+    [Header("Spawner")]
+    [SerializeField] private EnemySpawner enemySpawner;
+
     public int CurrentWave { get; private set; }
     public int Score { get; private set; }
     public int EnemiesAlive { get; private set; }
@@ -162,6 +166,11 @@ public class GameManager : MonoBehaviour
         {
             CurrentSpecialWaveType = GetRandomSpecialWaveType();
             Debug.Log($"Oleada especial: {CurrentSpecialWaveType}");
+        }
+
+        if (enemySpawner != null)
+        {
+            enemySpawner.PrintWavePreview(wave);
         }
 
         if (bossSpawner != null && wave % 5 == 0)
@@ -504,4 +513,85 @@ public class GameManager : MonoBehaviour
         int random = Random.Range(1, 4);
         return (SpecialWaveType)random;
     }
+
+
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+
+    [Header("Debug de oleadas")]
+    [SerializeField] private int debugWave = 1;
+
+    public void DebugStartSelectedWave()
+    {
+        DebugJumpToWave(debugWave);
+    }
+
+    public void DebugNextWave()
+    {
+        DebugJumpToWave(CurrentWave + 1);
+    }
+
+    public void DebugPreviousWave()
+    {
+        DebugJumpToWave(Mathf.Max(1, CurrentWave - 1));
+    }
+
+    public void DebugRestartWave()
+    {
+        DebugJumpToWave(CurrentWave);
+    }
+
+    public void DebugFinishCurrentWave()
+    {
+        if (!IsWaveRunning)
+            return;
+
+        WaveTimeRemaining = 0f;
+    }
+
+    public void DebugJumpToWave(int targetWave)
+    {
+        targetWave = Mathf.Clamp(targetWave, 1, finalWave);
+
+        StopAllCoroutines();
+        CleanupWaveEnemies();
+
+        _isGameOver = false;
+        _shopClosed = false;
+
+        CurrentWave = targetWave;
+        WaveTimeRemaining = GetWaveDuration(CurrentWave);
+
+        IsInShop = false;
+        IsWaveRunning = true;
+
+        if (SlotMachine.Instance != null)
+        {
+            SlotMachine.Instance.IsChargeLocked = false;
+            SlotMachine.Instance.ResetChargeForNewWave();
+        }
+
+        PlayerController playerController = GetPlayerController();
+
+        if (playerController != null)
+        {
+            playerController.enabled = true;
+            playerController.IsMovementLocked = false;
+        }
+
+        if (uiFlow != null)
+            uiFlow.ShowGameplayImmediate();
+
+        ApplyTimeScale();
+        ApplyCursorState();
+        UpdateUI();
+
+        StartCoroutine(GameLoop());
+
+        Debug.Log($"DEBUG: iniciando oleada {CurrentWave}");
+    }
+
+#endif
 }
+
+
