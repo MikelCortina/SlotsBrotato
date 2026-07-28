@@ -131,12 +131,12 @@ public class EnemyController : MonoBehaviour
         _bouncePhase = 0f;
 
         _visualY = Mathf.SmoothDamp(
-            _visualY,
-            0f,
-            ref _visualYVelocity,
-            hitFallSmoothTime,
-            maxHitFallSpeed,
-            Time.deltaTime
+        _visualY,
+        0f,
+        ref _visualYVelocity,
+        hitFallSmoothTime,
+        maxHitFallSpeed,
+        Time.deltaTime
         );
 
         if (Mathf.Abs(_visualY) <= 0.01f)
@@ -203,8 +203,8 @@ public class EnemyController : MonoBehaviour
         float speedMult = dist < arrivalRadius ? dist / arrivalRadius : 1f;
 
         Vector2 desiredVelocity = dist > 0.001f
-            ? toPlayer.normalized * speed * speedMult
-            : Vector2.zero;
+        ? toPlayer.normalized * speed * speedMult
+        : Vector2.zero;
 
         Vector2 sepForce = Vector2.zero;
         Collider2D[] neighbors = Physics2D.OverlapCircleAll(pos, separationRadius);
@@ -224,9 +224,9 @@ public class EnemyController : MonoBehaviour
         desiredVelocity += sepForce;
 
         _currentVelocity = Vector2.MoveTowards(
-            _currentVelocity,
-            desiredVelocity,
-            acceleration * Time.fixedDeltaTime
+        _currentVelocity,
+        desiredVelocity,
+        acceleration * Time.fixedDeltaTime
         );
 
         _rb.MovePosition(pos + _currentVelocity * Time.fixedDeltaTime);
