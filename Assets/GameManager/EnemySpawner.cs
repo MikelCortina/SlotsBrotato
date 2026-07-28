@@ -71,34 +71,43 @@ public class EnemySpawner : MonoBehaviour
             _spawnRoutine = null;
         }
     }
-
     IEnumerator SpawnLoop()
     {
         while (_running)
         {
-            if (GameManager.Instance == null || !GameManager.Instance.IsWaveRunning)
+            if (GameManager.Instance == null ||
+                !GameManager.Instance.IsWaveRunning)
             {
                 yield return null;
                 continue;
             }
 
             int wave = GameManager.Instance.CurrentWave;
-            _spawnBudget = spawnBudgetPerSecond + (wave - 1) * spawnBudgetIncreasePerWave;
 
-            if (GameManager.Instance != null &&
-                GameManager.Instance.CurrentSpecialWaveType == SpecialWaveType.Swarm)
+            _spawnBudget =
+                spawnBudgetPerSecond +
+                (wave - 1) * spawnBudgetIncreasePerWave;
+
+            if (GameManager.Instance.CurrentSpecialWaveType ==
+                SpecialWaveType.Swarm)
             {
                 _spawnBudget *= specialWaveSpawnMultiplier;
             }
 
-            while (_running && GameManager.Instance != null && GameManager.Instance.IsWaveRunning)
+            while (_running &&
+                   GameManager.Instance != null &&
+                   GameManager.Instance.IsWaveRunning)
             {
+                // Si el debug cambia de oleada, salir y recalcular todo.
+                if (GameManager.Instance.CurrentWave != wave)
+                    break;
+
                 _spawnBudget += Time.deltaTime;
 
                 while (_spawnBudget >= 1f)
                 {
                     _spawnBudget -= 1f;
-                    StartCoroutine(SpawnEnemyWithWarning(wave));
+                    StartCoroutine(SpawnEnemyWithWarning());
                 }
 
                 yield return null;
@@ -106,7 +115,7 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    IEnumerator SpawnEnemyWithWarning(int wave)
+    IEnumerator SpawnEnemyWithWarning()
     {
         if (enemyPrefab == null) yield break;
 
@@ -126,6 +135,10 @@ public class EnemySpawner : MonoBehaviour
 
         if (GameManager.Instance == null || !GameManager.Instance.IsWaveRunning)
             yield break;
+
+        // Leer la oleada actual justo antes de crear el enemigo.
+        // Así el botón Start Wave aplica inmediatamente la nueva oleada.
+        int wave = GameManager.Instance.CurrentWave;
 
         GameObject prefabToSpawn = enemyPrefab;
 
@@ -246,5 +259,85 @@ public class EnemySpawner : MonoBehaviour
     bool IsSpecialWave(int wave)
     {
         return specialWaveInterval > 0 && wave % specialWaveInterval == 0;
+    }
+
+    public void PrintWavePreview(int wave)
+    {
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("No existe GameManager para calcular la oleada.");
+            return;
+        }
+
+        float duration = GameManager.Instance.GetWaveDuration(wave);
+
+        float budgetPerSecond =
+            spawnBudgetPerSecond +
+            (wave - 1) * spawnBudgetIncreasePerWave;
+
+        bool isSwarm =
+            GameManager.Instance.CurrentSpecialWaveType ==
+            SpecialWaveType.Swarm;
+
+        if (isSwarm)
+            budgetPerSecond *= specialWaveSpawnMultiplier;
+
+        int estimatedTotal =
+            Mathf.Max(1, Mathf.RoundToInt(duration * budgetPerSecond));
+
+        float normalChance = 1f;
+        float spitterChance = 0f;
+        float ringSpitterChance = 0f;
+        float dasherChance = 0f;
+
+        if (wave >= 12)
+        {
+            dasherChance = 0.08f;
+            ringSpitterChance = 0.10f;
+            spitterChance = 0.20f;
+            normalChance = 0.62f;
+        }
+        else if (wave >= 10)
+        {
+            ringSpitterChance = 0.18f;
+            spitterChance = 0.20f;
+            normalChance = 0.62f;
+        }
+        else if (wave >= 5)
+        {
+            spitterChance = 0.38f;
+            normalChance = 0.62f;
+        }
+
+        int estimatedDashers =
+            Mathf.RoundToInt(estimatedTotal * dasherChance);
+
+        int estimatedRingSpitters =
+            Mathf.RoundToInt(estimatedTotal * ringSpitterChance);
+
+        int estimatedSpitters =
+            Mathf.RoundToInt(estimatedTotal * spitterChance);
+
+        int estimatedNormals =
+            estimatedTotal -
+            estimatedDashers -
+            estimatedRingSpitters -
+            estimatedSpitters;
+
+        string specialType =
+            GameManager.Instance.CurrentSpecialWaveType.ToString();
+
+        Debug.Log(
+            $"\n========== PREVISIÓN OLEADA {wave} ==========\n" +
+            $"Duración: {duration:0} segundos\n" +
+            $"Presupuesto por segundo: {budgetPerSecond:0.00}\n" +
+            $"Tipo especial: {specialType}\n" +
+            $"Total aproximado: {estimatedTotal}\n\n" +
+            $"Normales: {estimatedNormals} ({normalChance * 100f:0}%)\n" +
+            $"Spitters: {estimatedSpitters} ({spitterChance * 100f:0}%)\n" +
+            $"Ring Spitters: {estimatedRingSpitters} ({ringSpitterChance * 100f:0}%)\n" +
+            $"Dashers: {estimatedDashers} ({dasherChance * 100f:0}%)\n" +
+            $"============================================"
+        );
     }
 }

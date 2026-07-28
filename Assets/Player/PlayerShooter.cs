@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerShooter : MonoBehaviour
 {
@@ -20,6 +21,9 @@ public class PlayerShooter : MonoBehaviour
     public float _fireTimer;
     public PlayerStats _stats;
     public WeaponData _currentWeapon;
+
+    [Header("Bloqueo por UI")]
+    [SerializeField] private RectTransform waveDebugPanel;
 
     public WeaponInstance _currentWeaponInstance;
     public Transform _firePoint;
@@ -81,6 +85,18 @@ public class PlayerShooter : MonoBehaviour
 
         if (_boomerangInFlight)
             return;
+
+        // Solo bloquear el disparo si el cursor está dentro
+        // del panel concreto de debug.
+        if (waveDebugPanel != null &&
+            RectTransformUtility.RectangleContainsScreenPoint(
+                waveDebugPanel,
+                Input.mousePosition,
+                null
+            ))
+        {
+            return;
+        }
 
         if (shootPressed && _fireTimer <= 0f)
         {
