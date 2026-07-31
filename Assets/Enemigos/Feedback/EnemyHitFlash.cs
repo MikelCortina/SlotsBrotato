@@ -1,52 +1,39 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyHealth))]
 public class EnemyHitFlash : MonoBehaviour
 {
-    [Header("Animator")]
-    [SerializeField] private Animator targetAnimator;
-    [SerializeField] private string hitTriggerName = "Hit";
-
-    [Header("Hit State")]
-    [SerializeField] private string hitStateName = "Hit";
-    [SerializeField] private int animatorLayer = 0;
-
-    [Header("Block Hit On States")]
-    [Tooltip("Estados en los que NO se lanzará el hit. Ej: Base Layer.Death")]
-    [SerializeField] private List<string> blockedStates = new List<string>();
-
-    [Header("Blocked Hit Flash")]
-    [SerializeField] private SpriteRenderer flashSpriteRenderer;
+    [Header("Visual")]
+    [SerializeField] private SpriteRenderer targetSpriteRenderer;
     [SerializeField] private Color flashColor = Color.white;
     [SerializeField] private float flashDuration = 0.06f;
+    [SerializeField][Range(0f, 1f)] private float flashAmount = 1f;
 
     private EnemyHealth _health;
-    private int _hitTriggerHash;
-    private int _hitStateHash;
-
-    private Color _originalColor;
     private Coroutine _flashCoroutine;
+    private MaterialPropertyBlock _propertyBlock;
+
+    private static readonly int FlashColorId = Shader.PropertyToID("_FlashColor");
+    private static readonly int FlashAmountId = Shader.PropertyToID("_FlashAmount");
 
     void Awake()
     {
         _health = GetComponent<EnemyHealth>();
 
-        if (targetAnimator == null)
-            targetAnimator = GetComponentInChildren<Animator>();
+        if (targetSpriteRenderer == null)
+            targetSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
-        _hitTriggerHash = Animator.StringToHash(hitTriggerName);
-        _hitStateHash = Animator.StringToHash(hitStateName);
-
-        if (flashSpriteRenderer != null)
-            _originalColor = flashSpriteRenderer.color;
+        if (targetSpriteRenderer != null)
+            _propertyBlock = new MaterialPropertyBlock();
     }
 
     void OnEnable()
     {
         if (_health != null)
             _health.OnDamaged += HandleDamaged;
+
+        ResetFlash();
     }
 
     void OnDisable()
@@ -57,71 +44,57 @@ public class EnemyHitFlash : MonoBehaviour
         if (_flashCoroutine != null)
             StopCoroutine(_flashCoroutine);
 
-        RestoreColor();
+        _flashCoroutine = null;
+        ResetFlash();
     }
 
     private void HandleDamaged(float amount, float currentHp)
     {
-        if (targetAnimator == null)
+        if (targetSpriteRenderer == null)
         {
-            Debug.LogWarning($"{name}: targetAnimator es null");
+            Debug.LogWarning($"{name}: targetSpriteRenderer es null");
             return;
         }
 
-        if (IsInBlockedState())
-        {
-            TriggerBlockedFlash();
-            return;
-        }
-
-        targetAnimator.ResetTrigger(_hitTriggerHash);
-        targetAnimator.SetTrigger(_hitTriggerHash);
-        targetAnimator.Play(_hitStateHash, animatorLayer, 0f);
-        targetAnimator.Update(0f);
-    }
-
-    private bool IsInBlockedState()
-    {
-        AnimatorStateInfo currentState = targetAnimator.GetCurrentAnimatorStateInfo(animatorLayer);
-
-        for (int i = 0; i < blockedStates.Count; i++)
-        {
-            string stateName = blockedStates[i];
-
-            if (string.IsNullOrWhiteSpace(stateName))
-                continue;
-
-            if (currentState.IsName(stateName))
-                return true;
-        }
-
-        return false;
-    }
-
-    private void TriggerBlockedFlash()
-    {
-        if (flashSpriteRenderer == null)
-            return;
+        if (_propertyBlock == null)
+            _propertyBlock = new MaterialPropertyBlock();
 
         if (_flashCoroutine != null)
             StopCoroutine(_flashCoroutine);
 
-        _flashCoroutine = StartCoroutine(BlockedFlashCoroutine());
+        _flashCoroutine = StartCoroutine(FlashCoroutine());
     }
 
-    private IEnumerator BlockedFlashCoroutine()
+    private IEnumerator FlashCoroutine()
     {
-        flashSpriteRenderer.color = flashColor;
+        SetFlash(flashColor, flashAmount);
         yield return new WaitForSeconds(flashDuration);
-        RestoreColor();
+        ResetFlash();
         _flashCoroutine = null;
     }
 
-    private void RestoreColor()
+    private void SetFlash(Color color, float amount)
     {
-        if (flashSpriteRenderer == null)
+        if (targetSpriteRenderer == null)
             return;
 
-        flashSpriteRenderer.color = _originalColor;
+        targetSpriteRenderer.GetPropertyBlock(_propertyBlock);
+        _propertyBlock.SetColor(FlashColorId, color);
+        _propertyBlock.SetFloat(FlashAmountId, amount);
+        targetSpriteRenderer.SetPropertyBlock(_propertyBlock);
+    }
+
+    private void ResetFlash()
+    {
+        if (targetSpriteRenderer == null)
+            return;
+
+        if (_propertyBlock == null)
+            _propertyBlock = new MaterialPropertyBlock();
+
+        targetSpriteRenderer.GetPropertyBlock(_propertyBlock);
+        _propertyBlock.SetColor(FlashColorId, flashColor);
+        _propertyBlock.SetFloat(FlashAmountId, 0f);
+        targetSpriteRenderer.SetPropertyBlock(_propertyBlock);
     }
 }

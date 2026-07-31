@@ -30,4 +30,13 @@ MonoBehaviour:
   weaponPrefab: {fileID: 1855688961912401076, guid: 116c7012ed8314f43b085b2c963b98a9, type: 3}
   boomerangDistance: 5
   boomerangThrownWeaponSprite: {fileID: 0}
+  shellPrefab: {fileID: 2148095309717484689, guid: 8641a3823b01dc84ab0a3452d364aeec, type: 3}
+  shellsPerShot: 1
+  shellEjectPointName: ShellEjectPoint
+  shellEjectAngle: 175
+  shellEjectAngleRandom: 12
+  shellEjectForce: 2.5
+  shellTorque: 120
+  firePointName: FirePoint
+  muzzleVFXPointName: MuzzleVFXPoint
   shootSound: {fileID: 8300000, guid: e0ce80b2dae256f4c8cf8b94d9ca4d12, type: 3}

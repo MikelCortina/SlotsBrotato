@@ -21,6 +21,10 @@ public class CameraFollow2D : MonoBehaviour
     [Header("Zoom transición")]
     [SerializeField] private bool transitionZoomActive;
 
+    [Header("Shake")]
+    public float shakeDuration = 0.2f;
+    public float shakeMagnitude = 0.15f;
+
     private Camera cam;
 
     private float baseOrthographicSize;
@@ -29,6 +33,9 @@ public class CameraFollow2D : MonoBehaviour
     private float transitionDuration;
     private float transitionElapsed;
     private Vector3 frozenPosition;
+
+    private float shakeTimer;
+    private Vector3 shakeOffset;
 
     void Awake()
     {
@@ -45,7 +52,7 @@ public class CameraFollow2D : MonoBehaviour
         if (transitionZoomActive)
         {
             UpdateTransitionZoomOnly();
-            transform.position = frozenPosition;
+            transform.position = frozenPosition + GetShakeOffset();
             return;
         }
 
@@ -76,7 +83,41 @@ public class CameraFollow2D : MonoBehaviour
         if (boundTop != null)
             smoothedPosition.y = Mathf.Min(smoothedPosition.y, boundTop.position.y - halfHeight);
 
-        transform.position = smoothedPosition;
+        transform.position = smoothedPosition + GetShakeOffset();
+    }
+
+    Vector3 GetShakeOffset()
+    {
+        if (shakeTimer > 0f)
+        {
+            shakeTimer -= Time.deltaTime;
+
+            shakeOffset = new Vector3(
+                Random.Range(-shakeMagnitude, shakeMagnitude),
+                Random.Range(-shakeMagnitude, shakeMagnitude),
+                0f
+            );
+
+            if (shakeTimer <= 0f)
+            {
+                shakeTimer = 0f;
+                shakeOffset = Vector3.zero;
+            }
+        }
+
+        return shakeOffset;
+    }
+
+    public void TriggerShake()
+    {
+        shakeTimer = shakeDuration;
+    }
+
+    public void TriggerShake(float duration, float magnitude)
+    {
+        shakeDuration = duration;
+        shakeMagnitude = magnitude;
+        shakeTimer = duration;
     }
 
     void UpdateTransitionZoomOnly()

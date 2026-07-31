@@ -31,7 +31,20 @@ public class WeaponData : ScriptableObject
 
     [Header("Boomerang")]
     public float boomerangDistance = 5f;
-    public Sprite boomerangThrownWeaponSprite; // NUEVO
+    public Sprite boomerangThrownWeaponSprite;
+
+    [Header("Shell Ejection")]
+    public GameObject shellPrefab;
+    [Min(0)] public int shellsPerShot = 0;
+    public string shellEjectPointName = "ShellEjectPoint";
+    public float shellEjectAngle = 120f;
+    public float shellEjectAngleRandom = 12f;
+    public float shellEjectForce = 2.5f;
+    public float shellTorque = 120f;
+
+    [Header("Auto Find Transforms")]
+    public string firePointName = "FirePoint";
+    public string muzzleVFXPointName = "MuzzleVFXPoint";
 
     [Header("Audio")]
     public AudioClip shootSound;

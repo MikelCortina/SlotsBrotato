@@ -58,7 +58,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 8d1f00e63803563478e3316c413f7b81, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -317,10 +317,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdb3ec6afcc766946ad37806b7bbd718, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetAnimator: {fileID: 1549634066566050112}
-  hitTriggerName: A
-  hitStateName: Impacto
-  animatorLayer: 0
+  targetSpriteRenderer: {fileID: 5816935239957371402}
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  flashDuration: 0.075
+  flashAmount: 0.75
 --- !u!114 &5704340328708446050
 MonoBehaviour:
   m_ObjectHideFlags: 0
