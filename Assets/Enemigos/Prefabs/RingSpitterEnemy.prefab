@@ -19,6 +19,8 @@ GameObject:
   - component: {fileID: 4763244687152569090}
   - component: {fileID: 6354277436017179375}
   - component: {fileID: 6638300598172010739}
+  - component: {fileID: 8499045560535730004}
+  - component: {fileID: 3182726550175260175}
   m_Layer: 0
   m_Name: RingSpitterEnemy
   m_TagString: Enemy
@@ -36,7 +38,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.22707096, y: -1.6624272, z: 0}
-  m_LocalScale: {x: 0.39999998, y: 0.39999998, z: 0.39999998}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -110,8 +112,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdb3ec6afcc766946ad37806b7bbd718, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flashColor: {r: 1, g: 1, b: 1, a: 0.6039216}
-  flashDuration: 0.05
+  targetSpriteRenderer: {fileID: 1132406168940409485}
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  flashDuration: 0.075
+  flashAmount: 0.75
 --- !u!114 &5704340328708446050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,6 +129,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 50
+  visualAnimator: {fileID: 8499045560535730004}
+  deathTrigger: Die
 --- !u!212 &1132406168940409485
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -148,7 +154,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 8d1f00e63803563478e3316c413f7b81, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -169,8 +175,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.097764134, g: 1, b: 0, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 3b09e3b21a27a104e8e4e3beb8dea596, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -255,8 +261,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4daef09134bc0c54d99f88222592dd7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
-  projectilePrefab: {fileID: 2148095309717484689, guid: 99ebaf0fc6e34554699d015727ef31b3, type: 3}
+  moveSpeed: 0
+  projectilePrefab: {fileID: 2148095309717484689, guid: baa70154bdc23d744a65e357acbfd695, type: 3}
   shootInterval: 3
   projectileDamage: 2
+  attackTriggerName: Attack
   fleeDistance: 4
+--- !u!95 &8499045560535730004
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 107e3ff6ade1259449987f190c252d50, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3182726550175260175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f81ddaaa13aed84888915861ec3ad82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyHealth: {fileID: 5704340328708446050}

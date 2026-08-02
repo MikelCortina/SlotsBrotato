@@ -9,6 +9,7 @@ public class PlayerShooter : MonoBehaviour
     [SerializeField] private float weaponOrbitRadius = 1.2f;
     [SerializeField] public WeaponPivotAim weaponAim;
     [SerializeField] public bool autoFire = true;
+    [SerializeField] private Transform shellEjectPoint;
 
     [Header("Melee Visual")]
     [SerializeField] private GameObject meleeSlashPrefab;
@@ -41,6 +42,14 @@ public class PlayerShooter : MonoBehaviour
     public float spreadAngle;
     public float singleShotBloomAngle;
     public float bulletSize = 1f;
+
+    [Header("Shell Runtime Stats")]
+    public GameObject shellPrefab;
+    public int shellsPerShot;
+    public float shellEjectAngle;
+    public float shellEjectAngleRandom;
+    public float shellEjectForce;
+    public float shellTorque;
 
     [Header("Audio")]
     [SerializeField] private AudioSource _audioSource;
@@ -86,8 +95,6 @@ public class PlayerShooter : MonoBehaviour
         if (_boomerangInFlight)
             return;
 
-        // Solo bloquear el disparo si el cursor está dentro
-        // del panel concreto de debug.
         if (waveDebugPanel != null &&
             RectTransformUtility.RectangleContainsScreenPoint(
                 waveDebugPanel,
@@ -120,7 +127,8 @@ public class PlayerShooter : MonoBehaviour
 
     public void ApplyWeaponData(WeaponData weapon)
     {
-        if (weapon == null) return;
+        if (weapon == null)
+            return;
 
         _currentWeapon = weapon;
 
@@ -137,6 +145,13 @@ public class PlayerShooter : MonoBehaviour
         spreadAngle = weapon.spreadAngle;
         singleShotBloomAngle = weapon.singleShotBloomAngle;
         bulletSize = weapon.bulletSize;
+
+        shellPrefab = weapon.shellPrefab;
+        shellsPerShot = weapon.shellsPerShot;
+        shellEjectAngle = weapon.shellEjectAngle;
+        shellEjectAngleRandom = weapon.shellEjectAngleRandom;
+        shellEjectForce = weapon.shellEjectForce;
+        shellTorque = weapon.shellTorque;
 
         _lastSingleShotBloomAngle = float.NaN;
         _boomerangInFlight = false;
@@ -273,10 +288,49 @@ public class PlayerShooter : MonoBehaviour
             GameObject go = Instantiate(bulletPrefab, _firePoint.position, Quaternion.identity);
 
             Bullet bullet = go.GetComponent<Bullet>();
-            if (bullet == null) continue;
+            if (bullet == null)
+                continue;
 
             float finalDamage = GetFinalWeaponDamage();
             bullet.Init(dir, bulletSpeed, finalDamage, bulletRange, bulletSize);
+        }
+
+        EjectShells(baseDir);
+    }
+
+    void EjectShells(Vector2 shootDir)
+    {
+        if (shellPrefab == null || shellsPerShot <= 0)
+            return;
+
+        Transform ejectPoint = shellEjectPoint != null ? shellEjectPoint : _firePoint;
+        if (ejectPoint == null)
+            return;
+
+        float horizontalSign = shootDir.x >= 0f ? -1f : 1f;
+
+        for (int i = 0; i < shellsPerShot; i++)
+        {
+            float randomHorizontal = UnityEngine.Random.Range(0f, shellEjectAngleRandom);
+            float randomVertical = UnityEngine.Random.Range(0f, shellEjectAngleRandom);
+
+            float x = horizontalSign * (shellEjectAngle + randomHorizontal);
+            float y = Mathf.Abs(shellEjectForce) + randomVertical;
+
+            Vector2 ejectDir = new Vector2(x, y).normalized;
+
+            GameObject shellGO = Instantiate(
+                shellPrefab,
+                ejectPoint.position,
+                Quaternion.identity
+            );
+
+            ShellCasing shell = shellGO.GetComponent<ShellCasing>();
+            if (shell != null)
+            {
+                float randomTorque = UnityEngine.Random.Range(-shellTorque, shellTorque);
+                shell.Init(ejectDir, shellEjectForce, randomTorque);
+            }
         }
     }
 
@@ -292,7 +346,8 @@ public class PlayerShooter : MonoBehaviour
         go.transform.localScale *= bulletSize;
 
         BoomerangProjectile boomerang = go.GetComponent<BoomerangProjectile>();
-        if (boomerang == null) return;
+        if (boomerang == null)
+            return;
 
         float finalDamage = GetFinalWeaponDamage();
 
@@ -379,7 +434,10 @@ public class PlayerShooter : MonoBehaviour
         _currentWeaponInstance = weaponGO.GetComponent<WeaponInstance>();
 
         if (_currentWeaponInstance != null)
+        {
+            _currentWeaponInstance.ConfigureFromWeaponData(_currentWeapon);
             _firePoint = _currentWeaponInstance.firePoint;
+        }
 
         _weaponBaseScale = weaponGO.transform.localScale;
 
@@ -390,7 +448,8 @@ public class PlayerShooter : MonoBehaviour
 
     void PlayShootSound()
     {
-        if (_audioSource == null) return;
+        if (_audioSource == null)
+            return;
 
         AudioClip soundToPlay = _currentWeapon != null && _currentWeapon.shootSound != null
             ? _currentWeapon.shootSound

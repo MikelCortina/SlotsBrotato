@@ -13649,6 +13649,7 @@ MonoBehaviour:
   weaponOrbitRadius: 0
   weaponAim: {fileID: 477142607}
   autoFire: 1
+  shellEjectPoint: {fileID: 1826285437}
   meleeSlashPrefab: {fileID: 7501758475988855061, guid: 96011464f85fa3546b07639aa0bba25f, type: 3}
   meleeSlashDistance: 1.2
   startWeapon: {fileID: 0}
@@ -13670,6 +13671,12 @@ MonoBehaviour:
   spreadAngle: 25
   singleShotBloomAngle: 0
   bulletSize: 0
+  shellPrefab: {fileID: 0}
+  shellsPerShot: 0
+  shellEjectAngle: 0
+  shellEjectAngleRandom: 0
+  shellEjectForce: 0
+  shellTorque: 0
   _audioSource: {fileID: 809848649}
   _defaultShootSound: {fileID: 0}
   _shootSoundVolume: 0.5
@@ -13744,6 +13751,7 @@ Transform:
   - {fileID: 477142604}
   - {fileID: 2122602198}
   - {fileID: 1934441788}
+  - {fileID: 1826285437}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!58 &809848642
@@ -26608,6 +26616,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 2059314402}
   buttonClickSfx: {fileID: 8300000, guid: bb7622cf7b04c0a49a3f9b32e62cba8b, type: 3}
+  cameraFollow: {fileID: 1695375331}
 --- !u!1 &1608442811
 GameObject:
   m_ObjectHideFlags: 0
@@ -28141,6 +28150,8 @@ MonoBehaviour:
   boundTop: {fileID: 1502147739}
   boundBottom: {fileID: 256905947}
   transitionZoomActive: 0
+  shakeDuration: 0.2
+  shakeMagnitude: 0.15
 --- !u!114 &1695375332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30555,6 +30566,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1458880999}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1826285436
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1826285437}
+  m_Layer: 6
+  m_Name: ShellEjectTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1826285437
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826285436}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.59, y: -0.48, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 809848641}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1826434337
 GameObject:

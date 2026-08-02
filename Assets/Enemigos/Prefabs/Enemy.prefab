@@ -58,7 +58,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 8d1f00e63803563478e3316c413f7b81, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -210,7 +210,6 @@ GameObject:
   - component: {fileID: 601241133694424984}
   - component: {fileID: 5704340328708446050}
   - component: {fileID: 6058993248186953044}
-  - component: {fileID: 1132406168940409485}
   - component: {fileID: 4763244687152569090}
   - component: {fileID: 7175976034400577419}
   - component: {fileID: 1828510591363902687}
@@ -306,8 +305,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7376d54bfe6acc844b51ebd15b05bc2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knockbackForce: 0.5
-  knockbackDuration: 0.04
+  knockbackForce: 0
+  knockbackDuration: 0
 --- !u!114 &601241133694424984
 MonoBehaviour:
   m_ObjectHideFlags: 0

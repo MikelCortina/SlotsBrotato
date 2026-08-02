@@ -24,7 +24,19 @@ MonoBehaviour:
   bulletRange: 4
   bulletsPerShot: 5
   spreadAngle: 25
+  singleShotBloomAngle: 0
+  bulletSize: 1
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
   weaponPrefab: {fileID: 1855688961912401076, guid: 2f31bd0c0cedc1e419f0f35a10a4cd86, type: 3}
   boomerangDistance: 5
+  boomerangThrownWeaponSprite: {fileID: 0}
+  shellPrefab: {fileID: 2148095309717484689, guid: 8641a3823b01dc84ab0a3452d364aeec, type: 3}
+  shellsPerShot: 5
+  shellEjectPointName: ShellEjectPoint
+  shellEjectAngle: 120
+  shellEjectAngleRandom: 100
+  shellEjectForce: 2.5
+  shellTorque: 120
+  firePointName: FirePoint
+  muzzleVFXPointName: MuzzleVFXPoint
   shootSound: {fileID: 8300000, guid: 04d37a7e6f90b7a4ea3068a30cc0a0d4, type: 3}
