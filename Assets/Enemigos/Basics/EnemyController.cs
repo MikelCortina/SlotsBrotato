@@ -234,19 +234,35 @@ public class EnemyController : MonoBehaviour
 
     void OnTriggerStay2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Player")) return;
+        Debug.Log($"{name} tocando {collision.name}");
+
+        if (!collision.CompareTag("Player"))
+            return;
+
+        Debug.Log("PLAYER DETECTADO");
 
         if (_playerHealth == null)
             _playerHealth = collision.GetComponent<PlayerHealth>();
 
-        if (_playerHealth == null) return;
-        if (Time.time < _nextDamageTime) return;
+        Debug.Log("PlayerHealth = " + (_playerHealth != null));
+
+        if (_playerHealth == null)
+            return;
+
+        if (Time.time < _nextDamageTime)
+        {
+            Debug.Log("Cooldown");
+            return;
+        }
 
         float dmg = _enemyDamage != null ? _enemyDamage.damage : 1f;
+
+        Debug.Log("Daño = " + dmg);
+
         _nextDamageTime = Time.time + damageInterval;
+
         _playerHealth.TakeDamage(dmg);
     }
-
     public void ApplySlow(float multiplier, float duration)
     {
         speed = _baseSpeed * multiplier;

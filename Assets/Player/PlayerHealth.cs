@@ -16,9 +16,23 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private GameObject gameOverMenu;
 
+
+    [Header("Damage Shockwave")]
+    [SerializeField] private float shockwaveRadius = 3f;
+    [SerializeField] private float shockwaveForce = 12f;
+    [SerializeField] private float shockwaveDuration = 0.20f;
     private float _lastDamageTime;
     private bool _isDead;
 
+
+    [Header("Invulnerability Visual")]
+    [SerializeField] private SpriteRenderer playerSprite;
+    [SerializeField] private float blinkInterval = 0.08f;
+    [SerializeField, Range(0f, 1f)] private float blinkAlpha = 0.3f;
+    [SerializeField] private float hitFlashDuration = 0.06f;
+
+    private Coroutine _invulnerabilityVisualCoroutine;
+    private Color _originalSpriteColor;
     public float CurrentHealth => currentHealth;
     public int MaxHealth => maxHealth;
     public bool IsDead => _isDead;
@@ -38,6 +52,11 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
         if (gameOverMenu) gameOverMenu.SetActive(false);
         _shield = GetComponent<PlayerShield>();
+        if (playerSprite == null)
+            playerSprite = GetComponentInChildren<SpriteRenderer>();
+
+        if (playerSprite != null)
+            _originalSpriteColor = playerSprite.color;
         UpdateUI();
     }
 
@@ -58,22 +77,29 @@ public class PlayerHealth : MonoBehaviour
     }
     public void TakeDamage(float damage)
     {
-        if (_isDead) return;
-        if (_shield != null && _shield.TryBlockDamage())
-        {
+        if (_isDead)
             return;
-        }
-        if (Time.time < _lastDamageTime + damageCooldown) return;
+
+        if (Time.time < _lastDamageTime + damageCooldown)
+            return;
 
         _lastDamageTime = Time.time;
-        currentHealth = Mathf.Max(0, currentHealth - damage);
+        StartInvulnerabilityVisual();
+
+        if (_shield != null && _shield.TryBlockDamage())
+        {
+            OnPlayerHit();
+            return;
+        }
+
+        currentHealth = Mathf.Max(0f, currentHealth - damage);
         UpdateUI();
 
+        OnPlayerHit();
 
-        if (currentHealth <= 0)
+        if (currentHealth <= 0f)
             Die();
     }
-
     private void Die()
     {
         _isDead = true;
@@ -125,5 +151,77 @@ public class PlayerHealth : MonoBehaviour
         {
             Debug.Log("healthText es NULL, no hay referencia al texto");
         }
+    }
+
+    private void PushNearbyEnemies()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            transform.position,
+            shockwaveRadius
+        );
+
+        foreach (Collider2D hit in hits)
+        {
+            EnemyController enemy = hit.GetComponentInParent<EnemyController>();
+
+            if (enemy == null)
+                continue;
+
+            Vector2 direction =
+                (enemy.transform.position - transform.position).normalized;
+
+            // Por seguridad, si ambos están exactamente en la misma posición.
+            if (direction.sqrMagnitude < 0.001f)
+                direction = Random.insideUnitCircle.normalized;
+
+            enemy.StartKnockback(
+                direction * shockwaveForce,
+                shockwaveDuration
+            );
+
+            enemy.OnReceiveDamageBounceReset();
+        }
+    }
+
+    private void OnPlayerHit()
+    {
+        PushNearbyEnemies();
+    }
+
+    private void StartInvulnerabilityVisual()
+    {
+        if (playerSprite == null)
+            return;
+
+        if (_invulnerabilityVisualCoroutine != null)
+            StopCoroutine(_invulnerabilityVisualCoroutine);
+
+        _invulnerabilityVisualCoroutine =
+            StartCoroutine(InvulnerabilityVisualRoutine());
+    }
+
+    private System.Collections.IEnumerator InvulnerabilityVisualRoutine()
+    {
+        // Flash blanco inicial
+        playerSprite.color = Color.white;
+        yield return new WaitForSeconds(hitFlashDuration);
+
+        float elapsed = hitFlashDuration;
+        bool transparent = false;
+
+        while (elapsed < damageCooldown)
+        {
+            transparent = !transparent;
+
+            Color color = _originalSpriteColor;
+            color.a = transparent ? blinkAlpha : _originalSpriteColor.a;
+            playerSprite.color = color;
+
+            yield return new WaitForSeconds(blinkInterval);
+            elapsed += blinkInterval;
+        }
+
+        playerSprite.color = _originalSpriteColor;
+        _invulnerabilityVisualCoroutine = null;
     }
 }

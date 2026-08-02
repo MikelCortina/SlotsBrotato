@@ -7478,11 +7478,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 570641634}
+  m_Father: {fileID: 1008812081}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 831, y: -438.00357}
+  m_AnchoredPosition: {x: 565, y: -26}
   m_SizeDelta: {x: 200, y: 36.1591}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &462446324
@@ -9457,11 +9457,9 @@ RectTransform:
   - {fileID: 372318581}
   - {fileID: 480596091}
   - {fileID: 1608442814}
-  - {fileID: 462446323}
   - {fileID: 2010057005}
   - {fileID: 2093354423}
   - {fileID: 1780184506}
-  - {fileID: 1936484098}
   - {fileID: 1826434340}
   - {fileID: 1879076831}
   - {fileID: 809126475}
@@ -13801,6 +13799,13 @@ MonoBehaviour:
   damageCooldown: 0.5
   healthText: {fileID: 462446324}
   gameOverMenu: {fileID: 1242824830}
+  shockwaveRadius: 3
+  shockwaveForce: 8
+  shockwaveDuration: 0.2
+  playerSprite: {fileID: 809848640}
+  blinkInterval: 0.08
+  blinkAlpha: 0.3
+  hitFlashDuration: 0.06
 --- !u!114 &809848644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16755,6 +16760,8 @@ RectTransform:
   - {fileID: 406920908}
   - {fileID: 1323690551}
   - {fileID: 1278293568}
+  - {fileID: 1936484098}
+  - {fileID: 462446323}
   - {fileID: 592220817}
   m_Father: {fileID: 1456000080}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -32876,11 +32883,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 570641634}
+  m_Father: {fileID: 1008812081}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 831, y: -519}
+  m_AnchoredPosition: {x: 551, y: 28}
   m_SizeDelta: {x: 200, y: 36.1591}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1947461220

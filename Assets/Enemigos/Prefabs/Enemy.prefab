@@ -213,6 +213,7 @@ GameObject:
   - component: {fileID: 1132406168940409485}
   - component: {fileID: 4763244687152569090}
   - component: {fileID: 7175976034400577419}
+  - component: {fileID: 1828510591363902687}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -321,6 +322,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetAnimator: {fileID: 1549634066566050112}
   hitTriggerName: Hit
+  resetBounceOnHit: 1
+  groundLockTimeOverride: -1
 --- !u!114 &5704340328708446050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,6 +362,9 @@ MonoBehaviour:
   visualRoot: {fileID: 8735416672367327392}
   idlePortion: 0.35
   movePortion: 0.65
+  hitGroundLockTime: 0.1
+  hitFallSmoothTime: 0.05
+  maxHitFallSpeed: 20
 --- !u!212 &1132406168940409485
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -463,3 +469,39 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &1828510591363902687
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964806071213379794}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.003397614, y: -0.24498518}
+  m_Radius: 0.51097107
