@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections;
 using UnityEngine.EventSystems;
 
 public class PlayerShooter : MonoBehaviour
@@ -42,6 +43,19 @@ public class PlayerShooter : MonoBehaviour
     public float spreadAngle;
     public float singleShotBloomAngle;
     public float bulletSize = 1f;
+
+    [Header("Ammo Runtime")]
+    public bool usesAmmo;
+    public int currentAmmo;
+    public int maxAmmo;
+    public float reloadDuration;
+    public bool autoReloadWhenEmpty;
+
+    private bool _isReloading;
+    private Coroutine _reloadCoroutine;
+
+    public bool IsReloading => _isReloading;
+    public float ReloadDuration => reloadDuration;
 
     [Header("Shell Runtime Stats")]
     public GameObject shellPrefab;
@@ -88,6 +102,14 @@ public class PlayerShooter : MonoBehaviour
     {
         _fireTimer -= Time.deltaTime;
 
+        if (usesAmmo &&
+            !_isReloading &&
+            Input.GetKeyDown(KeyCode.R) &&
+            currentAmmo < maxAmmo)
+        {
+            StartReload();
+        }
+
         bool shootPressed = autoFire
             ? Input.GetMouseButton(0)
             : Input.GetMouseButtonDown(0);
@@ -105,16 +127,42 @@ public class PlayerShooter : MonoBehaviour
             return;
         }
 
-        if (shootPressed && _fireTimer <= 0f)
-        {
-            Shoot();
-            PlayShootSound();
-            LastShootTime = Time.time;
-            OnShoot?.Invoke();
+        if (_isReloading)
+            return;
 
-            float finalFireRate = GetFinalWeaponFireRate();
-            _fireTimer = 1f / Mathf.Max(0.01f, finalFireRate);
+        if (!shootPressed || _fireTimer > 0f)
+            return;
+
+        if (usesAmmo && currentAmmo <= 0)
+        {
+            Debug.Log("Cargador vacío.");
+
+            if (autoReloadWhenEmpty)
+                StartReload();
+
+            return;
         }
+
+        bool shotPerformed = Shoot();
+
+        if (!shotPerformed)
+            return;
+
+        if (usesAmmo)
+        {
+            currentAmmo = Mathf.Max(0, currentAmmo - 1);
+            Debug.Log($"Munición: {currentAmmo}/{maxAmmo}");
+
+            if (currentAmmo <= 0 && autoReloadWhenEmpty)
+                StartReload();
+        }
+
+        PlayShootSound();
+        LastShootTime = Time.time;
+        OnShoot?.Invoke();
+
+        float finalFireRate = GetFinalWeaponFireRate();
+        _fireTimer = 1f / Mathf.Max(0.01f, finalFireRate);
     }
 
     void PlayWeaponParticles(Vector2 shootDir)
@@ -129,6 +177,15 @@ public class PlayerShooter : MonoBehaviour
     {
         if (weapon == null)
             return;
+
+        // Si había una recarga activa, la cancelamos
+        if (_reloadCoroutine != null)
+        {
+            StopCoroutine(_reloadCoroutine);
+            _reloadCoroutine = null;
+        }
+
+        _isReloading = false;
 
         _currentWeapon = weapon;
 
@@ -146,6 +203,28 @@ public class PlayerShooter : MonoBehaviour
         singleShotBloomAngle = weapon.singleShotBloomAngle;
         bulletSize = weapon.bulletSize;
 
+        usesAmmo = weapon.usesAmmo;
+        autoReloadWhenEmpty = weapon.autoReloadWhenEmpty;
+
+        if (usesAmmo)
+        {
+            maxAmmo = WeaponLevelSystem.Instance != null
+                ? WeaponLevelSystem.Instance.GetFinalMagazineSize(weapon)
+                : weapon.magazineSize;
+
+            reloadDuration = WeaponLevelSystem.Instance != null
+                ? WeaponLevelSystem.Instance.GetFinalReloadDuration(weapon)
+                : weapon.reloadDuration;
+
+            currentAmmo = maxAmmo;
+        }
+        else
+        {
+            currentAmmo = 0;
+            maxAmmo = 0;
+            reloadDuration = 0f;
+        }
+
         shellPrefab = weapon.shellPrefab;
         shellsPerShot = weapon.shellsPerShot;
         shellEjectAngle = weapon.shellEjectAngle;
@@ -158,7 +237,6 @@ public class PlayerShooter : MonoBehaviour
 
         EquipWeaponPrefab();
     }
-
     float GetFinalWeaponDamage()
     {
         float finalDamage = damage;
@@ -187,47 +265,56 @@ public class PlayerShooter : MonoBehaviour
         return Mathf.Max(0.01f, finalFireRate);
     }
 
-    void Shoot()
+    bool Shoot()
     {
         if (_currentWeapon == null)
-            return;
+            return false;
 
         if (weaponAim == null)
-            return;
+            return false;
 
         if (!weaponAim.TryGetMouseWorldPosition(out Vector3 mouseWorld))
-            return;
+            return false;
 
         if (_currentWeapon.weaponType != WeaponType.Melee)
         {
             if (bulletPrefab == null || _firePoint == null)
-                return;
+                return false;
         }
 
         Vector2 baseDir;
 
         if (_firePoint != null)
-            baseDir = ((Vector2)(mouseWorld - _firePoint.position)).normalized;
+        {
+            baseDir =
+                ((Vector2)(mouseWorld - _firePoint.position)).normalized;
+        }
         else if (weaponPivot != null)
-            baseDir = ((Vector2)(mouseWorld - weaponPivot.position)).normalized;
+        {
+            baseDir =
+                ((Vector2)(mouseWorld - weaponPivot.position)).normalized;
+        }
         else
-            return;
+        {
+            return false;
+        }
 
         PlayWeaponParticles(baseDir);
 
         if (_currentWeapon.weaponType == WeaponType.Boomerang)
         {
             ShootBoomerang(baseDir);
-            return;
+            return true;
         }
 
         if (_currentWeapon.weaponType == WeaponType.Melee)
         {
             MeleeAttack(baseDir);
-            return;
+            return true;
         }
 
         ShootProjectileWeapon(baseDir);
+        return true;
     }
 
     void ShootProjectileWeapon(Vector2 baseDir)
@@ -486,5 +573,40 @@ public class PlayerShooter : MonoBehaviour
             spawnPos,
             Quaternion.identity
         );
+    }
+
+    public void StartReload()
+    {
+        if (!usesAmmo)
+            return;
+
+        if (_isReloading)
+            return;
+
+        if (currentAmmo >= maxAmmo)
+            return;
+
+        if (_reloadCoroutine != null)
+            StopCoroutine(_reloadCoroutine);
+
+        _reloadCoroutine = StartCoroutine(ReloadRoutine());
+    }
+
+    private IEnumerator ReloadRoutine()
+    {
+        _isReloading = true;
+
+        Debug.Log(
+            $"Recargando {_currentWeapon.weaponName}... " +
+            $"Tiempo: {reloadDuration:0.00}s"
+        );
+
+        yield return new WaitForSeconds(reloadDuration);
+
+        currentAmmo = maxAmmo;
+        _isReloading = false;
+        _reloadCoroutine = null;
+
+        Debug.Log($"Recarga completa: {currentAmmo}/{maxAmmo}");
     }
 }

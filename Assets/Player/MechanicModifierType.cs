@@ -12,4 +12,5 @@ public enum MechanicModifierType
     DoubleShot,
     StunningImpact,
     ChainBoomerang,
+    FifthReel,
 }

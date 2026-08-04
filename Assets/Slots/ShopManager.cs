@@ -12,6 +12,10 @@ public class ShopManager : MonoBehaviour
     [Header("Modifier Offers")]
     public MechanicModifierOfferData[] allModifiers;
 
+    [Header("Debug Offers")]
+    [SerializeField] private bool forceModifierOffer = false;
+    [SerializeField] private MechanicModifierOfferData forcedModifier;
+
     [Header("Weapon Offers")]
     public WeaponSystem weaponSystem;
     public int weaponUpgradeBaseCost = 40;
@@ -76,6 +80,16 @@ public class ShopManager : MonoBehaviour
         if (RunConfig.Instance == null) return;
         if (allSymbols == null || allSymbols.Length == 0) return;
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (forceModifierOffer && forcedModifier != null)
+        {
+            if (offerSlots != null && offerSlots.Length > 0 && offerSlots[0] != null)
+            {
+                offerSlots[0].SetupBuyModifier(forcedModifier);
+            }
+        }
+#endif
+
         List<SlotSymbolData> availableSymbols =
             new List<SlotSymbolData>(allSymbols);
 
@@ -92,7 +106,14 @@ public class ShopManager : MonoBehaviour
 
         bool weaponOfferAlreadyUsed = false;
 
-        for (int i = 0; i < offerSlots.Length; i++)
+        int startIndex = 0;
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (forceModifierOffer && forcedModifier != null)
+            startIndex = 1;
+#endif
+
+        for (int i = startIndex; i < offerSlots.Length; i++)
         {
             if (offerSlots[i] == null) continue;
 
@@ -107,18 +128,39 @@ public class ShopManager : MonoBehaviour
 
                 foreach (var modifier in availableModifiers)
                 {
-                    if (modifier == null) continue;
-                    if (GameManager.Instance != null &&
-    GameManager.Instance.CurrentWave < modifier.unlockWave)
+                    if (modifier == null)
                         continue;
+
+                    if (GameManager.Instance != null &&
+                        GameManager.Instance.CurrentWave < modifier.unlockWave)
+                    {
+                        continue;
+                    }
 
                     if (MechanicModifierManager.Instance != null &&
                         MechanicModifierManager.Instance.HasModifier(modifier.modifier))
+                    {
                         continue;
+                    }
+
+                    // La quinta ruleta solo puede aparecer si ya tenemos la cuarta.
+                    if (modifier.modifier == MechanicModifierType.FifthReel)
+                    {
+                        bool hasFourthReel =
+                            MechanicModifierManager.Instance != null &&
+                            MechanicModifierManager.Instance.HasModifier(
+                                MechanicModifierType.FourthReel
+                            );
+
+                        if (!hasFourthReel)
+                            continue;
+                    }
 
                     if (MechanicModifierManager.Instance != null &&
                         !MechanicModifierManager.Instance.HasFreeSlot())
+                    {
                         continue;
+                    }
 
                     validModifiers.Add(modifier);
                 }

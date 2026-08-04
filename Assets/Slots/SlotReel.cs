@@ -70,14 +70,17 @@ public class SlotReel : MonoBehaviour
 
     public void StartSpin(float stopAfter)
     {
-        if (_spinning) return;
+        if (_spinning)
+            return;
 
         ResetVisualState();
         BuildSymbolPool();
 
         if (currentSymbols == null || currentSymbols.Length == 0)
         {
-            Debug.LogWarning($"[SlotReel] {gameObject.name} no puede girar porque no hay símbolos.");
+            Debug.LogWarning(
+                $"[SlotReel] {gameObject.name} no puede girar porque no hay símbolos."
+            );
             return;
         }
 

@@ -15,6 +15,15 @@ public class SlotMachine : MonoBehaviour
     public GameObject fourthReelObject;
     public TextMeshProUGUI jackpotMessageText;
 
+    [SerializeField] private UnityEngine.UI.Image fourthReelLockImage;
+    [SerializeField] private Sprite fourthReelClosedSprite;
+    [SerializeField] private Sprite fourthReelOpenSprite;
+
+
+    [Header("Fifth Reel")]
+    [SerializeField] private UnityEngine.UI.Image fifthReelLockImage;
+    [SerializeField] private Sprite fifthReelClosedSprite;
+    [SerializeField] private Sprite fifthReelOpenSprite;
     [Header("UI")]
     public SlotReel[] reels;
     public TextMeshProUGUI timerText;
@@ -383,49 +392,65 @@ public class SlotMachine : MonoBehaviour
 
     bool IsJackpot(List<(int reelIndex, SlotSymbolData data)> symbols)
     {
-        if (symbols.Count < 2)
+        if (symbols == null || symbols.Count < 2)
             return false;
 
         bool reducedJackpot =
             MechanicModifierManager.Instance != null &&
             MechanicModifierManager.Instance.HasModifier(
-                MechanicModifierType.ReducedJackpot);
+                MechanicModifierType.ReducedJackpot
+            );
 
-        Dictionary<SlotSymbolType, int> counts = new Dictionary<SlotSymbolType, int>();
+        int requiredMatches = reducedJackpot ? 2 : 3;
+
+        Dictionary<SlotSymbolType, int> counts =
+            new Dictionary<SlotSymbolType, int>();
 
         foreach (var symbol in symbols)
         {
-            if (!counts.ContainsKey(symbol.data.symbolType))
-                counts[symbol.data.symbolType] = 0;
+            if (symbol.data == null)
+                continue;
 
-            counts[symbol.data.symbolType]++;
-        }
+            SlotSymbolType type = symbol.data.symbolType;
 
-        int requiredMatches = reducedJackpot ? 2 : symbols.Count;
+            if (!counts.ContainsKey(type))
+                counts[type] = 0;
 
-        foreach (var pair in counts)
-        {
-            if (pair.Value >= requiredMatches)
+            counts[type]++;
+
+            if (counts[type] >= requiredMatches)
                 return true;
         }
 
         return false;
     }
-
     IEnumerator ResolveAutoSymbolsRoutine()
     {
-        bool jackpotAuto = _autoSymbols.Count > 0 && AreAllSameType(_autoSymbols);
-
         for (int i = 0; i < _autoSymbols.Count; i++)
         {
             var symbol = _autoSymbols[i];
-            int jackpotValue = GetJackpotAmount();
-            int amount = jackpotAuto ? jackpotValue : 1;
 
-            yield return StartCoroutine(ResolveSingleSymbolVisual(symbol, amount));
+            bool isPartOfJackpot =
+                HasJackpotMatch(
+                    _autoSymbols,
+                    symbol.data.symbolType
+                );
 
-            if (i < _autoSymbols.Count - 1 && activationStepDelay > 0f)
-                yield return new WaitForSeconds(activationStepDelay);
+            int amount = isPartOfJackpot
+                ? GetJackpotAmount()
+                : 1;
+
+            yield return StartCoroutine(
+                ResolveSingleSymbolVisual(symbol, amount)
+            );
+
+            if (i < _autoSymbols.Count - 1 &&
+                activationStepDelay > 0f)
+            {
+                yield return new WaitForSeconds(
+                    activationStepDelay
+                );
+            }
         }
 
         _autoSymbols.Clear();
@@ -1118,13 +1143,22 @@ public class SlotMachine : MonoBehaviour
 
     public int GetReelCount()
     {
-        int count = reels.Length;
+        int count = Mathf.Min(3, reels != null ? reels.Length : 0);
 
         if (MechanicModifierManager.Instance != null &&
             MechanicModifierManager.Instance.HasModifier(
-                MechanicModifierType.FourthReel))
+                MechanicModifierType.FourthReel
+            ))
         {
-            count += 1;
+            count++;
+        }
+
+        if (MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(
+                MechanicModifierType.FifthReel
+            ))
+        {
+            count++;
         }
 
         return count;
@@ -1132,12 +1166,29 @@ public class SlotMachine : MonoBehaviour
 
     bool IsReelEnabledByModifier(int index)
     {
+        // Las tres ruletas principales siempre funcionan.
         if (index < 3)
             return true;
 
-        return MechanicModifierManager.Instance != null &&
-               MechanicModifierManager.Instance.HasModifier(
-                   MechanicModifierType.FourthReel);
+        // Índice 3: cuarta ruleta.
+        if (index == 3)
+        {
+            return MechanicModifierManager.Instance != null &&
+                   MechanicModifierManager.Instance.HasModifier(
+                       MechanicModifierType.FourthReel
+                   );
+        }
+
+        // Índice 4: quinta ruleta.
+        if (index == 4)
+        {
+            return MechanicModifierManager.Instance != null &&
+                   MechanicModifierManager.Instance.HasModifier(
+                       MechanicModifierType.FifthReel
+                   );
+        }
+
+        return false;
     }
 
     public void RefreshReelVisibility()
@@ -1145,31 +1196,40 @@ public class SlotMachine : MonoBehaviour
         bool fourthReelActive =
             MechanicModifierManager.Instance != null &&
             MechanicModifierManager.Instance.HasModifier(
-                MechanicModifierType.FourthReel);
+                MechanicModifierType.FourthReel
+            );
 
-        if (fourthReelObject != null)
-            fourthReelObject.SetActive(fourthReelActive);
+        bool fifthReelActive =
+            MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(
+                MechanicModifierType.FifthReel
+            );
 
-        if (reels == null) return;
+        // Solo cambiamos sprites. No desactivamos ningún borde.
+        if (fourthReelLockImage != null)
+        {
+            fourthReelLockImage.sprite = fourthReelActive
+                ? fourthReelOpenSprite
+                : fourthReelClosedSprite;
+        }
 
+        if (fifthReelLockImage != null)
+        {
+            fifthReelLockImage.sprite = fifthReelActive
+                ? fifthReelOpenSprite
+                : fifthReelClosedSprite;
+        }
+
+        if (reels == null)
+            return;
+
+        // Todos permanecen activos para no modificar el layout.
         for (int i = 0; i < reels.Length; i++)
         {
-            if (reels[i] == null) continue;
-
-            if (i < 3)
-            {
+            if (reels[i] != null)
                 reels[i].gameObject.SetActive(true);
-                reels[i].ForceShowLock();
-                continue;
-            }
-
-            reels[i].gameObject.SetActive(fourthReelActive);
-
-            if (fourthReelActive)
-                reels[i].ForceShowLock();
         }
     }
-
     IEnumerator ShowJackpotMessage(string message)
     {
         if (jackpotMessageText == null)
@@ -1191,5 +1251,30 @@ public class SlotMachine : MonoBehaviour
         _charge = Mathf.Min(_charge, chargeTime);
 
         UpdateChargeUI();
+    }
+
+    bool HasJackpotMatch(
+    List<(int reelIndex, SlotSymbolData data)> symbols,
+    SlotSymbolType type)
+    {
+        bool reducedJackpot =
+            MechanicModifierManager.Instance != null &&
+            MechanicModifierManager.Instance.HasModifier(
+                MechanicModifierType.ReducedJackpot
+            );
+
+        int requiredMatches = reducedJackpot ? 2 : 3;
+        int matches = 0;
+
+        foreach (var symbol in symbols)
+        {
+            if (symbol.data != null &&
+                symbol.data.symbolType == type)
+            {
+                matches++;
+            }
+        }
+
+        return matches >= requiredMatches;
     }
 }

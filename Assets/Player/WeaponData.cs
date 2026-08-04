@@ -4,7 +4,10 @@ using UnityEngine;
 public class WeaponData : ScriptableObject
 {
     public string weaponName;
-    [TextArea] public string description;
+
+    [TextArea]
+    public string description;
+
     public Sprite icon;
 
     public WeaponType weaponType;
@@ -26,6 +29,27 @@ public class WeaponData : ScriptableObject
     public float bulletSize = 1f;
     public GameObject bulletPrefab;
 
+    [Header("Ammo / Reload")]
+    public bool usesAmmo = false;
+
+    [Min(1)]
+    public int magazineSize = 30;
+
+    [Min(0.01f)]
+    public float reloadDuration = 2f;
+
+    public bool autoReloadWhenEmpty = true;
+
+    [Header("Ammo Upgrade Scaling")]
+    [Min(0)]
+    public int magazineSizePerLevel = 2;
+
+    [Range(0f, 0.5f)]
+    public float reloadReductionPerLevel = 0.05f;
+
+    [Min(0.1f)]
+    public float minimumReloadDuration = 0.5f;
+
     [Header("Prefab")]
     public GameObject weaponPrefab;
 
@@ -35,7 +59,10 @@ public class WeaponData : ScriptableObject
 
     [Header("Shell Ejection")]
     public GameObject shellPrefab;
-    [Min(0)] public int shellsPerShot = 0;
+
+    [Min(0)]
+    public int shellsPerShot = 0;
+
     public string shellEjectPointName = "ShellEjectPoint";
     public float shellEjectAngle = 120f;
     public float shellEjectAngleRandom = 12f;

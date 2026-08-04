@@ -27,6 +27,10 @@ MonoBehaviour:
   singleShotBloomAngle: 25
   bulletSize: 0.75
   bulletPrefab: {fileID: 2148095309717484689, guid: 30fcd9931e2d43841abe64d8e041ed24, type: 3}
+  usesAmmo: 1
+  magazineSize: 30
+  reloadDuration: 2
+  autoReloadWhenEmpty: 1
   weaponPrefab: {fileID: 1855688961912401076, guid: 116c7012ed8314f43b085b2c963b98a9, type: 3}
   boomerangDistance: 5
   boomerangThrownWeaponSprite: {fileID: 0}

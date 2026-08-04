@@ -61,6 +61,9 @@ public class MechanicModifierManager : MonoBehaviour
             case MechanicModifierType.FourthReel:
                 SlotMachine.Instance?.RefreshReelVisibility();
                 break;
+            case MechanicModifierType.FifthReel:
+                SlotMachine.Instance?.RefreshReelVisibility();
+                break;
         }
     }
 

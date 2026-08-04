@@ -13671,6 +13671,11 @@ MonoBehaviour:
   spreadAngle: 25
   singleShotBloomAngle: 0
   bulletSize: 0
+  usesAmmo: 0
+  currentAmmo: 0
+  maxAmmo: 0
+  reloadDuration: 0
+  autoReloadWhenEmpty: 0
   shellPrefab: {fileID: 0}
   shellsPerShot: 0
   shellEjectAngle: 0
@@ -15576,6 +15581,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 943134629}
   m_CullTransparentMesh: 1
+--- !u!1 &947450883
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 947450884}
+  - component: {fileID: 947450886}
+  - component: {fileID: 947450885}
+  m_Layer: 5
+  m_Name: Fondo (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &947450884
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947450883}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.0000799, y: 1.0000799, z: 1.0000799}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1340027033}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 1, y: 0}
+  m_SizeDelta: {x: 150, y: 150}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &947450885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947450883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.28627452, g: 0.28235295, b: 0.28627452, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -978864876116669545, guid: e70ce17815a279f40b405d41fda304dc, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &947450886
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947450883}
+  m_CullTransparentMesh: 1
 --- !u!1 &949262047
 GameObject:
   m_ObjectHideFlags: 0
@@ -15844,13 +15924,20 @@ MonoBehaviour:
   maxOverloadReserve: 5
   totalSegments: 10
   chargePerCoinSegments: 1
-  fourthReelObject: {fileID: 1465491799}
+  fourthReelObject: {fileID: 1539462050}
   jackpotMessageText: {fileID: 2010057003}
+  fourthReelLockImage: {fileID: 602569829}
+  fourthReelClosedSprite: {fileID: -5478672989048632568, guid: 873397e087fb0fb48a676fa8edd12e20, type: 3}
+  fourthReelOpenSprite: {fileID: -2779026609978692919, guid: b449797803de63040a060b71edf0d8ce, type: 3}
+  fifthReelLockImage: {fileID: 2137633651}
+  fifthReelClosedSprite: {fileID: -5478672989048632568, guid: 873397e087fb0fb48a676fa8edd12e20, type: 3}
+  fifthReelOpenSprite: {fileID: -2779026609978692919, guid: b449797803de63040a060b71edf0d8ce, type: 3}
   reels:
   - {fileID: 958888469}
   - {fileID: 1532927244}
   - {fileID: 1465491801}
   - {fileID: 1539462052}
+  - {fileID: 1340027034}
   timerText: {fileID: 1196354523}
   flashOverlay: {fileID: 1508926457}
   pendingIndicator: {fileID: 0}
@@ -18990,7 +19077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f794f1beb4892540a5c0e52b4cde40b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coins: 100
+  coins: 100000
   coinsText: {fileID: 2093354424}
   shopCoinsText: {fileID: 1804796224}
 --- !u!4 &1205018490
@@ -21732,6 +21819,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 947450884}
   - {fileID: 1141618089}
   - {fileID: 964181639}
   - {fileID: 494254790}
@@ -24435,8 +24523,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentSymbols: []
   displayImage: {fileID: 1109251892}
-  topBlur: {fileID: 0}
-  botBlur: {fileID: 0}
+  topBlur: {fileID: 1032405936}
+  botBlur: {fileID: 1340830918}
   symbolLevelText: {fileID: 1597364537}
   lockObject: {fileID: 0}
   fastScrollInterval: 0.055
@@ -32000,6 +32088,18 @@ MonoBehaviour:
     description: El boomerang rebota entre hasta 2 enemigos adicionales antes de
       regresar.
     cost: 90
+    unlockWave: 1
+  - modifier: 12
+    displayName: ' 5 Ruleta'
+    description: "A\xF1ade una quinta ruleta a la slot."
+    cost: 90
+    unlockWave: 1
+  forceModifierOffer: 0
+  forcedModifier:
+    modifier: 3
+    displayName: 
+    description: 
+    cost: 50
     unlockWave: 1
   weaponSystem: {fileID: 809848647}
   weaponUpgradeBaseCost: 40
