@@ -609,4 +609,33 @@ public class PlayerShooter : MonoBehaviour
 
         Debug.Log($"Recarga completa: {currentAmmo}/{maxAmmo}");
     }
+
+    public void RefreshWeaponLevelStats()
+    {
+        if (_currentWeapon == null)
+            return;
+
+        int previousMaxAmmo = maxAmmo;
+
+        if (WeaponLevelSystem.Instance != null)
+        {
+            maxAmmo = WeaponLevelSystem.Instance.GetFinalMagazineSize(_currentWeapon);
+            reloadDuration = WeaponLevelSystem.Instance.GetFinalReloadDuration(_currentWeapon);
+        }
+        else
+        {
+            maxAmmo = _currentWeapon.magazineSize;
+            reloadDuration = _currentWeapon.reloadDuration;
+        }
+
+        if (usesAmmo)
+        {
+            int ammoIncrease = maxAmmo - previousMaxAmmo;
+
+            if (ammoIncrease > 0)
+                currentAmmo += ammoIncrease;
+
+            currentAmmo = Mathf.Clamp(currentAmmo, 0, maxAmmo);
+        }
+    }
 }

@@ -95,6 +95,13 @@ public class ShopOfferUI : MonoBehaviour
                 return;
 
             WeaponLevelSystem.Instance.UpgradeWeapon(_weapon);
+            PlayerShooter shooter = FindFirstObjectByType<PlayerShooter>();
+
+            if (shooter != null &&
+                shooter.GetCurrentWeapon() == _weapon)
+            {
+                shooter.RefreshWeaponLevelStats();
+            }
         }
         else if (_offerType == ShopOfferType.BuyModifier)
         {
