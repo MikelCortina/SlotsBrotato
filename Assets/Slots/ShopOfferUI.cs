@@ -165,38 +165,93 @@ public class ShopOfferUI : MonoBehaviour
 
             return;
         }
-
         if (_offerType == ShopOfferType.UpgradeWeapon)
         {
             if (iconImage && _weapon != null)
                 iconImage.sprite = _weapon.icon;
 
-            if (titleText && _weapon != null)
-            {
-                int level = WeaponLevelSystem.Instance != null
-                    ? WeaponLevelSystem.Instance.GetWeaponLevel(_weapon)
-                    : 1;
+            if (_weapon == null)
+                return;
 
-                titleText.text = $"Mejorar {_weapon.weaponName} Lv.{level}";
+            int currentLevel = WeaponLevelSystem.Instance != null
+                ? WeaponLevelSystem.Instance.GetWeaponLevel(_weapon)
+                : 1;
+
+            int nextLevel = currentLevel + 1;
+
+            float currentDamageMultiplier =
+                1f + ((currentLevel - 1) * 0.2f);
+
+            float nextDamageMultiplier =
+                1f + ((nextLevel - 1) * 0.2f);
+
+            float currentDamage =
+                _weapon.damage * currentDamageMultiplier;
+
+            float nextDamage =
+                _weapon.damage * nextDamageMultiplier;
+
+            if (titleText)
+            {
+                titleText.text =
+                    $"Mejorar {_weapon.weaponName} " +
+                    $"Lv.{currentLevel} → Lv.{nextLevel}";
             }
 
-            if (descriptionText && _weapon != null)
+            if (descriptionText)
             {
-                int level = WeaponLevelSystem.Instance != null
-                    ? WeaponLevelSystem.Instance.GetWeaponLevel(_weapon)
-                    : 1;
+                string description =
+                    $"Daño:\n" +
+                    $"{currentDamage:0.0} → {nextDamage:0.0}";
 
-                float currentMultiplier = WeaponLevelSystem.Instance != null
-                    ? WeaponLevelSystem.Instance.GetWeaponScalingMultiplier(_weapon)
-                    : 1f;
+                if (_weapon.usesAmmo)
+                {
+                    int currentMagazine =
+                        _weapon.magazineSize +
+                        (currentLevel - 1) *
+                        _weapon.magazineSizePerLevel;
 
-                float nextMultiplier = 1f + level * 0.2f;
+                    int nextMagazine =
+                        _weapon.magazineSize +
+                        (nextLevel - 1) *
+                        _weapon.magazineSizePerLevel;
 
-                descriptionText.text =
-                    $"Mejora el escalado del arma.\n\n" +
-                    $"Mejora: Lv.{level} → Lv.{level + 1}\n" +
-                    $"Escalado actual: x{currentMultiplier:0.0}\n" +
-                    $"Nuevo escalado: x{nextMultiplier:0.0}";
+                    float currentReloadMultiplier = Mathf.Pow(
+                        1f - _weapon.reloadReductionPerLevel,
+                        currentLevel - 1
+                    );
+
+                    float nextReloadMultiplier = Mathf.Pow(
+                        1f - _weapon.reloadReductionPerLevel,
+                        nextLevel - 1
+                    );
+
+                    float currentReload = Mathf.Max(
+                        _weapon.minimumReloadDuration,
+                        _weapon.reloadDuration *
+                        currentReloadMultiplier
+                    );
+
+                    float nextReload = Mathf.Max(
+                        _weapon.minimumReloadDuration,
+                        _weapon.reloadDuration *
+                        nextReloadMultiplier
+                    );
+
+                    description +=
+                        $"\n\nCargador:\n" +
+                        $"{currentMagazine} → {nextMagazine}" +
+                        $"\n\nRecarga:\n" +
+                        $"{currentReload:0.00}s → " +
+                        $"{nextReload:0.00}s";
+                }
+                else
+                {
+                    description +=
+                        "\n\nEsta arma no utiliza munición.";
+                }
+
+                descriptionText.text = description;
             }
 
             if (costText)
@@ -204,7 +259,6 @@ public class ShopOfferUI : MonoBehaviour
 
             return;
         }
-
         if (iconImage && _symbol)
             iconImage.sprite = _symbol.icon;
 
