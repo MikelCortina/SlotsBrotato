@@ -21,8 +21,11 @@ public class EnemyComboChargeReporter : MonoBehaviour
         if (_health != null)
             _health.OnDamaged -= HandleDamaged;
     }
-
-    private void HandleDamaged(float amount, float currentHp)
+    private void HandleDamaged(
+        float amount,
+        float currentHp,
+        bool isCritical
+    )
     {
        // SlotMachine.Instance?.OnEnemyDamaged(amount);
     }

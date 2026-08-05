@@ -378,8 +378,45 @@ public class PlayerShooter : MonoBehaviour
             if (bullet == null)
                 continue;
 
-            float finalDamage = GetFinalWeaponDamage();
-            bullet.Init(dir, bulletSpeed, finalDamage, bulletRange, bulletSize);
+            DamageResult result;
+
+            if (_stats != null)
+            {
+                result = _stats.CalculateDamage(
+                    damage,
+                    damageScalingFactor,
+                    true
+                );
+            }
+            else
+            {
+                result = new DamageResult(
+                    damage,
+                    false
+                );
+            }
+
+            if (WeaponLevelSystem.Instance != null &&
+                _currentWeapon != null)
+            {
+                float weaponMultiplier =
+                    WeaponLevelSystem.Instance
+                        .GetWeaponScalingMultiplier(_currentWeapon);
+
+                result = new DamageResult(
+                    result.Damage * weaponMultiplier,
+                    result.IsCritical
+                );
+            }
+
+            bullet.Init(
+                dir,
+                bulletSpeed,
+                result.Damage,
+                bulletRange,
+                bulletSize,
+                result.IsCritical
+            );
         }
 
         EjectShells(baseDir);

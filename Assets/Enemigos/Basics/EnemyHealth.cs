@@ -18,8 +18,12 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private Animator visualAnimator;
     [SerializeField] private string deathTrigger = "Die";
 
-    public event Action<float, float> OnDamaged;
-    public event Action<Vector2, DamageSource, float, float> OnDamagedFrom;
+    // amount, currentHp, isCritical
+    public event Action<float, float, bool> OnDamaged;
+
+    // hitFromPosition, source, amount, currentHp, isCritical
+    public event Action<Vector2, DamageSource, float, float, bool> OnDamagedFrom;
+
     public event Action OnDeath;
 
     private float _hp;
@@ -54,17 +58,53 @@ public class EnemyHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        TakeDamage(amount, transform.position, DamageSource.Unknown);
+        TakeDamage(
+            amount,
+            transform.position,
+            DamageSource.Unknown,
+            false
+        );
     }
 
-    public void TakeDamage(float amount, Vector2 hitFromPosition, DamageSource source)
+    public void TakeDamage(
+        float amount,
+        Vector2 hitFromPosition,
+        DamageSource source
+    )
     {
-        if (_isDead || _hp <= 0f) return;
+        TakeDamage(
+            amount,
+            hitFromPosition,
+            source,
+            false
+        );
+    }
+
+    public void TakeDamage(
+        float amount,
+        Vector2 hitFromPosition,
+        DamageSource source,
+        bool isCritical
+    )
+    {
+        if (_isDead || _hp <= 0f)
+            return;
 
         _hp = Mathf.Max(0f, _hp - amount);
 
-        OnDamaged?.Invoke(amount, _hp);
-        OnDamagedFrom?.Invoke(hitFromPosition, source, amount, _hp);
+        OnDamaged?.Invoke(
+            amount,
+            _hp,
+            isCritical
+        );
+
+        OnDamagedFrom?.Invoke(
+            hitFromPosition,
+            source,
+            amount,
+            _hp,
+            isCritical
+        );
 
         if (_hp <= 0f)
             Die();
@@ -72,7 +112,9 @@ public class EnemyHealth : MonoBehaviour
 
     private void Die()
     {
-        if (_isDead) return;
+        if (_isDead)
+            return;
+
         _isDead = true;
 
         OnDeath?.Invoke();
@@ -80,7 +122,7 @@ public class EnemyHealth : MonoBehaviour
         if (visualAnimator != null)
             visualAnimator.SetTrigger(deathTrigger);
 
-        foreach (var col in GetComponentsInChildren<Collider2D>())
+        foreach (Collider2D col in GetComponentsInChildren<Collider2D>())
             col.enabled = false;
     }
 

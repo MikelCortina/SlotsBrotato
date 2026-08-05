@@ -48,7 +48,11 @@ public class EnemyHitFlash : MonoBehaviour
         ResetFlash();
     }
 
-    private void HandleDamaged(float amount, float currentHp)
+    private void HandleDamaged(
+        float amount,
+        float currentHp,
+        bool isCritical
+    )
     {
         if (targetSpriteRenderer == null)
         {

@@ -28,14 +28,27 @@ public class EnemyDamagePopupSpawner : MonoBehaviour
             _health.OnDamaged -= HandleDamaged;
     }
 
-    private void HandleDamaged(float amount, float currentHp)
+    private void HandleDamaged(float amount, float currentHp, bool isCritical)
     {
-        if (popupPrefab == null) return;
+        if (popupPrefab == null)
+            return;
 
         Vector3 pos = transform.position + popupOffset;
-        pos.x += Random.Range(-randomHorizontalOffset, randomHorizontalOffset);
+        pos.x += Random.Range(
+            -randomHorizontalOffset,
+            randomHorizontalOffset
+        );
 
-        DamagePopup popup = Instantiate(popupPrefab, pos, Quaternion.identity);
-        popup.Show(Mathf.RoundToInt(amount));
+        DamagePopup popup =
+            Instantiate(
+                popupPrefab,
+                pos,
+                Quaternion.identity
+            );
+
+        popup.Show(
+            Mathf.RoundToInt(amount),
+            isCritical
+        );
     }
 }

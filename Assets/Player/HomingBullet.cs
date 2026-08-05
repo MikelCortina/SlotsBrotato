@@ -5,6 +5,7 @@ public class Bullet : MonoBehaviour
     [Header("Stats")]
     public float speed = 12f;
     public float damage = 25f;
+    public bool isCritical;
     public float maxLifetime = 4f;
     public float maxDistance = 8f;
 
@@ -40,7 +41,14 @@ public class Bullet : MonoBehaviour
             _baseTrailWidth = _trailRenderer.widthMultiplier;
     }
 
-    public void Init(Vector2 dir, float spd, float dmg, float distance, float sizeMultiplier)
+    public void Init(
+        Vector2 dir,
+        float spd,
+        float dmg,
+        float distance,
+        float sizeMultiplier,
+        bool critical
+    )
     {
         _direction = dir.normalized;
 
@@ -48,13 +56,18 @@ public class Bullet : MonoBehaviour
         _baseSpeed = spd;
         damage = dmg;
         maxDistance = distance;
+        isCritical = critical;
 
-        transform.localScale = _originalPrefabScale * sizeMultiplier;
+        transform.localScale =
+            _originalPrefabScale * sizeMultiplier;
+
         _initialScale = transform.localScale;
 
         if (_trailRenderer != null)
         {
-            _trailRenderer.widthMultiplier = _baseTrailWidth * sizeMultiplier;
+            _trailRenderer.widthMultiplier =
+                _baseTrailWidth * sizeMultiplier;
+
             _trailRenderer.Clear();
         }
 
@@ -148,7 +161,12 @@ public class Bullet : MonoBehaviour
 
         _hasHit = true;
 
-        health.TakeDamage(damage, transform.position, DamageSource.Bullet);
+        health.TakeDamage(
+            damage,
+            transform.position,
+            DamageSource.Bullet,
+            isCritical
+        );
 
         if (MechanicModifierManager.Instance != null &&
             MechanicModifierManager.Instance.HasModifier(MechanicModifierType.StunningImpact))

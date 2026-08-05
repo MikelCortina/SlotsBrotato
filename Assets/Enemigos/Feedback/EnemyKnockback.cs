@@ -29,7 +29,13 @@ public class EnemyKnockback : MonoBehaviour
             _health.OnDamagedFrom -= HandleDamagedFrom;
     }
 
-    private void HandleDamagedFrom(Vector2 hitFromPosition, DamageSource source, float amount, float currentHp)
+    private void HandleDamagedFrom(
+        Vector2 hitFromPosition,
+        DamageSource source,
+        float amount,
+        float currentHp,
+        bool isCritical
+    )
     {
         if (source != DamageSource.Bullet) return;
         Play(hitFromPosition);
